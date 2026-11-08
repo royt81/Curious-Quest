@@ -52,4 +52,6 @@ and edited by hand. Some icons and colouring outlines are licensed from Flaticon
 
 ## Licence
 
-© Roy Tate. All rights reserved. The source code is public for portfolio purposes.
+The **source code** is released under the [MIT License](LICENSE).
+The **artwork** (characters, Memory pictures, boards, backgrounds, logo) and the licensed Flaticon icons
+are **not** covered by the MIT License and may not be reused without permission.
