@@ -1,0 +1,128 @@
+@import '../../components/shared.css';
+
+.domino-play {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  max-width: 720px;
+}
+
+.domino-info {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  font-weight: 600;
+}
+
+/* ── played line ──────────────────────────────────────────────────────── */
+.domino-line-wrap {
+  width: 100%;
+  overflow-x: auto;
+  padding: 12px 10px;
+  border-radius: var(--r-lg);
+  background:
+    radial-gradient(circle at 50% 0%, var(--accent-tint), transparent 60%),
+    var(--surface-0);
+  border: 2px solid var(--accent-border);
+  box-shadow: var(--shadow-card);
+  min-height: 96px;
+  /* nicer, slimmer scrollbar (only shows if tiles hit the minimum size) */
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-border) transparent;
+}
+.domino-line-wrap::-webkit-scrollbar { height: 8px; }
+.domino-line-wrap::-webkit-scrollbar-track { background: transparent; }
+.domino-line-wrap::-webkit-scrollbar-thumb {
+  background: var(--accent-border);
+  border-radius: 99px;
+}
+.domino-line-wrap::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+.domino-line {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  min-height: 64px;
+  justify-content: center;
+  width: max-content;
+  margin: 0 auto;
+}
+.domino-empty {
+  color: var(--text-faint);
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 18px 24px;
+  white-space: nowrap;
+}
+
+/* ── domino tile ──────────────────────────────────────────────────────── */
+.domino-tile {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  overflow: visible;
+  flex-shrink: 0;
+  /* smoothly grow/shrink when the board auto-resizes */
+  transition: width 0.32s cubic-bezier(0.25, 0.1, 0.25, 1),
+              height 0.32s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+.domino-img {
+  display: block;
+  object-fit: contain;
+  user-select: none;
+  -webkit-user-drag: none;
+  transition: width 0.32s cubic-bezier(0.25, 0.1, 0.25, 1),
+              height 0.32s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+/* Tile + image dimensions are set inline from the JS `unit` (so the played
+   line can auto-fit). Here we only fix the flow direction. */
+.domino-tile.horizontal { flex-direction: row; }
+.domino-tile.vertical   { flex-direction: column; }
+
+.domino-tile.placed {
+  background: transparent;
+}
+
+.domino-tile.hand-tile { cursor: pointer; }
+.domino-tile.hand-tile.playable .domino-img {
+  filter: drop-shadow(0 0 3px var(--accent)) drop-shadow(0 0 1px var(--accent));
+}
+.domino-tile.hand-tile.dim {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* ── hand ─────────────────────────────────────────────────────────────── */
+.domino-hand-label {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.domino-hand {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  max-width: 100%;
+}
+
+/* ── end picker ───────────────────────────────────────────────────────── */
+.end-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--text);
+}

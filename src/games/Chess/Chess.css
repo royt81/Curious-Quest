@@ -1,0 +1,235 @@
+@import '../../components/shared.css';
+
+.chess-screen {
+  flex-direction: row;
+  padding: 0;
+  gap: 0;
+  align-items: stretch;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+/* ── Side panel ── */
+.cs-side {
+  width: 180px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 12px;
+  background: rgba(0, 0, 0, 0.30);
+  border-right: 1px solid var(--border-soft);
+  overflow-y: auto;
+}
+.cs-side-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--accent);
+  text-align: center;
+}
+.cs-players {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.cs-player {
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 6px 10px;
+  border-radius: var(--r-sm);
+  background: var(--surface-1);
+  border: 2px solid transparent;
+  color: var(--text);
+}
+.cs-player.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+.cs-turn {
+  font-size: 0.82rem;
+  padding: 7px 10px;
+  text-align: center;
+  white-space: normal;
+  line-height: 1.3;
+}
+.cs-turn.check-alert {
+  background: rgba(255, 70, 70, 0.22);
+  border-color: #ff5252;
+  color: #ff8a8a;
+  font-weight: 800;
+  animation: cs-check-pulse 0.9s ease-in-out infinite;
+}
+@keyframes cs-check-pulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(255,82,82,0.4); }
+  50%      { box-shadow: 0 0 18px rgba(255,82,82,0.85); }
+}
+.cs-gameover-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.cs-gameover-btns .btn { width: 100%; }
+
+/* ── Board area ── */
+.cs-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.chess-play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.chess-board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  height: 100%;
+  width: auto;
+  aspect-ratio: 1 / 1;
+  max-width: 100%;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 4px solid var(--accent-border);
+  box-shadow: var(--shadow-panel);
+  background: transparent;
+  isolation: isolate;
+}
+
+.cs-square {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+.cs-square.light {
+  background: rgba(240, 208, 160, 0.2);
+}
+.cs-square.dark {
+  background: rgba(80, 30, 5, 0.2);
+}
+.cs-square.dest,
+.cs-square.light,
+.cs-square.dark { cursor: pointer; }
+
+.cs-square.selected::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: var(--r-sm);
+  box-shadow: inset 0 0 0 3px var(--accent);
+  pointer-events: none;
+}
+.cs-square.in-check::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, rgba(255,60,60,0.55), rgba(255,60,60,0) 70%);
+  pointer-events: none;
+  animation: cs-check-pulse 0.9s ease-in-out infinite;
+}
+
+.cs-dot {
+  position: absolute;
+  width: 28%;
+  height: 28%;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.5;
+  box-shadow: 0 0 12px var(--accent-glow);
+  animation: cs-pulse 1.4s ease-in-out infinite;
+  pointer-events: none;
+}
+/* capture target → ring instead of dot */
+.cs-dot.capture {
+  width: 84%;
+  height: 84%;
+  background: transparent;
+  border: 4px solid var(--accent);
+  opacity: 0.6;
+  box-shadow: 0 0 12px var(--accent-glow);
+}
+@keyframes cs-pulse {
+  0%, 100% { transform: scale(0.85); opacity: 0.4; }
+  50%      { transform: scale(1.1);  opacity: 0.7; }
+}
+
+.cs-piece {
+  position: relative;
+  width: 80%;
+  height: 80%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  pointer-events: none;
+  z-index: 1;
+}
+.cs-piece-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  -webkit-user-drag: none;
+  user-select: none;
+}
+.cs-piece.white .cs-piece-img {
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.45));
+}
+.cs-piece.black .cs-piece-img {
+  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.55));
+}
+
+/* ── Setup screen ── */
+.cs-setup {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 14px; text-align: center;
+  background: var(--surface-0); border-radius: var(--r-xl);
+  padding: 28px 32px 24px; border: 2px solid var(--accent-border);
+  box-shadow: var(--shadow-panel); max-width: 440px; width: 100%;
+}
+.cs-setup-title {
+  font-family: var(--font-display); font-size: 1.5rem; font-weight: 800;
+  color: var(--accent);
+}
+.cs-setup-label {
+  font-family: var(--font-display); font-size: 0.72rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 1.3px; color: var(--text-faint);
+}
+.cs-mode-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.cs-mode-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 14px 20px; border-radius: var(--r-md); min-width: 140px;
+  background: var(--surface-1); border: 2px solid var(--border-soft);
+  cursor: pointer; transition: border-color 0.15s, background 0.15s; color: var(--text);
+}
+.cs-mode-btn.selected { border-color: var(--accent); background: var(--accent-soft); }
+.cs-mode-icon { font-size: 1.9rem; }
+.cs-mode-name { font-family: var(--font-display); font-weight: 700; font-size: 1rem; }
+.cs-mode-desc { font-size: 0.75rem; color: var(--text-faint); }
+.cs-start-btn { font-size: 1.05rem; padding: 11px 32px; }
+.cs-back-setup-btn { font-size: 0.9rem; }
+
+/* ── Clarity pass (Nov 2026): solid wooden board so squares are easy to see ── */
+.chess-board {
+  border: 8px solid #6b4226;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45), inset 0 0 0 1px #24150c;
+}
+.cs-square.light { background: #f0d9b5; }
+.cs-square.dark  { background: #b58863; }
+.cs-dot { background: #2f9e44; opacity: 0.7; box-shadow: 0 0 10px rgba(47,158,68,0.6); }
+.cs-dot.capture { background: transparent; border-color: #e03131; box-shadow: 0 0 10px rgba(224,49,49,0.6); }
+.cs-square.selected::after { box-shadow: inset 0 0 0 4px #ffd43b; }
+.cs-piece.black .cs-piece-img {
+  filter: drop-shadow(0 0 1px rgba(255,255,255,0.9)) drop-shadow(0 2px 3px rgba(0,0,0,0.5));
+}

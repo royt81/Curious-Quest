@@ -1,0 +1,265 @@
+@import '../../components/shared.css';
+
+.checkers-screen {
+  flex-direction: row;
+  padding: 0;
+  gap: 0;
+  align-items: stretch;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+/* ── Side panel ── */
+.ck-side {
+  width: 180px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 12px;
+  background: rgba(0, 0, 0, 0.30);
+  border-right: 1px solid var(--border-soft);
+  overflow-y: auto;
+}
+.ck-side-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--accent);
+  text-align: center;
+}
+.ck-turn {
+  font-size: 0.82rem;
+  padding: 7px 10px;
+  text-align: center;
+  white-space: normal;
+  line-height: 1.3;
+}
+.ck-gameover-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ck-gameover-btns .btn { width: 100%; }
+
+/* ── Board area ── */
+.ck-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+}
+
+.checkers-play {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  width: 100%;
+}
+
+.checkers-board {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  /* Fill available height; width follows aspect-ratio */
+  height: 100%;
+  width: auto;
+  aspect-ratio: 1 / 1;
+  max-width: 100%;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 4px solid var(--accent-border);
+  box-shadow: var(--shadow-panel);
+  background: transparent;
+  isolation: isolate;
+}
+
+.ck-square {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+}
+.ck-square.light {
+  background: rgba(240, 208, 160, 0.2);
+}
+.ck-square.dark {
+  background: rgba(80, 30, 5, 0.2);
+  cursor: pointer;
+}
+.ck-square.dest {
+  cursor: pointer;
+}
+.ck-square.selected::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: var(--r-sm);
+  box-shadow: inset 0 0 0 3px var(--accent);
+  pointer-events: none;
+}
+
+.ck-dot {
+  position: absolute;
+  width: 28%;
+  height: 28%;
+  border-radius: 50%;
+  background: var(--accent);
+  opacity: 0.55;
+  box-shadow: 0 0 12px var(--accent-glow);
+  animation: ck-pulse 1.4s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes ck-pulse {
+  0%, 100% { transform: scale(0.85); opacity: 0.45; }
+  50%      { transform: scale(1.1);  opacity: 0.75; }
+}
+
+.ck-piece {
+  position: relative;
+  width: 80%;
+  height: 80%;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 -4px 8px rgba(0,0,0,0.3), inset 0 3px 6px rgba(255,255,255,0.35);
+}
+.ck-piece.human {
+  background: radial-gradient(circle at 35% 30%, #ff6a3d, #c0392b);
+  border: 3px solid #8b1a0a;
+}
+.ck-piece.comp {
+  background: radial-gradient(circle at 35% 30%, #ffffff, #ccd0d9);
+  border: 3px solid #7a8090;
+}
+.ck-piece.king {
+  box-shadow: var(--shadow-pop), inset 0 -4px 8px rgba(0,0,0,0.3), 0 0 0 3px gold;
+}
+/* Chain-jump piece — must keep capturing */
+.ck-square.chain::after {
+  content: '';
+  position: absolute;
+  inset: 2px;
+  border-radius: var(--r-sm);
+  box-shadow: inset 0 0 0 3px #ff6b35, 0 0 14px rgba(255,107,53,0.7);
+  pointer-events: none;
+  animation: ck-chain-ring 0.9s ease-in-out infinite;
+}
+@keyframes ck-chain-ring {
+  0%, 100% { box-shadow: inset 0 0 0 3px #ff6b35, 0 0 10px rgba(255,107,53,0.5); }
+  50%       { box-shadow: inset 0 0 0 4px #ff8c55, 0 0 22px rgba(255,107,53,0.9); }
+}
+.ck-piece.chain {
+  animation: ck-chain-bounce 0.7s ease-in-out infinite;
+}
+@keyframes ck-chain-bounce {
+  0%, 100% { transform: scale(1);    }
+  50%       { transform: scale(1.12); }
+}
+/* Chain-jump sidebar banner */
+.ck-turn.chain-alert {
+  background: rgba(255, 107, 53, 0.22);
+  border-color: #ff6b35;
+  color: #ff8c55;
+  font-weight: 800;
+  animation: ck-chain-ring 0.9s ease-in-out infinite;
+}
+
+.ck-crown {
+  font-size: 1.1rem;
+  line-height: 1;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.5));
+}
+
+@media (max-width: 520px) {
+  .ck-crown { font-size: 0.85rem; }
+}
+
+/* ── Setup screen ─────────────────────────────────────────────────────────── */
+.ck-setup {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 14px; text-align: center;
+  background: var(--surface-0); border-radius: var(--r-xl);
+  padding: 28px 32px 24px; border: 2px solid var(--accent-border);
+  box-shadow: var(--shadow-panel); max-width: 440px; width: 100%;
+}
+.ck-setup-title {
+  font-family: var(--font-display); font-size: 1.5rem; font-weight: 800;
+  color: var(--accent);
+}
+.ck-setup-label {
+  font-family: var(--font-display); font-size: 0.72rem; font-weight: 800;
+  text-transform: uppercase; letter-spacing: 1.3px; color: var(--text-faint);
+}
+.ck-mode-btns { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; }
+.ck-mode-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 14px 20px; border-radius: var(--r-md); min-width: 140px;
+  background: var(--surface-1); border: 2px solid var(--border-soft);
+  cursor: pointer; transition: border-color 0.15s, background 0.15s; color: var(--text);
+}
+.ck-mode-btn.selected { border-color: var(--accent); background: var(--accent-soft); }
+.ck-mode-icon { font-size: 1.9rem; }
+.ck-mode-name { font-family: var(--font-display); font-weight: 700; font-size: 1rem; }
+.ck-mode-desc { font-size: 0.75rem; color: var(--text-faint); }
+.ck-start-btn { font-size: 1.05rem; padding: 11px 32px; }
+.ck-back-setup-btn { font-size: 0.9rem; }
+
+/* ── Clarity pass (Nov 2026): solid wooden board, visible king ring ── */
+.checkers-board {
+  border: 8px solid #6b4226;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45), inset 0 0 0 1px #24150c;
+}
+.ck-square.light { background: #f0d9b5; }
+.ck-square.dark  { background: #8b5a3c; }
+.ck-dot { background: #7ee787; opacity: 0.8; box-shadow: 0 0 10px rgba(126,231,135,0.7); }
+.ck-square.selected::after { box-shadow: inset 0 0 0 4px #ffd43b; }
+/* --shadow-pop was never defined, so the gold king ring silently didn't render */
+.ck-piece.king {
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5), inset 0 -4px 8px rgba(0,0,0,0.3), 0 0 0 3px gold;
+}
+
+/* ── Slightly see-through board (Nov 5) ── */
+.checkers-board {
+  border-color: rgba(107, 66, 38, 0.85);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.ck-square.light { background: rgba(240, 217, 181, 0.62); }
+.ck-square.dark  { background: rgba(139, 90, 60, 0.68); }
+
+/* ── Theme pieces (Nov 6): a coin with the world's character on it ── */
+.ck-piece { overflow: visible; }
+.ck-piece.human {
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--piece-color, #ffc83d) 70%, #fff), var(--piece-color, #ffc83d));
+  border: 3px solid #fff;
+  outline: 2px solid rgba(0,0,0,0.55);
+}
+.ck-piece.comp {
+  background: radial-gradient(circle at 35% 30%, #ffffff, #d9d4c7);
+  border: 3px solid #4a4540;
+  outline: 2px solid rgba(0,0,0,0.35);
+}
+.ck-face {
+  width: 72%;
+  height: 72%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+  filter: drop-shadow(0 1px 1px rgba(0,0,0,0.35));
+}
+.ck-crown {
+  position: absolute;
+  top: -32%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 1.15rem;
+}
+.ck-score-face { width: 1.4em; height: 1.4em; vertical-align: middle; object-fit: contain; }

@@ -1,0 +1,278 @@
+/* ─── Draw & Paint ───────────────────────────────────────────────────────── */
+.draw-screen { gap: 10px; }
+.draw-save-btn { font-size: 0.95rem; padding: 9px 18px; white-space: nowrap; }
+
+/* ── page picker ── */
+.draw-picker {
+  flex: 1; min-height: 0; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 14px;
+  padding: 4px 6px 24px;
+}
+.draw-blank-card {
+  align-self: center;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  width: min(100%, 360px);
+  padding: 18px 20px;
+  border-radius: var(--r-xl);
+  background: #fff;
+  border: 4px dashed var(--accent);
+  color: #1d1d1f;
+  cursor: pointer;
+  box-shadow: var(--shadow-md);
+}
+.draw-blank-icon { font-size: 2.6rem; }
+.draw-card-title { font-family: var(--font-display); font-size: 1.4rem; font-weight: 700; }
+.draw-card-sub { font-size: 0.9rem; color: #555; }
+.draw-picker-heading {
+  font-family: var(--font-display); color: var(--accent);
+  font-size: 1.25rem; text-align: center; margin-top: 4px;
+}
+.draw-picker-world { display: flex; flex-direction: column; gap: 6px; }
+.draw-picker-world-name {
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--font-display); font-weight: 700; color: var(--text);
+}
+.draw-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(118px, 1fr));
+  gap: 10px;
+}
+.draw-page-card {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 10px 6px 8px;
+  border-radius: var(--r-md);
+  background: #fffdf7;
+  border: 3px solid transparent;
+  color: #1d1d1f;
+  font-family: var(--font-display); font-weight: 700; font-size: 0.85rem;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+.draw-page-card:hover { border-color: var(--accent); }
+.draw-page-card img { width: 72px; height: 72px; object-fit: contain; }
+
+/* ── workspace: tools | stage, options underneath ── */
+.draw-work {
+  flex: 1; min-height: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-rows: 1fr auto;
+  grid-template-areas: "tools stage" "tools options";
+  gap: 10px;
+}
+.draw-tools {
+  grid-area: tools;
+  display: flex; flex-direction: column; gap: 6px;
+  padding: 8px;
+  background: var(--surface-0);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+  overflow-y: auto;
+}
+.draw-tool {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  width: 72px; padding: 8px 4px;
+  border-radius: var(--r-md);
+  background: var(--surface-1);
+  border: 3px solid transparent;
+  color: var(--text);
+  cursor: pointer;
+  font-family: var(--font-display); font-weight: 700; font-size: 0.75rem;
+  transition: transform 0.12s, border-color 0.12s, background 0.12s;
+}
+.draw-tool:hover:not(:disabled) { transform: translateY(-2px); }
+.draw-tool.active { border-color: var(--accent); background: var(--accent-soft); }
+.draw-tool:disabled { opacity: 0.35; cursor: default; }
+.draw-tool-icon { font-size: 1.7rem; line-height: 1.1; }
+.draw-tools-sep { height: 1px; background: var(--border-soft); margin: 4px 0; flex-shrink: 0; }
+
+.draw-stage-wrap {
+  grid-area: stage;
+  min-width: 0; min-height: 0;
+  container-type: size;
+  display: flex; align-items: center; justify-content: center;
+}
+.draw-stage {
+  position: relative;
+  width: min(100cqw, calc(100cqh * 4 / 3));
+  aspect-ratio: 4 / 3;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45), 0 0 0 6px rgba(255,255,255,0.85);
+  transition: background 0.2s;
+}
+.draw-layer { position: absolute; }
+.draw-layer svg { width: 100%; height: 100%; display: block; }
+.draw-areas [data-r] { transition: fill 0.18s; }
+.draw-outline { pointer-events: none; }
+.draw-canvas {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  touch-action: none;
+  cursor: crosshair;
+}
+.draw-canvas.tool-fill    { cursor: pointer; }
+.draw-canvas.tool-sticker { cursor: copy; }
+.draw-canvas.tool-eraser  { cursor: cell; }
+
+.draw-options {
+  grid-area: options;
+  display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+  gap: 10px 16px;
+  padding: 8px 12px;
+  background: var(--surface-0);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-lg);
+}
+.draw-palette, .draw-stickers { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; }
+.draw-swatch {
+  width: 38px; height: 38px;
+  border-radius: 50%;
+  border: 3px solid rgba(255,255,255,0.85);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.45);
+  cursor: pointer;
+  transition: transform 0.12s;
+}
+.draw-swatch:hover { transform: scale(1.1); }
+.draw-swatch.active { transform: scale(1.22); border-color: #fff; box-shadow: 0 0 0 3px var(--accent), 0 3px 8px rgba(0,0,0,0.5); }
+.draw-sticker {
+  width: 46px; height: 46px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.6rem;
+  border-radius: var(--r-sm);
+  background: #fffdf7;
+  border: 3px solid transparent;
+  cursor: pointer;
+}
+.draw-sticker img { width: 34px; height: 34px; object-fit: contain; }
+.draw-sticker.active { border-color: var(--accent); transform: scale(1.08); }
+.draw-sizes { display: flex; gap: 6px; }
+.draw-size {
+  width: 46px; height: 46px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: var(--r-sm);
+  background: var(--surface-1);
+  border: 3px solid transparent;
+  cursor: pointer;
+}
+.draw-size span { border-radius: 50%; box-shadow: 0 0 0 1px rgba(255,255,255,0.6); }
+.draw-size.active { border-color: var(--accent); }
+
+/* ── phones / portrait tablets: tools across the top ── */
+@media (orientation: portrait) and (max-width: 1024px), (max-width: 700px) {
+  .draw-work {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto 1fr auto;
+    grid-template-areas: "tools" "stage" "options";
+    gap: 8px;
+  }
+  .draw-tools { flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 6px; justify-content: center; }
+  .draw-tool { width: 58px; padding: 5px 2px; flex-shrink: 0; }
+  .draw-tool-icon { font-size: 1.4rem; }
+  .draw-tools-sep { width: 1px; height: auto; margin: 0 2px; }
+  .draw-swatch { width: 32px; height: 32px; }
+  .draw-save-btn { padding: 8px 12px; font-size: 0.85rem; }
+  .draw-picker-grid { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); }
+}
+
+@media (max-width: 560px) {
+  .draw-screen .game-header { gap: 6px; flex-wrap: nowrap; }
+  .draw-screen .game-header h2 { font-size: 1.1rem; }
+  .draw-tools { justify-content: flex-start; gap: 4px; }
+  .draw-tool { width: 46px; padding: 6px 0; }
+  .draw-tool-label { display: none; }
+  .draw-tools-sep { display: none; }
+}
+@media (max-width: 560px) {
+  .draw-screen .game-header h2 { display: none; }
+  .draw-screen .game-header { justify-content: space-between; }
+  .draw-tool { width: 40px; }
+  .draw-tool-icon { font-size: 1.3rem; }
+  .draw-tools { padding: 5px; gap: 3px; }
+}
+
+/* ════════════════════════════════════════════════════════════════════════════
+   Page picker, no scrolling (Nov 7): blank page on the left, pictures to colour
+   on the right with one tab per world (4 pictures each, 2 × 2).
+   ════════════════════════════════════════════════════════════════════════════ */
+.draw-picker {
+  flex: 1; min-height: 0;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(200px, 1fr) minmax(0, 1.6fr);
+  gap: 18px;
+  padding: 4px 4px 8px;
+}
+.draw-blank-card {
+  width: auto;
+  align-self: stretch;
+  justify-content: center;
+  gap: 10px;
+  padding: 24px;
+}
+.draw-blank-icon { font-size: clamp(3rem, 8vh, 5rem); }
+.draw-card-title { font-size: clamp(1.4rem, 3.5vh, 2rem); }
+.draw-card-sub { font-size: 1rem; }
+
+.draw-colour-side {
+  min-height: 0;
+  display: flex; flex-direction: column; gap: 10px;
+  padding: 14px;
+  background: var(--surface-0);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-xl);
+}
+.draw-picker-heading { margin: 0; text-align: left; font-size: 1.2rem; }
+.draw-world-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+.draw-world-tab {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 6px 4px;
+  border-radius: var(--r-md);
+  background: var(--surface-1);
+  border: 2px solid transparent;
+  color: var(--text);
+  font-family: var(--font-display); font-weight: 700; font-size: 0.78rem;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.draw-world-tab span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.draw-world-tab:hover { border-color: var(--accent-border); }
+.draw-world-tab.active { border-color: var(--accent); background: var(--accent-soft); }
+
+.draw-picker-grid {
+  flex: 1; min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.draw-page-card {
+  min-height: 0;
+  justify-content: center;
+  padding: 8px;
+  font-size: 0.95rem;
+}
+.draw-page-card img {
+  width: auto; height: auto;
+  max-width: 70%;
+  max-height: calc(100% - 1.6em);
+  flex: 1 1 0; min-height: 0;
+  object-fit: contain;
+}
+
+/* phones / portrait tablets: blank page becomes a slim bar on top */
+@media (orientation: portrait) and (max-width: 1024px), (max-width: 700px) {
+  .draw-picker { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); gap: 10px; }
+  .draw-blank-card { flex-direction: row; padding: 10px 16px; gap: 12px; }
+  .draw-blank-icon { font-size: 2rem; }
+  .draw-card-title { font-size: 1.2rem; }
+  .draw-card-sub { display: none; }
+  .draw-colour-side { padding: 10px; gap: 8px; }
+  .draw-world-tab span { font-size: 0.65rem; }
+}
+@media (orientation: portrait) and (max-width: 1024px), (max-width: 700px) {
+  .draw-picker-grid { grid-template-rows: none; grid-auto-rows: auto; align-content: center; }
+  .draw-page-card { aspect-ratio: 1 / 1; max-height: 100%; }
+}

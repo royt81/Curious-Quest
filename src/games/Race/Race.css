@@ -1,0 +1,182 @@
+@import '../../components/shared.css';
+
+.race-screen {
+  gap: 8px;
+  justify-content: center;
+  padding: 8px 16px;
+  overflow: hidden;
+}
+
+.turn-badge {
+  padding: 6px 16px; border-radius: var(--r-sm);
+  background: var(--accent-soft); border: 1px solid var(--accent-border);
+  font-family: var(--font-display);
+  font-weight: 600; color: var(--accent); font-size: 0.95rem;
+}
+
+.race-play {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 8px; width: 100%; max-width: 700px;
+  position: relative;
+}
+
+.race-track {
+  width: 100%; display: flex; flex-direction: column; gap: 8px;
+  background: var(--scrim); border-radius: var(--r-lg); padding: 12px 16px;
+}
+
+.track-lane { display: flex; align-items: center; gap: 10px; }
+.lane-label {
+  width: 110px; font-weight: 700; font-size: 0.95rem; flex-shrink: 0;
+  display: flex; align-items: center; gap: 5px;
+}
+.lane-medal { font-size: 1rem; line-height: 1; }
+
+.lane-bar {
+  flex: 1; display: flex; gap: 2px; align-items: center;
+}
+
+.track-cell {
+  flex: 1; height: 30px;
+  background: var(--surface-0);
+  border-radius: var(--r-xs);
+  border: 1px solid var(--border-soft);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem; position: relative;
+  min-width: 0;
+}
+.track-cell.finish {
+  background: var(--accent-soft);
+  border-color: var(--accent-border);
+}
+
+.animal-token {
+  position: absolute; width: 30px; height: 30px;
+  border-radius: 50%; border: 2px solid rgba(255,255,255,0.6);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+
+.pos-label { width: 36px; font-size: 0.8rem; color: var(--text-faint); text-align: right; }
+
+/* Log fills remaining space next to card */
+.card-row .log-box {
+  flex: 1;
+  max-width: none;
+  justify-content: center;
+  background: var(--scrim);
+  border-radius: var(--r-md);
+  padding: 8px 12px;
+  overflow: hidden;
+}
+.card-row .log-line { text-align: left; font-size: 0.82rem; }
+
+/* Card + log side by side */
+.card-row {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  align-items: stretch;
+}
+
+.card-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  flex: 0 0 auto;
+  width: 96px;
+}
+
+.card-area {
+  height: 76px; display: flex; align-items: center; justify-content: center;
+}
+
+.drawn-card {
+  width: 60px; height: 74px;
+  border-radius: var(--r-sm);
+  background: var(--card-bg, #888);
+  border: 4px solid var(--border-mid);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 4px;
+  box-shadow: var(--shadow-card);
+}
+.drawn-emoji { font-size: 2rem; }
+.drawn-steps { font-size: 1.3rem; font-weight: 900; color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+.drawn-event { font-size: 2.4rem; }
+
+.draw-btn {
+  font-size: 0.85rem; padding: 8px 10px; width: 100%;
+  border-radius: var(--r-lg);
+  animation: pulse-glow 2s infinite;
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: var(--shadow-press), 0 0 0 rgba(0,0,0,0); }
+  50% { box-shadow: var(--shadow-press), 0 0 20px var(--accent-glow); }
+}
+.draw-btn:disabled { opacity: 0.6; animation: none; }
+
+/* Winner lane highlight */
+.track-lane.winner-lane .lane-label { font-size: 1.05rem; }
+.track-lane.winner-lane .track-cell.finish {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+.animal-token.winner-token {
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.9), 0 0 18px rgba(255,255,255,0.4);
+  animation: winner-pulse 1.2s ease-in-out infinite;
+}
+@keyframes winner-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(255,255,255,0.9), 0 0 12px rgba(255,255,255,0.3); }
+  50%       { box-shadow: 0 0 0 3px rgba(255,255,255,0.9), 0 0 26px rgba(255,255,255,0.6); }
+}
+
+/* Podium */
+.race-podium {
+  display: flex; align-items: flex-end; justify-content: center;
+  gap: 20px; width: 100%;
+}
+.podium-place {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.podium-medal { font-size: 1.5rem; line-height: 1; }
+.podium-emoji { font-size: 1.9rem; line-height: 1; }
+.podium-name  { font-size: 0.82rem; font-weight: 700; color: var(--text-dim); }
+.podium-1 .podium-medal { font-size: 1.9rem; }
+.podium-1 .podium-emoji { font-size: 2.5rem; }
+.podium-1 .podium-name  { color: var(--text); font-size: 0.9rem; }
+
+/* Winner overlay — absolutely covers race-play, adds zero height */
+.race-winner-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.62);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-lg);
+  z-index: 20;
+}
+
+/* Winner banner — floats inside the overlay */
+.race-winner-banner {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 12px; padding: 28px 40px 30px;
+  background: var(--surface-0); border-radius: var(--r-xl);
+  border: 2px solid var(--accent-border);
+  box-shadow: 0 0 40px var(--accent-glow), var(--shadow-panel);
+  text-align: center;
+}
+.race-winner-banner .winner-trophy { font-size: 2.6rem; line-height: 1; }
+.race-winner-banner h2 {
+  font-family: var(--font-display); font-size: 1.5rem;
+  font-weight: 800; color: var(--text); margin: 0;
+}
+.race-winner-banner .winner-player {
+  color: var(--accent); font-weight: 600; font-size: 0.95rem; margin: 0;
+}
+.race-winner-banner .gameover-btns { margin-top: 6px; }

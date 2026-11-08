@@ -1,0 +1,129 @@
+@import '../../components/shared.css';
+
+.memory-screen {
+  gap: 10px;
+  justify-content: flex-start;
+  padding: 10px 16px 12px;
+  overflow-y: auto;
+}
+
+.memory-play {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.memory-grid {
+  display: grid;
+  width: min(calc(100vw - 32px), calc(100svh - 150px), 480px);
+  gap: clamp(6px, 1.5vmin, 10px);
+}
+/* 24-card board (6 columns) can be a touch wider so tiles stay tappable */
+.memory-grid-24 {
+  width: min(calc(100vw - 32px), calc(100svh - 150px) * 1.5, 620px);
+  gap: clamp(5px, 1.2vmin, 8px);
+}
+.memory-grid-24 .memory-back-mark,
+.memory-grid-24 .memory-emoji {
+  font-size: clamp(1.3rem, 5.5vmin, 2.4rem);
+}
+
+/* ── Board-size toggle (header) ── */
+.memory-size-toggle {
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+}
+.memory-size-btn {
+  min-width: 38px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: var(--r-sm, 8px);
+  background: transparent;
+  color: var(--text, inherit);
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  line-height: 1;
+}
+.memory-size-btn.is-active {
+  background: var(--accent);
+  color: #fff;
+  box-shadow: 0 0 0 2px var(--accent-glow);
+}
+
+/* ── Card ── */
+.memory-card {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  width: 100%;
+  padding: 0;
+  background: transparent;
+  border-radius: var(--r-md);
+  cursor: pointer;
+}
+.memory-card:disabled { cursor: default; }
+
+/* Face — shared base styles */
+.memory-card-face {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+  /* Face-down: themed accent gradient */
+  background:
+    radial-gradient(circle at 30% 25%, var(--accent-soft), transparent 60%),
+    linear-gradient(135deg, var(--accent), var(--accent-strong, var(--accent)));
+  border: 3px solid var(--accent-border);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+/* Face-up: each card uses its own symbol's dark background so the
+   solid-colour SVG pops with maximum contrast — zero transparency issues. */
+.memory-card.is-up .memory-card-face {
+  background: var(--sym-bg, #111);
+  border: 3px solid var(--sym-color, #fff);
+  box-shadow: inset 0 2px 8px rgba(0,0,0,0.4), var(--shadow-card);
+}
+
+/* Face-down: themed icon, slightly muted so it reads as a "back" pattern */
+.memory-back-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56%;
+  height: 56%;
+  opacity: 0.9;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+}
+
+/* Matched: accent glow highlight */
+.memory-card.is-matched .memory-card-face {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-glow), 0 0 18px var(--accent-glow);
+  animation: memory-match-pop 0.5s var(--ease, ease);
+}
+@keyframes memory-match-pop {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+/* ── Win-screen stars ── */
+.memory-stars {
+  display: flex;
+  gap: 8px;
+  font-size: 2.4rem;
+  line-height: 1;
+}
+.memory-star.on  { filter: drop-shadow(0 0 10px var(--accent-glow)); }
+.memory-star.off { opacity: 0.4; }

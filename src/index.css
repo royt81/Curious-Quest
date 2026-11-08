@@ -1,0 +1,179 @@
+/* ─── Font ────────────────────────────────────────────────────────────────── */
+/* Fonts are imported in main.jsx from @fontsource (self-hosted) */
+
+/* ─── Reset ───────────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+/* ─── Base tokens (theme-agnostic) ───────────────────────────────────────── */
+:root {
+  --font-body:    'Nunito', system-ui, sans-serif;
+  --font-display: 'Nunito', system-ui, sans-serif;
+  --font-title:   'Gloria Hallelujah', 'Fredoka', 'Nunito', cursive;
+
+  /* Radii */
+  --r-xs: 6px;
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 20px;
+  --r-xl: 28px;
+
+  /* Motion */
+  --ease: 0.18s ease;
+
+  /* Surfaces — semi-transparent layers over any background */
+  --surface-ink: rgba(6,  10, 22, 0.80);   /* sidebar / heavy panel */
+  --surface-0:   rgba(10, 16, 32, 0.66);   /* panels: dark glass so text stays readable */
+  --surface-1:   rgba(255,255,255,0.10);
+  --surface-2:   rgba(255,255,255,0.13);
+  --surface-3:   rgba(255,255,255,0.20);
+  --scrim:       rgba(0, 0, 0, 0.30);
+
+  /* Borders */
+  --border-soft: rgba(255,255,255,0.14);
+  --border-mid:  rgba(255,255,255,0.18);
+
+  /* Text */
+  --text:        #ffffff;
+  --text-dim:    rgba(255,255,255,0.78);
+  --text-faint:  rgba(255,255,255,0.58);
+
+  /* Shadows */
+  --shadow-sm:    0 2px 8px  rgba(0,0,0,0.35);
+  --shadow-md:    0 6px 20px rgba(0,0,0,0.45);
+  --shadow-panel: 0 16px 48px rgba(0,0,0,0.55);
+  --shadow-card:  0 4px 14px rgba(0,0,0,0.55);
+  --shadow-press: 0 2px 6px  rgba(0,0,0,0.45);
+
+  /* ── Default accent: Animals (green) ── */
+  --accent:        #4ade80;
+  --accent-soft:   rgba(74,222,128,0.12);
+  --accent-border: rgba(74,222,128,0.35);
+  --accent-glow:   rgba(74,222,128,0.45);
+  --accent-tint:   rgba(74,222,128,0.15);
+  --accent-ink:    #052012;
+}
+
+/* ── Per-theme accent overrides ────────────────────────────────────────────── */
+[data-theme="animals"] {
+  --accent:        #4ade80;
+  --accent-soft:   rgba(74,222,128,0.12);
+  --accent-border: rgba(74,222,128,0.35);
+  --accent-glow:   rgba(74,222,128,0.45);
+  --accent-tint:   rgba(74,222,128,0.15);
+  --accent-ink:    #052012;
+}
+[data-theme="dinosaurs"] {
+  --accent:        #fb923c;
+  --accent-soft:   rgba(251,146,60,0.12);
+  --accent-border: rgba(251,146,60,0.35);
+  --accent-glow:   rgba(251,146,60,0.45);
+  --accent-tint:   rgba(251,146,60,0.15);
+  --accent-ink:    #1e0800;
+}
+[data-theme="space"] {
+  --accent:        #a78bfa;
+  --accent-soft:   rgba(167,139,250,0.12);
+  --accent-border: rgba(167,139,250,0.35);
+  --accent-glow:   rgba(167,139,250,0.45);
+  --accent-tint:   rgba(167,139,250,0.15);
+  --accent-ink:    #0d0520;
+}
+[data-theme="robots"] {
+  --accent:        #22d3ee;
+  --accent-soft:   rgba(34,211,238,0.12);
+  --accent-border: rgba(34,211,238,0.35);
+  --accent-glow:   rgba(34,211,238,0.45);
+  --accent-tint:   rgba(34,211,238,0.15);
+  --accent-ink:    #021018;
+}
+[data-theme="sea"] {
+  --accent:        #38bdf8;
+  --accent-soft:   rgba(56,189,248,0.12);
+  --accent-border: rgba(56,189,248,0.35);
+  --accent-glow:   rgba(56,189,248,0.45);
+  --accent-tint:   rgba(56,189,248,0.15);
+  --accent-ink:    #011422;
+}
+
+/* ─── Body ────────────────────────────────────────────────────────────────── */
+body {
+  font-family: var(--font-body);
+  background: #000510;
+  height: 100vh;
+  overflow: hidden;
+  color: var(--text);
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+#root {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+button {
+  cursor: pointer;
+  border: none;
+  outline: none;
+  font-family: inherit;
+}
+
+/* ─── Utility classes ─────────────────────────────────────────────────────── */
+.screen {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 24px;
+  height: 100%;
+  overflow-y: auto;
+}
+
+/* Glass panel — the main content wrapper */
+.glass-panel {
+  background: rgba(8, 14, 35, 0.60);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--r-xl);
+  box-shadow: var(--shadow-panel);
+}
+
+/* Buttons */
+.btn {
+  padding: 12px 26px;
+  border-radius: var(--r-md);
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  transition: transform var(--ease), box-shadow var(--ease), background var(--ease);
+  box-shadow: var(--shadow-sm);
+}
+.btn:active { transform: translateY(2px); box-shadow: none; }
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+  box-shadow: 0 4px 16px var(--accent-glow);
+}
+.btn-primary:hover {
+  filter: brightness(1.1);
+  box-shadow: 0 6px 24px var(--accent-glow);
+}
+
+.btn-secondary {
+  background: var(--surface-1);
+  color: var(--text-dim);
+  border: 1.5px solid var(--border-mid);
+}
+.btn-secondary:hover {
+  background: var(--surface-2);
+  color: var(--text);
+}
+
+.btn-danger  { background: #ef4444; color: #fff; }
+.btn-danger:hover { background: #f87171; }

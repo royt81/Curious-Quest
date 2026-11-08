@@ -1,0 +1,62 @@
+/* ════════════════════════════════════════════════════════════════════════════
+   PHONE & TABLET LAYOUT (Nov 2026)
+   Loaded after index.css and every game stylesheet, so these rules win.
+   ════════════════════════════════════════════════════════════════════════════ */
+
+/* Square boards keep their shape on any screen: sized from the space they
+   actually have (container query units) instead of "height: 100%". */
+.chess-play, .checkers-play { container-type: size; }
+.chess-board, .checkers-board {
+  height: auto;
+  width: min(100cqw, 100cqh);
+  max-width: none;
+}
+
+/* Grids that used 100vw ignored the side menu → measure the parent instead */
+.memory-grid    { width: min(100%, calc(100svh - 150px), 480px); }
+.memory-grid-24 { width: min(100%, calc(100svh - 150px) * 1.5, 620px); }
+.player-count-btns { flex-wrap: wrap; justify-content: center; }
+
+/* Comfortable tap targets everywhere */
+button, .btn { touch-action: manipulation; }
+html, body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent; }
+
+/* ── Portrait phones / tablets: side panel moves to the TOP of the board ── */
+@media (orientation: portrait) and (max-width: 1024px), (max-width: 700px) {
+  .chess-screen, .checkers-screen, .backgammon-screen { flex-direction: column; }
+
+  .cs-side, .ck-side, .bg-sidebar {
+    width: 100%;
+    max-height: 38%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 6px 8px;
+    padding: 8px 10px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .cs-side-title, .ck-side-title, .bg-sidebar-title { display: none; }
+  .cs-side .log-box, .ck-side .log-box, .bg-sidebar .log-box { flex-basis: 100%; flex: none; }
+  .cs-side .log-line:not(.new), .ck-side .log-line:not(.new), .bg-sidebar .log-line:not(.new) { display: none; }
+  .cs-players { flex-direction: row; }
+  .cs-turn, .ck-turn, .bg-turn { padding: 5px 10px; font-size: 0.85rem; }
+  .cs-gameover-btns, .ck-gameover-btns, .bg-gameover-btns { flex-direction: row; }
+
+  /* backgammon: trays sit in a row above the board */
+  .bg-table-wrap { flex-direction: column; }
+  .bg-side { flex-direction: row; justify-content: center; }
+  .bg-off { flex-direction: row; gap: 6px; padding: 4px 10px; width: auto; }
+  .bg-table { margin: 0; }
+  .bg-row { grid-template-columns: repeat(6, 1fr) 16px repeat(6, 1fr); gap: 1px; padding: 0 2px; }
+  .bg-bar { grid-template-columns: repeat(6, 1fr) 16px repeat(6, 1fr); gap: 1px; }
+  .bg-table::before { width: 16px; }
+  .bg-point-num { font-size: 0.55rem; }
+  .bg-die { width: 38px; height: 38px; padding: 4px; }
+  .bg-pip { width: 7px; height: 7px; }
+  .bg-roll-btn { padding: 8px 18px; }
+
+  /* snakes & ladders board measured from its own column, not the window */
+  .sl-board-wrap { width: min(85vh, 88%, 540px); }
+}

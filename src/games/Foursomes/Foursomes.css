@@ -1,0 +1,74 @@
+@import '../../components/shared.css';
+
+.foursomes-screen { gap: 20px; justify-content: flex-start; padding-top: 16px; }
+
+.foursomes-play { display: flex; flex-direction: column; align-items: center; gap: 20px; width: 100%; }
+
+.cards-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.player-area { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.player-label { font-size: 0.95rem; color: var(--text-dim); font-weight: 600; }
+
+.animal-card {
+  width: 200px;
+  min-height: 280px;
+  border-radius: var(--r-lg);
+  background: linear-gradient(160deg, var(--card-color, #888) 0%, rgba(0,0,0,0.5) 100%);
+  border: 3px solid var(--border-mid);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 12px;
+  gap: 8px;
+  box-shadow: var(--shadow-card);
+}
+
+.animal-card.face-down {
+  background: linear-gradient(160deg, #333 0%, #111 100%);
+  justify-content: center;
+}
+
+.card-emoji { font-size: 3.5rem; }
+.card-name { font-family: var(--font-display); font-size: 1.1rem; font-weight: 600; color: var(--text); }
+.card-family { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+.card-stats { display: flex; flex-direction: column; gap: 6px; width: 100%; margin-top: 4px; }
+
+.stat-btn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 7px 10px;
+  border-radius: var(--r-xs);
+  background: var(--scrim);
+  border: 1.5px solid var(--border-soft);
+  font-size: 0.85rem;
+  color: var(--text);
+  transition: all 0.15s;
+  width: 100%;
+  cursor: default;
+}
+.stat-btn.clickable { cursor: pointer; }
+.stat-btn.clickable:hover { background: var(--accent-tint); border-color: var(--accent); }
+.stat-btn.selected { background: var(--accent-tint); border-color: var(--accent); }
+.stat-label { color: var(--text-dim); }
+.stat-val { font-weight: 800; color: var(--accent); font-size: 1rem; }
+
+.vs-badge {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--accent); color: var(--accent-ink);
+  font-family: var(--font-display);
+  font-weight: 700; font-size: 1rem;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 3px 12px var(--accent-glow);
+}
+
+.no-cards { color: var(--text-faint); font-style: italic; padding: 40px 20px; }
+
+/* turn-banner, log-box, gameover — from shared.css */

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>Snakes &amp; Ladders — Board Style Options</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+
+:root {
+  --font: 'Nunito', system-ui, sans-serif;
+  --surface-0: rgba(255,255,255,0.04);
+  --surface-1: rgba(255,255,255,0.08);
+  --surface-2: rgba(255,255,255,0.13);
+  --surface-3: rgba(255,255,255,0.20);
+  --border-soft: rgba(255,255,255,0.08);
+  --border-mid: rgba(255,255,255,0.18);
+  --text: #ffffff;
+  --text-dim: rgba(255,255,255,0.6);
+  --text-faint: rgba(255,255,255,0.32);
+  --accent: #4ade80;
+  --accent-soft: rgba(74,222,128,0.12);
+  --accent-border: rgba(74,222,128,0.35);
+  --accent-tint: rgba(74,222,128,0.15);
+  --accent-ink: #052012;
+}
+[data-theme="animals"] {
+  --accent: #4ade80; --accent-soft: rgba(74,222,128,0.12); --accent-border: rgba(74,222,128,0.35); --accent-tint: rgba(74,222,128,0.15); --accent-ink:#052012;
+}
+[data-theme="dinosaurs"] {
+  --accent: #fb923c; --accent-soft: rgba(251,146,60,0.12); --accent-border: rgba(251,146,60,0.35); --accent-tint: rgba(251,146,60,0.15); --accent-ink:#1e0800;
+}
+[data-theme="space"] {
+  --accent: #a78bfa; --accent-soft: rgba(167,139,250,0.12); --accent-border: rgba(167,139,250,0.35); --accent-tint: rgba(167,139,250,0.15); --accent-ink:#0d0520;
+}
+[data-theme="robots"] {
+  --accent: #22d3ee; --accent-soft: rgba(34,211,238,0.12); --accent-border: rgba(34,211,238,0.35); --accent-tint: rgba(34,211,238,0.15); --accent-ink:#021018;
+}
+[data-theme="sea"] {
+  --accent: #38bdf8; --accent-soft: rgba(56,189,248,0.12); --accent-border: rgba(56,189,248,0.35); --accent-tint: rgba(56,189,248,0.15); --accent-ink:#011422;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0; min-height: 100vh; background: #000510; color: var(--text);
+  font-family: var(--font); padding: 24px;
+}
+h1 { font-size: 1.4rem; margin: 0 0 4px; }
+.sub { color: var(--text-dim); margin: 0 0 18px; font-size: 0.9rem; }
+
+.theme-switcher { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 22px; }
+.theme-switcher button {
+  font-family: var(--font); font-weight: 700; font-size: 0.85rem;
+  padding: 8px 16px; border-radius: 10px; border: 2px solid var(--border-soft);
+  background: var(--surface-1); color: var(--text); cursor: pointer;
+  transition: border-color .15s, background .15s;
+}
+.theme-switcher button.active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 22px;
+}
+.card {
+  background: var(--surface-1); border: 1px solid var(--border-soft);
+  border-radius: 18px; padding: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+.card h2 { font-size: 1.05rem; margin: 0 0 4px; color: var(--accent); }
+.card p { font-size: 0.82rem; color: var(--text-dim); margin: 0 0 10px; line-height: 1.4; }
+.board-wrap {
+  width: 100%; aspect-ratio: 1; border-radius: 14px; overflow: hidden;
+  border: 3px solid var(--accent-border); box-shadow: inset 0 0 0 2px var(--surface-1);
+  background: linear-gradient(160deg, var(--surface-2), var(--surface-0));
+}
+svg { display: block; width: 100%; height: 100%; }
+.legend { display:flex; gap: 14px; margin-top: 8px; font-size: 0.75rem; color: var(--text-dim); }
+.legend span { display:flex; align-items:center; gap:5px; }
+.swatch { width: 12px; height: 12px; border-radius: 3px; display:inline-block; }
+</style>
+</head>
+<body data-theme="animals">
+
+<h1>Snakes &amp; Ladders — 5 Flat Geometric Board Styles</h1>
+<p class="sub">Switch themes to check every style still reads well across all 5 palettes. Green = ladder, Red = snake.</p>
+
+<div class="theme-switcher">
+  <button data-theme="animals" class="active">🐾 Animals</button>
+  <button data-theme="dinosaurs">🦖 Dinosaurs</button>
+  <button data-theme="space">🚀 Space</button>
+  <button data-theme="robots">🤖 Robots</button>
+  <button data-theme="sea">🐠 Sea</button>
+</div>
+
+<div class="grid">
+  <div class="card">
+    <h2>1 · Bold Checker</h2>
+    <p>Classic alternating checkerboard with bold flat number badges, triangle corner markers for ladder feet / snake heads, and thick flat-color ladder rails &amp; snake bodies.</p>
+    <div class="board-wrap"><svg id="b1" viewBox="0 0 100 100"></svg></div>
+  </div>
+
+  <div class="card">
+    <h2>2 · Pathway Trail</h2>
+    <p>A single flat ribbon traces the full 1→100 route through tinted progress zones, so kids can literally see the path. Ladders are solid bridges, snakes are bold tapered trails.</p>
+    <div class="board-wrap"><svg id="b2" viewBox="0 0 100 100"></svg></div>
+  </div>
+
+  <div class="card">
+    <h2>3 · Bauhaus Corners</h2>
+    <p>Minimalist geometric style: every cell gets a flat triangular corner accent, ladders become thin rail-and-rung circuits, and snakes are a chain of shrinking flat circles.</p>
+    <div class="board-wrap"><svg id="b3" viewBox="0 0 100 100"></svg></div>
+  </div>
+
+  <div class="card">
+    <h2>4 · Zone Bands</h2>
+    <p>Horizontal "race track" bands group each row of 10 into a flat color zone, with circular number badges. Ladders are flat trapezoid ramps, snakes are chevron arrows pointing back to their head.</p>
+    <div class="board-wrap"><svg id="b4" viewBox="0 0 100 100"></svg></div>
+  </div>
+
+  <div class="card">
+    <h2>5 · Diagonal Split</h2>
+    <p>Every tile is split into two flat triangles for a herringbone texture, with diamond number badges. Ladders are angled flat ramps, snakes are a chain of rotated flat squares — a friendly "caterpillar".</p>
+    <div class="board-wrap"><svg id="b5" viewBox="0 0 100 100"></svg></div>
+  </div>
+</div>
+
+<script>
+const LADDERS = { 1: 38, 4: 14, 9: 31, 21: 42, 28: 84, 36: 44, 51: 67, 71: 91, 80: 100 };
+const SNAKES  = { 16: 6, 47: 26, 49: 11, 56: 53, 62: 19, 64: 60, 87: 24, 93: 73, 95: 75, 98: 78 };
+const SNAKE_COLOR = '#ef4444';
+
+function cellCenter(n) {
+  const rowFromBottom = Math.floor((n - 1) / 10);
+  const idx = (n - 1) % 10;
+  const col = rowFromBottom % 2 === 0 ? idx : 9 - idx;
+  const displayRow = 9 - rowFromBottom;
+  return { x: (col + 0.5) * 10, y: (displayRow + 0.5) * 10 };
+}
+function cellNumber(displayRow, col) {
+  const rowFromBottom = 9 - displayRow;
+  const base = rowFromBottom * 10;
+  return rowFromBottom % 2 === 0 ? base + col + 1 : base + 10 - col;
+}
+function el(tag, attrs, parent) {
+  const e = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const k in attrs) e.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(e);
+  return e;
+}
+function label(svg, x, y, n, size, fill) {
+  const t = el('text', { x, y, 'font-size': size, 'font-weight': 800, fill, 'text-anchor': 'middle', 'font-family': 'Nunito, sans-serif' }, svg);
+  t.textContent = n;
+  return t;
+}
+function snakeBend(a, b, idx) {
+  const mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
+  const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1;
+  const nx = -dy / len, ny = dx / len;
+  const bend = (idx % 2 === 0 ? 1 : -1) * (8 + (idx % 3) * 2);
+  return { x: mx + nx * bend, y: my + ny * bend };
+}
+function bezPt(a, c, b, t) {
+  const mt = 1 - t;
+  return { x: mt * mt * a.x + 2 * mt * t * c.x + t * t * b.x, y: mt * mt * a.y + 2 * mt * t * c.y + t * t * b.y };
+}
+
+/* ── Shared ladder/snake renderers ─────────────────────────────────────── */
+function drawLadderRails(svg, a, b, w, color, thin) {
+  const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1;
+  const ux = dx / len, uy = dy / len, nx = -uy, ny = ux;
+  const g = el('g', {}, svg);
+  [1, -1].forEach(sign => {
+    el('line', { x1: a.x + nx * w * sign, y1: a.y + ny * w * sign, x2: b.x + nx * w * sign, y2: b.y + ny * w * sign, stroke: color, 'stroke-width': thin ? 0.9 : 1.4, 'stroke-linecap': 'round' }, g);
+  });
+  const steps = Math.max(2, Math.round(len / 6));
+  for (let i = 1; i < steps; i++) {
+    const t = i / steps, cx = a.x + dx * t, cy = a.y + dy * t;
+    el('line', { x1: cx + nx * w, y1: cy + ny * w, x2: cx - nx * w, y2: cy - ny * w, stroke: color, 'stroke-width': thin ? 0.7 : 1, 'stroke-linecap': 'round' }, g);
+  }
+}
+function drawSnakeFlat(svg, a, b, idx) {
+  const c = snakeBend(a, b, idx);
+  const d = `M ${a.x} ${a.y} Q ${c.x} ${c.y} ${b.x} ${b.y}`;
+  const g = el('g', {}, svg);
+  el('path', { d, stroke: SNAKE_COLOR, 'stroke-width': 2.8, fill: 'none', 'stroke-linecap': 'round' }, g);
+  const angle = Math.atan2(c.y - a.y, c.x - a.x);
+  const hs = 3.4, perp = angle + Math.PI / 2;
+  const p1 = { x: a.x + Math.cos(angle) * hs, y: a.y + Math.sin(angle) * hs };
+  const p2 = { x: a.x + Math.cos(perp) * hs * 0.7, y: a.y + Math.sin(perp) * hs * 0.7 };
+  const p3 = { x: a.x - Math.cos(perp) * hs * 0.7, y: a.y - Math.sin(perp) * hs * 0.7 };
+  el('polygon', { points: `${p1.x},${p1.y} ${p2.x},${p2.y} ${p3.x},${p3.y}`, fill: SNAKE_COLOR }, g);
+  el('circle', { cx: a.x, cy: a.y, r: 0.6, fill: '#fff' }, g);
+  // tail dot
+  el('circle', { cx: b.x, cy: b.y, r: 0.9, fill: SNAKE_COLOR }, g);
+}
+
+/* ── Style 1: Bold Checker ──────────────────────────────────────────────── */
+function buildStyle1(svg) {
+  for (let dr = 0; dr < 10; dr++) {
+    for (let c = 0; c < 10; c++) {
+      const n = cellNumber(dr, c), x = c * 10, y = dr * 10;
+      const even = (dr + c) % 2 === 0;
+      el('rect', { x, y, width: 10, height: 10, fill: n === 100 ? 'var(--accent-tint)' : (even ? 'var(--surface-0)' : 'var(--surface-1)'), stroke: 'var(--border-mid)', 'stroke-width': 0.3 }, svg);
+      el('rect', { x: x + 0.5, y: y + 0.5, width: n >= 10 ? 4.4 : 3, height: 2.8, rx: 0.6, fill: 'var(--surface-2)' }, svg);
+      label(svg, x + 0.5 + (n >= 10 ? 2.2 : 1.5), y + 2.6, n, 1.9, 'var(--text)');
+      if (LADDERS[n]) el('polygon', { points: `${x + 10},${y + 10} ${x + 10},${y + 5.5} ${x + 5.5},${y + 10}`, fill: 'var(--accent)' }, svg);
+      if (SNAKES[n]) el('polygon', { points: `${x + 10},${y + 10} ${x + 10},${y + 5.5} ${x + 5.5},${y + 10}`, fill: SNAKE_COLOR }, svg);
+    }
+  }
+  for (const [s, e] of Object.entries(LADDERS)) drawLadderRails(svg, cellCenter(+s), cellCenter(+e), 1.6, 'var(--accent)');
+  Object.entries(SNAKES).forEach(([s, e], idx) => drawSnakeFlat(svg, cellCenter(+s), cellCenter(+e), idx));
+}
+
+/* ── Style 2: Pathway Trail ─────────────────────────────────────────────── */
+function buildStyle2(svg) {
+  let d = '';
+  for (let n = 1; n <= 100; n++) {
+    const c = cellCenter(n);
+    d += (n === 1 ? `M ${c.x} ${c.y}` : ` L ${c.x} ${c.y}`);
+  }
+  el('path', { d, stroke: 'var(--accent)', 'stroke-width': 0.7, fill: 'none', opacity: 0.35, 'stroke-linejoin': 'round' }, svg);
+
+  for (let dr = 0; dr < 10; dr++) {
+    for (let c = 0; c < 10; c++) {
+      const n = cellNumber(dr, c), x = c * 10, y = dr * 10;
+      const quartile = Math.floor((n - 1) / 25);
+      const opac = [0.05, 0.10, 0.16, 0.24][quartile];
+      el('rect', { x, y, width: 10, height: 10, fill: 'var(--accent)', opacity: n === 100 ? 0.32 : opac, stroke: 'var(--border-soft)', 'stroke-width': 0.2 }, svg);
+      label(svg, x + 5, y + 6.2, n, 2.6, 'var(--text)');
+      // direction arrow at the turn of each row (cell 10,20,...90)
+      if (n % 10 === 0 && n !== 100) {
+        const cur = cellCenter(n), next = cellCenter(n + 1);
+        const ang = Math.atan2(next.y - cur.y, next.x - cur.x);
+        const tip = { x: cur.x + Math.cos(ang) * 2.4, y: cur.y + Math.sin(ang) * 2.4 };
+        const perp = ang + Math.PI / 2;
+        const l = { x: cur.x - Math.cos(ang) * 1.4 + Math.cos(perp) * 1.4, y: cur.y - Math.sin(ang) * 1.4 + Math.sin(perp) * 1.4 };
+        const r = { x: cur.x - Math.cos(ang) * 1.4 - Math.cos(perp) * 1.4, y: cur.y - Math.sin(ang) * 1.4 - Math.sin(perp) * 1.4 };
+        el('polygon', { points: `${tip.x},${tip.y} ${l.x},${l.y} ${r.x},${r.y}`, fill: 'var(--accent)', opacity: 0.6 }, svg);
+      }
+    }
+  }
+  for (const [s, e] of Object.entries(LADDERS)) {
+    const a = cellCenter(+s), b = cellCenter(+e);
+    const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len, uy = dy / len, nx = -uy, ny = ux, w = 1.9;
+    const g = el('g', {}, svg);
+    const pts = [[a.x + nx * w, a.y + ny * w], [b.x + nx * w, b.y + ny * w], [b.x - nx * w, b.y - ny * w], [a.x - nx * w, a.y - ny * w]].map(p => p.join(',')).join(' ');
+    el('polygon', { points: pts, fill: 'var(--accent)', opacity: 0.5 }, g);
+    const steps = Math.max(2, Math.round(len / 6));
+    for (let i = 1; i < steps; i++) {
+      const t = i / steps, cx = a.x + dx * t, cy = a.y + dy * t;
+      el('line', { x1: cx + nx * w, y1: cy + ny * w, x2: cx - nx * w, y2: cy - ny * w, stroke: 'var(--accent)', 'stroke-width': 0.6, opacity: 0.9 }, g);
+    }
+  }
+  Object.entries(SNAKES).forEach(([s, e], idx) => drawSnakeFlat(svg, cellCenter(+s), cellCenter(+e), idx));
+}
+
+/* ── Style 3: Bauhaus Corners ───────────────────────────────────────────── */
+function buildStyle3(svg) {
+  for (let dr = 0; dr < 10; dr++) {
+    for (let c = 0; c < 10; c++) {
+      const n = cellNumber(dr, c), x = c * 10, y = dr * 10;
+      el('rect', { x, y, width: 10, height: 10, fill: n === 100 ? 'var(--accent-tint)' : 'var(--surface-1)', stroke: 'var(--border-mid)', 'stroke-width': 0.25 }, svg);
+      const corner = (dr + c) % 2 === 0;
+      const tri = corner ? `${x},${y} ${x + 5.5},${y} ${x},${y + 5.5}` : `${x + 10},${y + 10} ${x + 4.5},${y + 10} ${x + 10},${y + 4.5}`;
+      el('polygon', { points: tri, fill: 'var(--accent)', opacity: 0.22 }, svg);
+      const tx = corner ? x + 1.8 : x + 8.2, ty = corner ? y + 2.8 : y + 9.2;
+      label(svg, tx, ty, n, 2, 'var(--text)');
+      if (LADDERS[n] || SNAKES[n]) {
+        el('circle', { cx: x + 5, cy: y + 5, r: 1.5, fill: LADDERS[n] ? 'var(--accent)' : SNAKE_COLOR, opacity: 0.85 }, svg);
+      }
+    }
+  }
+  for (const [s, e] of Object.entries(LADDERS)) drawLadderRails(svg, cellCenter(+s), cellCenter(+e), 1.4, 'var(--accent)', true);
+  Object.entries(SNAKES).forEach(([s, e], idx) => {
+    const a = cellCenter(+s), b = cellCenter(+e), c = snakeBend(a, b, idx);
+    const g = el('g', {}, svg);
+    const n = 7;
+    for (let i = n; i >= 0; i--) {
+      const t = i / n, p = bezPt(a, c, b, t), r = 2.6 - t * 1.9;
+      el('circle', { cx: p.x, cy: p.y, r, fill: SNAKE_COLOR, opacity: 0.5 + (1 - t) * 0.4 }, g);
+    }
+    el('circle', { cx: a.x - 0.9, cy: a.y - 0.9, r: 0.55, fill: '#fff' }, g);
+    el('circle', { cx: a.x + 0.9, cy: a.y - 0.9, r: 0.55, fill: '#fff' }, g);
+  });
+}
+
+/* ── Style 4: Zone Bands ────────────────────────────────────────────────── */
+function buildStyle4(svg) {
+  const palette = ['var(--accent-tint)', 'var(--surface-0)', 'var(--accent-soft)', 'var(--surface-1)'];
+  for (let dr = 0; dr < 10; dr++) {
+    const rowFromBottom = 9 - dr;
+    const bandColor = palette[rowFromBottom % 4];
+    for (let c = 0; c < 10; c++) {
+      const n = cellNumber(dr, c), x = c * 10, y = dr * 10;
+      el('rect', { x, y, width: 10, height: 10, fill: n === 100 ? 'var(--accent)' : bandColor, stroke: 'var(--border-soft)', 'stroke-width': 0.2 }, svg);
+      el('circle', { cx: x + 2.6, cy: y + 2.6, r: 1.9, fill: 'none', stroke: 'var(--accent)', 'stroke-width': 0.45 }, svg);
+      label(svg, x + 2.6, y + 3.3, n, 1.8, n === 100 ? 'var(--accent-ink)' : 'var(--text)');
+    }
+  }
+  for (const [s, e] of Object.entries(LADDERS)) {
+    const a = cellCenter(+s), b = cellCenter(+e);
+    const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len, uy = dy / len, nx = -uy, ny = ux, wa = 2.3, wb = 1.0;
+    const g = el('g', {}, svg);
+    const pts = [[a.x + nx * wa, a.y + ny * wa], [b.x + nx * wb, b.y + ny * wb], [b.x - nx * wb, b.y - ny * wb], [a.x - nx * wa, a.y - ny * wa]].map(p => p.join(',')).join(' ');
+    el('polygon', { points: pts, fill: 'var(--accent)', opacity: 0.45 }, g);
+    const steps = Math.max(2, Math.round(len / 6));
+    for (let i = 1; i < steps; i++) {
+      const t = i / steps, cx = a.x + dx * t, cy = a.y + dy * t, w = wa + (wb - wa) * t;
+      el('line', { x1: cx + nx * w, y1: cy + ny * w, x2: cx - nx * w, y2: cy - ny * w, stroke: 'var(--accent)', 'stroke-width': 0.5, opacity: 0.9 }, g);
+    }
+  }
+  Object.entries(SNAKES).forEach(([s, e], idx) => {
+    const a = cellCenter(+s), b = cellCenter(+e), c = snakeBend(a, b, idx);
+    const g = el('g', {}, svg);
+    const n = 6;
+    for (let i = 0; i < n; i++) {
+      const t0 = i / n;
+      const p0 = bezPt(a, c, b, t0);
+      const dirT = bezPt(a, c, b, Math.max(0, t0 - 0.05));
+      const ang = Math.atan2(p0.y - dirT.y, p0.x - dirT.x);
+      const size = 1.7, perp = ang + Math.PI / 2;
+      const tip = { x: p0.x + Math.cos(ang) * size, y: p0.y + Math.sin(ang) * size };
+      const l = { x: p0.x + Math.cos(perp) * size * 0.6 - Math.cos(ang) * size * 0.4, y: p0.y + Math.sin(perp) * size * 0.6 - Math.sin(ang) * size * 0.4 };
+      const r = { x: p0.x - Math.cos(perp) * size * 0.6 - Math.cos(ang) * size * 0.4, y: p0.y - Math.sin(perp) * size * 0.6 - Math.sin(ang) * size * 0.4 };
+      el('polygon', { points: `${tip.x},${tip.y} ${l.x},${l.y} ${r.x},${r.y}`, fill: SNAKE_COLOR, opacity: 0.85 }, g);
+    }
+    el('circle', { cx: a.x, cy: a.y, r: 2.8, fill: SNAKE_COLOR }, g);
+    el('circle', { cx: a.x - 1, cy: a.y - 1, r: 0.6, fill: '#fff' }, g);
+    el('circle', { cx: a.x + 1, cy: a.y - 1, r: 0.6, fill: '#fff' }, g);
+  });
+}
+
+/* ── Style 5: Diagonal Split ────────────────────────────────────────────── */
+function buildStyle5(svg) {
+  for (let dr = 0; dr < 10; dr++) {
+    for (let c = 0; c < 10; c++) {
+      const n = cellNumber(dr, c), x = c * 10, y = dr * 10;
+      const flip = (dr + c) % 2 === 0;
+      const colA = n === 100 ? 'var(--accent-tint)' : 'var(--surface-1)';
+      const colB = n === 100 ? 'var(--accent-soft)' : 'var(--surface-0)';
+      if (flip) {
+        el('polygon', { points: `${x},${y} ${x + 10},${y} ${x},${y + 10}`, fill: colA }, svg);
+        el('polygon', { points: `${x + 10},${y} ${x + 10},${y + 10} ${x},${y + 10}`, fill: colB }, svg);
+      } else {
+        el('polygon', { points: `${x},${y} ${x + 10},${y} ${x + 10},${y + 10}`, fill: colA }, svg);
+        el('polygon', { points: `${x},${y} ${x + 10},${y + 10} ${x},${y + 10}`, fill: colB }, svg);
+      }
+      el('rect', { x, y, width: 10, height: 10, fill: 'none', stroke: 'var(--border-mid)', 'stroke-width': 0.2 }, svg);
+      const cx = x + 2.7, cy = y + 2.7;
+      el('rect', { x: cx - 1.9, y: cy - 1.9, width: 3.8, height: 3.8, fill: 'var(--surface-2)', transform: `rotate(45 ${cx} ${cy})` }, svg);
+      label(svg, cx, cy + 0.6, n, 1.8, 'var(--text)');
+      if (LADDERS[n] || SNAKES[n]) {
+        el('rect', { x: x + 10 - 3, y: y + 10 - 3, width: 3, height: 3, fill: LADDERS[n] ? 'var(--accent)' : SNAKE_COLOR, opacity: 0.7 }, svg);
+      }
+    }
+  }
+  for (const [s, e] of Object.entries(LADDERS)) {
+    const a = cellCenter(+s), b = cellCenter(+e);
+    const dx = b.x - a.x, dy = b.y - a.y, len = Math.hypot(dx, dy) || 1;
+    const ux = dx / len, uy = dy / len, nx = -uy, ny = ux, w = 1.9;
+    const g = el('g', {}, svg);
+    const pts = [[a.x + nx * w, a.y + ny * w], [b.x + nx * w, b.y + ny * w], [b.x - nx * w, b.y - ny * w], [a.x - nx * w, a.y - ny * w]].map(p => p.join(',')).join(' ');
+    el('polygon', { points: pts, fill: 'var(--accent)', opacity: 0.4 }, g);
+    const steps = Math.max(2, Math.round(len / 5));
+    for (let i = 0; i < steps; i++) {
+      const t0 = i / steps, t1 = (i + 0.5) / steps;
+      const c0 = { x: a.x + dx * t0, y: a.y + dy * t0 }, c1 = { x: a.x + dx * t1, y: a.y + dy * t1 };
+      el('line', { x1: c0.x + nx * w, y1: c0.y + ny * w, x2: c1.x - nx * w, y2: c1.y - ny * w, stroke: 'var(--accent)', 'stroke-width': 0.5, opacity: 0.9 }, g);
+    }
+  }
+  Object.entries(SNAKES).forEach(([s, e], idx) => {
+    const a = cellCenter(+s), b = cellCenter(+e), c = snakeBend(a, b, idx);
+    const g = el('g', {}, svg);
+    const n = 6;
+    for (let i = n; i >= 0; i--) {
+      const t = i / n, p = bezPt(a, c, b, t), size = 4.4 - t * 2.8;
+      el('rect', { x: p.x - size / 2, y: p.y - size / 2, width: size, height: size, rx: size * 0.28, fill: SNAKE_COLOR, opacity: 0.5 + (1 - t) * 0.4, transform: `rotate(${idx * 15} ${p.x} ${p.y})` }, g);
+    }
+    el('circle', { cx: a.x - 1, cy: a.y - 1, r: 0.55, fill: '#fff' }, g);
+    el('circle', { cx: a.x + 1, cy: a.y - 1, r: 0.55, fill: '#fff' }, g);
+  });
+}
+
+buildStyle1(document.getElementById('b1'));
+buildStyle2(document.getElementById('b2'));
+buildStyle3(document.getElementById('b3'));
+buildStyle4(document.getElementById('b4'));
+buildStyle5(document.getElementById('b5'));
+
+document.querySelectorAll('.theme-switcher button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.body.dataset.theme = btn.dataset.theme;
+    document.querySelectorAll('.theme-switcher button').forEach(b => b.classList.toggle('active', b === btn));
+  });
+});
+</script>
+</body>
+</html>

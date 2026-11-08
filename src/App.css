@@ -1,0 +1,43 @@
+/* App layout */
+.app-layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-main {
+  flex: 1;
+  margin-left: 200px;
+  transition: margin-left 0.25s ease;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+}
+
+/* When sidebar is collapsed the margin shrinks */
+:has(.sidebar.collapsed) .app-main {
+  margin-left: 56px;
+}
+
+/* Screensaver: fade out sidebar + main, leaving only the animated background.
+   Any mouse/keyboard/touch activity wakes it (handled in App.jsx). */
+.sidebar,
+.app-main {
+  transition: opacity 0.8s ease;
+}
+.app-layout.screensaver-active .sidebar,
+.app-layout.screensaver-active .app-main {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Phones / portrait tablets: the expanded sidebar slides OVER the game
+   instead of squeezing it; the game always keeps the full width. */
+@media (max-width: 899px) {
+  .app-main,
+  :has(.sidebar.collapsed) .app-main { margin-left: 56px; }
+  .sidebar:not(.collapsed) { box-shadow: 8px 0 30px rgba(0,0,0,0.5); }
+}

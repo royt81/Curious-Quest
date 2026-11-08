@@ -1,0 +1,217 @@
+.settings-btn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 12px;
+  width: 100%;
+  border-radius: var(--r-sm);
+  background: transparent;
+  border: 2px solid transparent;
+  color: var(--text-dim);
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+  text-align: left;
+}
+.settings-btn:hover {
+  background: var(--surface-1);
+  color: var(--text);
+}
+.settings-btn-icon {
+  font-size: 1.15rem;
+  flex-shrink: 0;
+  transition: transform 0.3s;
+}
+.settings-btn:hover .settings-btn-icon { transform: rotate(60deg); }
+
+.settings-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.65);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settings-panel {
+  background: var(--surface-ink);
+  border-radius: var(--r-xl);
+  padding: 32px 40px;
+  border: 2px solid var(--accent-border);
+  box-shadow: var(--shadow-panel);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  min-width: 280px;
+}
+
+.settings-panel h3 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Sound on/off toggle */
+.sound-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  width: 100%;
+  padding: 12px 18px;
+  border-radius: var(--r-sm);
+  background: var(--surface-0);
+  border: 2px solid transparent;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.sound-toggle:hover { background: var(--surface-2); border-color: var(--accent-border); }
+.sound-toggle-label { text-align: left; }
+.sound-switch {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  border-radius: 999px;
+  background: var(--border-mid);
+  flex-shrink: 0;
+  transition: background 0.2s;
+}
+.sound-toggle.on .sound-switch { background: var(--accent); }
+.sound-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform 0.2s;
+}
+.sound-toggle.on .sound-knob { transform: translateX(20px); }
+
+.close-btn {
+  padding: 10px 28px;
+  border-radius: var(--r-sm);
+  background: var(--surface-2);
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  font-weight: 600;
+  border: 1px solid var(--border-mid);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.close-btn:hover { background: var(--surface-3); color: var(--text); }
+
+/* ── Upgraded settings panel (Nov 5) ── */
+.settings-overlay { padding: 16px; }
+.settings-panel {
+  background: rgba(14, 20, 38, 0.97);
+  padding: 22px 24px;
+  gap: 14px;
+  width: 100%;
+  max-width: 440px;
+  max-height: 100%;
+  overflow-y: auto;
+  align-items: stretch;
+  color: var(--text);
+  font-family: var(--font-body);
+}
+.settings-panel h3 { text-align: center; }
+.settings-section { display: flex; flex-direction: column; gap: 8px; }
+.settings-section h4 {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--text-faint);
+}
+.sound-toggle { background: var(--surface-1); font-size: 0.98rem; padding: 10px 14px; }
+.sound-toggle-label { display: flex; flex-direction: column; gap: 1px; }
+.sound-toggle-label small { font-size: 0.75rem; color: var(--text-faint); font-weight: 500; }
+.settings-volume {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px 14px;
+  background: var(--surface-1);
+  border-radius: var(--r-sm);
+}
+.settings-volume input { flex: 1; accent-color: var(--accent); height: 28px; cursor: pointer; }
+.settings-volume.disabled { opacity: 0.45; }
+.settings-themes { display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); gap: 8px; }
+.settings-theme {
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 10px 6px;
+  border-radius: var(--r-sm);
+  background: var(--surface-1);
+  border: 2px solid transparent;
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+.settings-theme:hover { border-color: var(--accent-border); }
+.settings-theme.active { border-color: var(--accent); background: var(--accent-soft); }
+.close-btn { align-self: center; background: var(--accent); color: var(--accent-ink); border: none; padding: 10px 36px; }
+.close-btn:hover { background: var(--accent); color: var(--accent-ink); filter: brightness(1.08); }
+
+/* ── Reading voice (Nov 6) ── */
+.settings-voice {
+  display: flex; flex-direction: column; gap: 8px;
+  padding: 10px 14px;
+  background: var(--surface-1);
+  border-radius: var(--r-sm);
+}
+.settings-voice.disabled { opacity: 0.45; }
+.settings-voice-row {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.9rem; font-weight: 700;
+}
+.settings-voice-row > span:first-child { width: 58px; flex-shrink: 0; color: var(--text-dim); }
+.settings-voice-row input[type="range"] { flex: 1; accent-color: var(--accent); height: 28px; cursor: pointer; }
+.settings-voice-row select {
+  flex: 1; min-width: 0;
+  padding: 7px 8px;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--border-mid);
+  background: rgba(10, 16, 32, 0.9);
+  color: var(--text);
+  font: inherit; font-weight: 600;
+}
+.settings-voice-end { font-size: 1.05rem; }
+.settings-voice-btns { display: flex; gap: 8px; justify-content: center; }
+.settings-mini-btn {
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 2px solid var(--accent-border);
+  background: transparent;
+  color: var(--text);
+  font-weight: 800; font-size: 0.85rem;
+  cursor: pointer;
+}
+.settings-mini-btn:hover { background: var(--accent-soft); }
+
+/* ── Colours (Nov 7) ── */
+.settings-colour-presets { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.settings-colour-preset {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 8px 4px;
+  border-radius: var(--r-sm);
+  background: var(--surface-1);
+  border: 2px solid transparent;
+  color: var(--text);
+  font-weight: 800; font-size: 0.8rem;
+  cursor: pointer;
+}
+.settings-colour-preset span { font-size: 1.3rem; }
+.settings-colour-preset.active { border-color: var(--accent); background: var(--accent-soft); }

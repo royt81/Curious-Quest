@@ -1,0 +1,502 @@
+@import '../../components/shared.css';
+
+/* ════════════════════════════════════════════════════════════════════════════
+   BACKGAMMON — restyled to match the app's glass-panel design language
+   ════════════════════════════════════════════════════════════════════════════ */
+
+.backgammon-screen {
+  flex-direction: row;
+  padding: 0;
+  gap: 0;
+  align-items: stretch;
+  justify-content: flex-start;
+  overflow: hidden;
+}
+
+/* ── Side panel ── */
+.bg-sidebar {
+  width: 180px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px 12px;
+  background: var(--surface-ink);
+  border-right: 1px solid var(--border-soft);
+  overflow-y: auto;
+}
+.bg-sidebar-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--accent);
+  text-align: center;
+}
+.bg-turn {
+  font-size: 0.85rem;
+  padding: 7px 10px;
+  text-align: center;
+  white-space: normal;
+  line-height: 1.3;
+}
+.bg-gameover-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bg-gameover-btns .btn { width: 100%; }
+.bg-log { flex: 1; min-height: 0; }
+
+/* ── Board area ── */
+.bg-main {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  overflow: hidden;
+}
+
+.bg-dice-row { display: flex; gap: 10px; flex-wrap: wrap; }
+.bg-die {
+  width: 42px; height: 42px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  padding: 6px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-mid);
+  border-radius: var(--r-sm);
+  box-shadow: var(--shadow-press), inset 0 1px 1px rgba(255,255,255,0.12);
+}
+.bg-pip {
+  width: 8px; height: 8px;
+  align-self: center; justify-self: center;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 6px var(--accent-glow);
+}
+.bg-dice-empty {
+  color: var(--text-faint);
+  font-size: 1.4rem;
+  padding: 0 14px;
+}
+
+/* ── Layout: off-trays + board, side-by-side, fills bg-main ── */
+.bg-table-wrap {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 10px;
+  height: 100%;
+  width: 100%;
+}
+
+.bg-side {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.bg-off {
+  width: 72px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 10px 6px;
+  border-radius: var(--r-md);
+  background: var(--surface-1);
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-press);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+.bg-off-label { font-size: 0.72rem; color: var(--text-dim); text-align: center; }
+.bg-off-count { font-size: 1.4rem; color: var(--text); }
+.bg-off.human.highlight {
+  border-color: var(--off-accent, var(--accent));
+  background: var(--accent-soft);
+  cursor: pointer;
+  box-shadow: 0 0 0 3px var(--accent-soft), 0 0 16px var(--accent-glow);
+}
+
+/* ── The board panel — glass surface matching the rest of the app ── */
+.bg-table {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  background:
+    radial-gradient(circle at 18% 12%, var(--accent-tint), transparent 42%),
+    radial-gradient(circle at 84% 88%, var(--accent-soft), transparent 46%),
+    linear-gradient(160deg, var(--surface-2), var(--surface-0));
+  border-radius: var(--r-xl);
+  border: 3px solid var(--accent-border);
+  box-shadow: var(--shadow-panel), inset 0 0 0 2px var(--surface-1);
+  padding: 10px;
+  margin: 6px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+/* Continuous central divider (the "bar") */
+.bg-table::before {
+  content: '';
+  position: absolute;
+  top: 10px;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 22px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--r-xs);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.bg-row {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr) 26px repeat(6, 1fr);
+  gap: 3px;
+  flex: 1;         /* fill half the board height each */
+  min-height: 0;
+}
+.bg-row.bg-top { align-items: start; }
+.bg-row.bg-bottom { align-items: end; }
+
+/* Vertical centre rail — kept as a spacer; visual line comes from .bg-table::before */
+.bg-rail {
+  background: transparent;
+}
+
+/* ── A single point (triangle + checker stack) ─────────────────────────────── */
+.bg-point {
+  position: relative;
+  height: 100%;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.bg-point.bottom { justify-content: flex-end; }
+
+/* Flat, theme-tinted triangles (subtle two-tone checkerboard) */
+.bg-triangle {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 86%;
+  z-index: 0;
+  background: var(--tri-fill, var(--surface-1));
+  border: 1px solid var(--border-soft);
+}
+.bg-point.top .bg-triangle {
+  top: 0;
+  clip-path: polygon(50% 100%, 0% 0%, 100% 0%);   /* apex pointing down */
+}
+.bg-point.bottom .bg-triangle {
+  bottom: 0;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%); /* apex pointing up */
+}
+/* alternating tints, both built from the theme surfaces/accent */
+.bg-point.dark.top    { --tri-fill: var(--surface-2); }
+.bg-point.dark.bottom { --tri-fill: var(--surface-2); }
+.bg-point.light.top   { --tri-fill: var(--accent-tint); }
+.bg-point.light.bottom{ --tri-fill: var(--accent-tint); }
+
+.bg-point.movable .bg-triangle { border-color: var(--accent-border); }
+.bg-point.selected .bg-triangle,
+.bg-point.highlight .bg-triangle {
+  --tri-fill: var(--accent-soft);
+  border-color: var(--accent);
+}
+.bg-point.highlight {
+  box-shadow: inset 0 0 0 2px var(--accent), inset 0 0 14px var(--accent-glow);
+  border-radius: var(--r-xs);
+}
+
+/* checker stack sits over the triangle, flowing from the base inward */
+.bg-stack {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  width: 100%;
+}
+.bg-point.top .bg-stack { margin-top: 2px; }
+.bg-point.bottom .bg-stack { margin-bottom: 2px; }
+
+.bg-checker {
+  width: 27px; height: 27px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: 0.8rem;
+  flex-shrink: 0;
+  position: relative;
+  background: var(--surface-3);
+  border: 2px solid var(--border-mid);
+  box-shadow: var(--shadow-press), inset 0 1px 1px rgba(255,255,255,0.18);
+}
+.bg-checker.human {
+  background: var(--accent);
+  color: var(--accent-ink);
+  border-color: rgba(255,255,255,0.5);
+  box-shadow: var(--shadow-press), 0 0 10px var(--accent-glow), inset 0 1px 1px rgba(255,255,255,0.35);
+}
+.bg-checker.comp {
+  background: var(--surface-3);
+  color: var(--text);
+  border-color: var(--border-mid);
+}
+
+.bg-point-num {
+  position: absolute;
+  font-size: 0.6rem;
+  color: var(--text-faint);
+  font-weight: 700;
+  z-index: 2;
+}
+.bg-point.top .bg-point-num { top: 1px; }
+.bg-point.bottom .bg-point-num { bottom: 1px; }
+
+/* ── Center bar ────────────────────────────────────────────────────────────── */
+.bg-bar {
+  /* Identical grid to .bg-row so the rail column (col 7) lines up perfectly */
+  display: grid;
+  grid-template-columns: repeat(6, 1fr) 26px repeat(6, 1fr);
+  gap: 3px;
+  align-items: center;
+  padding: 5px 0;
+  background: var(--surface-0);
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 1px solid var(--border-soft);
+}
+/* Span left 6 columns / right 6 columns */
+.bg-bar .bg-bar-cell.comp  { grid-column: 1 / 7; }
+.bg-bar .bg-bar-mid        { grid-column: 7 / 8; }
+.bg-bar .bg-bar-cell.human { grid-column: 8 / 14; }
+
+.bg-bar-cell {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--r-sm);
+}
+.bg-bar-cell.human { cursor: pointer; }
+.bg-bar-cell.movable { box-shadow: 0 0 0 2px var(--accent), 0 0 14px var(--accent-glow); border-radius: var(--r-sm); }
+.bg-bar-cell.selected { background: var(--accent-soft); }
+.bg-bar-mid {
+  background: transparent;
+  height: 100%;
+  border-radius: 0;
+}
+.bar-checker { width: 30px; height: 30px; }
+
+/* Flying checker overlay — absolutely positioned inside .bg-table */
+.fly-checker {
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5), 0 0 12px var(--accent-glow);
+}
+
+/* ── Controls ──────────────────────────────────────────────────────────────── */
+.bg-controls {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.bg-roll-btn { font-size: 1.05rem; padding: 10px 26px; }
+.bg-roll-btn:disabled { opacity: 0.45; cursor: default; }
+.bg-remaining {
+  font-family: var(--font-display);
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 0.95rem;
+}
+
+/* ── Responsive ─────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  .bg-checker { width: 21px; height: 21px; font-size: 0.65rem; }
+  .bar-checker { width: 25px; height: 25px; }
+  .bg-triangle { width: 22px; }
+  .bg-table { margin: 4px 6px; }
+}
+
+
+/* ════════════════════════════════════════════════════════════════════════════
+   CLARITY PASS (Nov 2026) — solid wooden board, high-contrast points and
+   checkers that scale with the available space. Overrides the glass styles above.
+   ════════════════════════════════════════════════════════════════════════════ */
+.bg-table {
+  background: #3b2416;                         /* dark wood frame */
+  border: 6px solid #6b4226;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.45), inset 0 0 0 2px #24150c;
+  padding: 8px;
+}
+.bg-row {
+  background: #1f5a43;                         /* felt playing field */
+  border-radius: 6px;
+  padding: 0 4px;
+}
+.bg-row.bg-top    { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+.bg-row.bg-bottom { border-top-left-radius: 0;    border-top-right-radius: 0; }
+.bg-table::before {                             /* the bar */
+  background: #6b4226;
+  border: none;
+  width: 26px;
+  border-radius: 3px;
+  z-index: 0;
+}
+.bg-rail { background: transparent; }
+
+/* points: real triangles, alternating cream / red */
+.bg-point { container-type: size; }
+.bg-triangle {
+  width: 92%;
+  height: 88%;
+  border: none;
+}
+.bg-point.dark  { --tri-fill: #e9d8b4; }
+.bg-point.light { --tri-fill: #b4482f; }
+.bg-point.dark.top, .bg-point.dark.bottom   { --tri-fill: #e9d8b4; }
+.bg-point.light.top, .bg-point.light.bottom { --tri-fill: #b4482f; }
+.bg-point.movable .bg-triangle { filter: brightness(1.12); }
+.bg-point.selected .bg-triangle { --tri-fill: #ffe066; filter: none; }
+.bg-point.highlight .bg-triangle { --tri-fill: #7ee787; filter: none; }
+.bg-point.highlight {
+  box-shadow: inset 0 0 0 3px #7ee787, inset 0 0 18px rgba(126,231,135,0.55);
+  border-radius: 6px;
+}
+.bg-point.movable { cursor: pointer; }
+
+/* checkers: sized from the point's own box (container query units) */
+.bg-checker {
+  --ck: min(90cqw, 19cqh, 56px);
+  width: var(--ck);
+  height: var(--ck);
+  font-size: calc(var(--ck) * 0.42);
+  border-width: 3px;
+}
+.bg-checker.human {
+  color: #1d1d1f;
+  border-color: #fff8;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.55), inset 0 -3px 0 rgba(0,0,0,0.18), inset 0 2px 0 rgba(255,255,255,0.45);
+  outline: 2px solid #1d1d1f;
+  outline-offset: -1px;
+}
+.bg-checker.comp {
+  background: #f6f2e8;
+  color: #2a2a2a;
+  border-color: #b9b2a3;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.55), inset 0 -3px 0 rgba(0,0,0,0.12), inset 0 2px 0 #fff;
+  outline: 2px solid #3a3530;
+  outline-offset: -1px;
+}
+.bg-point.movable .bg-stack .bg-checker.human:last-child {
+  box-shadow: 0 0 0 3px #ffe066, 0 0 14px #ffe066;
+}
+.bg-point-num {
+  color: #fff;
+  opacity: 0.75;
+  font-size: 0.7rem;
+  text-shadow: 0 1px 2px #000;
+}
+.bg-point.top .bg-point-num    { top: auto; bottom: 1px; }
+.bg-point.bottom .bg-point-num { bottom: auto; top: 1px; }
+
+/* middle strip between the two halves */
+.bg-bar {
+  background: #3b2416;
+  border: none;
+  padding: 6px 0;
+}
+.bg-bar .bg-checker, .bar-checker { --ck: 36px; }
+.fly-checker { --ck: 34px; }
+
+/* off trays + dice a bit chunkier */
+.bg-off { background: #3b2416; border: 3px solid #6b4226; color: #fff; }
+.bg-off-label { color: #e9d8b4; }
+.bg-off-count { color: #fff; }
+.bg-die {
+  width: 50px; height: 50px;
+  background: #fffdf7;
+  border-color: #d8d2c4;
+}
+.bg-pip { width: 9px; height: 9px; background: #222; box-shadow: none; }
+
+@media (max-width: 640px) {
+  .bg-checker { --ck: min(90cqw, 19cqh, 40px); }
+  .bg-triangle { width: 92%; }
+  .bg-table::before { width: 18px; }
+}
+
+/* ── Slightly see-through board (Nov 5) — background shows through, blur keeps it readable ── */
+.bg-table {
+  background: rgba(59, 36, 22, 0.62);
+  border-color: rgba(107, 66, 38, 0.85);
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.bg-row { background: rgba(31, 90, 67, 0.55); }
+.bg-bar { background: rgba(59, 36, 22, 0.5); }
+.bg-table::before { background: rgba(107, 66, 38, 0.75); }
+.bg-point.dark  { --tri-fill: rgba(233, 216, 180, 0.82); }
+.bg-point.light { --tri-fill: rgba(180, 72, 47, 0.82); }
+.bg-point.dark.top, .bg-point.dark.bottom   { --tri-fill: rgba(233, 216, 180, 0.82); }
+.bg-point.light.top, .bg-point.light.bottom { --tri-fill: rgba(180, 72, 47, 0.82); }
+
+/* ── Theme pieces (Nov 6): character coins + count badge ── */
+.bg-checker { position: relative; overflow: visible; }
+.bg-checker.human { outline-color: rgba(0,0,0,0.6); }
+.bg-face {
+  width: 74%;
+  height: 74%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+.bg-count {
+  position: absolute;
+  right: -5px;
+  bottom: -5px;
+  min-width: 1.5em;
+  height: 1.5em;
+  padding: 0 3px;
+  border-radius: 999px;
+  background: #1d1d1f;
+  color: #fff;
+  font-size: max(10px, calc(var(--ck) * 0.34));
+  font-weight: 900;
+  line-height: 1.5em;
+  text-align: center;
+  border: 2px solid #fff;
+}
+.bg-legend {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+.bg-legend span { display: flex; align-items: center; gap: 4px; }
+.bg-legend img { width: 26px; height: 26px; object-fit: contain; }
+.bg-legend-vs { color: var(--text-faint); font-size: 0.75rem; }
+
+/* Dice picture before the first roll — same as Snakes & Ladders (Nov 7) */
+.bg-dice-row { justify-content: center; min-height: 50px; align-items: center; }
+.bg-dice-empty { color: inherit; font-size: 2.4rem; padding: 0; line-height: 1; }

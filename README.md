@@ -1,0 +1,55 @@
+# 🦊 Curious Quest
+
+**Free games for curious kids — no ads, no purchases, no accounts, no data collected.**
+
+Curious Quest is a collection of 16 games for children aged about 4–10, built by a dad for his child.
+Every game comes in five worlds (Animals, Dinosaurs, Space, Robots, Under the Sea), each with its own
+painted characters, music and animated background, guided by Fox, the explorer mascot.
+
+## Games
+
+| | |
+|---|---|
+| 🗺️ **Adventure** – roll the dice, answer questions, race to the trophy | 🧠 **Memory** – 12 painted pictures per world |
+| 🧮 **Quiz Race** – maths and letters for readers and non-readers | 🎨 **Draw & Paint** – free drawing and colouring pages |
+| 🐍 **Snakes & Ladders**, 🏁 **Race**, 🎴 **Foursomes** (Quartett) | ♟️ **Chess**, **Checkers**, **Backgammon**, **Domino**, **Uno**, **Dots & Boxes** |
+| 🔬 **Game of Life**, 🔤 **Letter Hunt**, 🔢 **Number Quest** | |
+
+Made for small hands: big touch targets, a reading voice for children who can't read yet,
+"How to play" cards for every game, a calm-colours / black & white mode for bedtime,
+and play against the computer or pass-and-play with friends.
+
+## Privacy by design
+
+- No cookies, analytics, ads or third-party requests — fonts, pictures and sounds are all bundled.
+- Settings and scores live only in the browser's local storage.
+- Installable as an app (PWA) and playable offline after the first visit.
+
+## Tech
+
+- **React 19** + **Vite** (single-page app, no backend)
+- **framer-motion** for animation, **lottie-react** for animated creatures
+- Web Speech API for the reading voice, ZzFX + Web Audio for sound effects
+- Self-hosted fonts via **@fontsource**
+- Hand-written service worker for offline play
+- Deployed as static files on **Cloudflare Pages** (automatic deploy on every push to `main`)
+
+## Run it locally
+
+```bash
+npm install
+npm run dev        # http://localhost:5173
+npm run build      # production build in dist/
+npm run preview    # serve the production build
+```
+
+Requires Node.js 22 or newer.
+
+## Art
+
+Characters and Memory pictures were created for Curious Quest with AI image tools (Canva, FLUX.2)
+and edited by hand. Some icons and colouring outlines are licensed from Flaticon.
+
+## Licence
+
+© Roy Tate. All rights reserved. The source code is public for portfolio purposes.

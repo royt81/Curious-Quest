@@ -1,0 +1,225 @@
+@import '../../components/shared.css';
+
+.snakes-screen { gap: 0; justify-content: center; padding: 10px 16px; overflow: hidden; }
+
+/* ── Setup ─────────────────────────────────────────────────────────────────── */
+.sl-setup {
+  display: flex; flex-direction: column; align-items: center;
+  gap: 10px; text-align: center;
+  background: var(--surface-0); border-radius: var(--r-xl);
+  padding: 16px 24px 20px; border: 2px solid var(--accent-border);
+  box-shadow: var(--shadow-panel); max-width: 520px; width: 100%;
+}
+.sl-setup-header {
+  display: flex; align-items: center; justify-content: space-between;
+  width: 100%; gap: 8px; margin-bottom: 2px;
+}
+.sl-setup-title {
+  font-family: var(--font-display); font-size: 1.2rem; font-weight: 700;
+  flex: 1; text-align: center; margin: 0;
+}
+.sl-setup-h {
+  font-family: var(--font-display); font-size: 0.78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 1.2px; color: var(--text-faint); margin: 0;
+}
+.sl-mode-btns, .sl-count-btns { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.sl-mode-btn, .sl-count-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 9px 14px; border-radius: var(--r-md);
+  background: var(--surface-1); border: 2px solid var(--border-soft);
+  cursor: pointer; transition: border-color 0.15s, background 0.15s; color: var(--text); min-width: 110px;
+}
+.sl-mode-btn.selected, .sl-count-btn.selected { border-color: var(--accent); background: var(--accent-soft); }
+.sl-mode-racers, .sl-count-racers { font-size: 1.4rem; display: flex; align-items: center; gap: 6px; }
+.sl-vs { font-size: 0.8rem; color: var(--text-faint); font-weight: 700; }
+.sl-mode-label, .sl-count-label { font-family: var(--font-display); font-weight: 600; font-size: 0.9rem; }
+.sl-start-btn { margin-top: 4px; font-size: 1.05rem; padding: 10px 28px; }
+
+/* ── Play layout ───────────────────────────────────────────────────────────── */
+.sl-play {
+  display: flex; flex-direction: row; gap: 18px;
+  width: 100%; align-items: flex-start; justify-content: center;
+  flex-wrap: wrap;
+}
+.sl-board-wrap {
+  position: relative;
+  flex: 0 1 auto;
+  width: min(100%, calc(100vh - 140px), calc(100vw - 300px));
+  aspect-ratio: 1;
+  min-width: 0;
+  margin-left: 6%;
+  margin-bottom: 6%;
+}
+
+.sl-board {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  border: 3px solid var(--accent-border);
+  box-shadow: var(--shadow-panel), inset 0 0 0 2px var(--surface-1);
+  background:
+    url('/boards/snakes and ladders/snakes&ladders-board.webp') center / cover no-repeat;
+}
+.sl-cell {
+  position: relative;
+  display: flex; align-items: flex-start; justify-content: flex-start;
+  font-size: 0.6rem;
+  box-shadow: inset 0 0 0 1px var(--border-mid);
+  transition: background var(--ease);
+}
+.sl-cell.even { background: rgba(255,255,255,0.07); }
+.sl-cell.odd  { background: rgba(0,0,0,0.07); }
+.sl-cell.finish {
+  background:
+    radial-gradient(circle at 50% 50%, var(--accent-soft), transparent 70%),
+    var(--accent-tint);
+}
+.sl-cell-num {
+  position: absolute; top: 3px; left: 4px;
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(0.6rem, 1.6vw, 0.95rem); color: var(--text);
+  background: var(--surface-2);
+  border-radius: 5px;
+  padding: 1px 4px;
+  line-height: 1.4;
+}
+.sl-cell.finish .sl-cell-num { color: var(--accent); background: var(--accent-soft); }
+.sl-cell-mark {
+  position: absolute; bottom: 2px; right: 2px; font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center;
+  width: 1.25em; height: 1.25em; border-radius: 50%;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.4));
+}
+.sl-mark-ladder { background: rgba(217, 164, 65, 0.22); }
+.sl-mark-snake { background: var(--accent-soft); }
+.sl-cell-flag { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; }
+
+/* ── Ladder & snake overlay ──────────────────────────────────────────────── */
+.sl-overlay { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+
+/* Ladders — bold wood rails & rungs with shine + drop shadow for a 3D look */
+.sl-ladder-rail-shadow { stroke: rgba(0,0,0,0.35); stroke-width: 3.2; fill: none; stroke-linecap: round; transform: translate(0.5px, 0.6px); }
+.sl-ladder-rail { stroke: url(#sl-ladder-rail-grad); stroke-width: 2.5; fill: none; stroke-linecap: round; }
+.sl-ladder-rail-shine { stroke: rgba(255,255,255,0.55); stroke-width: 0.7; fill: none; stroke-linecap: round; }
+.sl-ladder-shine { stroke: rgba(255,255,255,0.55); stroke-width: 0.7; fill: none; stroke-linecap: round; }
+.sl-ladder-rung { stroke: #c1893b; stroke-width: 1.5; fill: none; stroke-linecap: round; }
+.sl-ladder-rung-shadow { stroke: rgba(0,0,0,0.3); stroke-width: 1.5; fill: none; stroke-linecap: round; }
+
+/* Snakes — bold cartoon body with hooded head, big eyes, scales & tongue */
+.sl-snake-shadow { stroke: rgba(0,0,0,0.35); stroke-width: 4.2; fill: none; stroke-linecap: round; transform: translate(0.5px, 0.6px); }
+.sl-snake-body { stroke-width: 3.8; fill: none; stroke-linecap: round; }
+.sl-snake-tail { stroke-width: 1.4; fill: none; stroke-linecap: round; }
+.sl-snake-belly { stroke: rgba(255,255,255,0.28); stroke-width: 1.1; fill: none; stroke-linecap: round; }
+.sl-snake-scale { fill: rgba(255,255,255,0.28); }
+.sl-snake-scale.alt { fill: rgba(0,0,0,0.14); }
+.sl-snake-head { stroke: rgba(0,0,0,0.3); stroke-width: 0.35; }
+.sl-snake-eye-white { fill: #ffffff; stroke: rgba(0,0,0,0.25); stroke-width: 0.15; }
+.sl-snake-eye-pupil { fill: #1a1a1a; }
+.sl-snake-tongue { stroke: #e0436b; stroke-width: 0.6; fill: none; stroke-linecap: round; }
+
+.sl-snake-c0 .sl-snake-body, .sl-snake-c0 .sl-snake-tail, .sl-snake-c0 .sl-snake-head { fill: url(#sl-snake-grad-0); stroke: url(#sl-snake-grad-0); }
+.sl-snake-c1 .sl-snake-body, .sl-snake-c1 .sl-snake-tail, .sl-snake-c1 .sl-snake-head { fill: url(#sl-snake-grad-1); stroke: url(#sl-snake-grad-1); }
+.sl-snake-c2 .sl-snake-body, .sl-snake-c2 .sl-snake-tail, .sl-snake-c2 .sl-snake-head { fill: url(#sl-snake-grad-2); stroke: url(#sl-snake-grad-2); }
+.sl-snake-c3 .sl-snake-body, .sl-snake-c3 .sl-snake-tail, .sl-snake-c3 .sl-snake-head { fill: url(#sl-snake-grad-3); stroke: url(#sl-snake-grad-3); }
+.sl-snake-head { stroke-width: 0.35; }
+.sl-snake-c0 .sl-snake-head, .sl-snake-c1 .sl-snake-head, .sl-snake-c2 .sl-snake-head, .sl-snake-c3 .sl-snake-head { stroke: rgba(0,0,0,0.3); }
+
+/* START tile — outside the board, bottom-left */
+.sl-start-tile {
+  position: absolute;
+  left: -7%; top: 107%;
+  transform: translate(-50%, -50%);
+  width: 13%; height: 13%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px;
+  border-radius: var(--r-md);
+  background: var(--accent-soft);
+  border: 2px dashed var(--accent-border);
+  box-shadow: var(--shadow-card);
+  z-index: 1;
+}
+.sl-start-emoji { font-size: clamp(0.9rem, 2.4vw, 1.6rem); }
+.sl-start-label {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(0.45rem, 1.1vw, 0.7rem); letter-spacing: 1px;
+  color: var(--accent);
+}
+
+/* Player tokens */
+.sl-token {
+  position: absolute; z-index: 3;
+  width: 6.4%; height: 6.4%;
+  transform: translate(-50%, -50%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.1rem;
+  border-radius: 50%;
+  background: var(--tok-col, #fff);
+  border: 2px solid #fff;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+}
+.sl-token.is-current { box-shadow: 0 0 0 2px #fff, 0 0 12px var(--tok-col); }
+
+/* ── Sidebar ───────────────────────────────────────────────────────────────── */
+.sl-sidebar {
+  flex: 0 0 220px; max-width: 240px;
+  display: flex; flex-direction: column; gap: 12px;
+  background: var(--surface-1); border-radius: var(--r-lg);
+  border: 1px solid var(--border-soft); padding: 16px 14px;
+}
+.sl-sidebar-title { font-family: var(--font-display); font-size: 1.05rem; font-weight: 800; color: var(--accent); text-align: center; }
+.sl-turn {
+  display: flex; align-items: center; gap: 8px; justify-content: center;
+  padding: 8px 10px; border-radius: var(--r-sm);
+  background: var(--surface-0); border: 1px solid var(--border-soft);
+  font-family: var(--font-display); font-weight: 700; color: var(--turn-col, var(--accent));
+}
+.sl-turn-emoji { font-size: 1.2rem; }
+.sl-players { display: flex; flex-direction: column; gap: 6px; }
+.sl-player-row {
+  display: flex; align-items: center; gap: 7px;
+  padding: 6px 10px; border-radius: var(--r-sm);
+  background: var(--surface-0); border-left: 4px solid transparent;
+  font-family: var(--font-display); font-size: 0.85rem;
+}
+.sl-player-row.active { border-left-color: var(--row-col, var(--accent)); background: var(--accent-soft); }
+.sl-player-arrow { color: var(--row-col, var(--accent)); font-size: 0.7rem; }
+.sl-player-emoji { font-size: 1rem; }
+.sl-player-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sl-player-pos { font-size: 0.72rem; font-weight: 700; color: var(--accent); }
+
+.sl-dice-area { display: flex; justify-content: center; padding: 4px 0; }
+.sl-dice-empty { font-size: 2.4rem; }
+.sl-dice.rolling { animation: sl-shake 0.13s linear infinite; }
+@keyframes sl-shake { 0%,100% { transform: rotate(-7deg); } 50% { transform: rotate(7deg); } }
+.sl-roll-btn { font-size: 1rem; padding: 11px 20px; }
+.sl-roll-btn:disabled { opacity: 0.5; cursor: default; }
+.sl-log { max-width: none; height: 90px; overflow: hidden; flex-shrink: 0; }
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+@media (max-width: 760px) {
+  .sl-play { flex-direction: column; align-items: center; }
+  .sl-sidebar { flex-basis: auto; width: 100%; max-width: 540px; }
+  .sl-board-wrap { width: min(85vh, 88vw, 540px); margin-left: 8%; margin-bottom: 8%; }
+}
+
+/* ── Calmer board + darker, easier-to-read numbers (Nov 5) ── */
+.sl-board {
+  background:
+    linear-gradient(rgba(20, 24, 40, 0.22), rgba(20, 24, 40, 0.22)),
+    url('/boards/snakes and ladders/snakes&ladders-board.webp') center / cover no-repeat;
+}
+.sl-board { filter: saturate(0.88); }
+.sl-cell { box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.12); }
+.sl-cell.even { background: rgba(0, 0, 0, 0.04); }
+.sl-cell.odd  { background: rgba(0, 0, 0, 0.10); }
+.sl-cell-num {
+  color: #1b2238;
+  background: rgba(255, 255, 255, 0.72);
+  font-weight: 900;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+}
+.sl-cell.finish .sl-cell-num { color: #1b2238; background: #ffe066; }
