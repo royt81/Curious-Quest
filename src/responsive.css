@@ -13,8 +13,8 @@
 }
 
 /* Grids that used 100vw ignored the side menu → measure the parent instead */
-.memory-grid    { width: min(100%, calc(100svh - 150px), 480px); }
-.memory-grid-24 { width: min(100%, calc(100svh - 150px) * 1.5, 620px); }
+.memory-grid    { width: min(100%, calc(100dvh - 150px), 820px); }   /* grows on big screens */
+.memory-grid-24 { width: min(100%, calc((100dvh - 150px) * 1.5), 1200px); }
 .player-count-btns { flex-wrap: wrap; justify-content: center; }
 
 /* Comfortable tap targets everywhere */
@@ -59,4 +59,13 @@ html, body { overscroll-behavior: none; -webkit-tap-highlight-color: transparent
 
   /* snakes & ladders board measured from its own column, not the window */
   .sl-board-wrap { width: min(85vh, 88%, 540px); }
+}
+
+/* ── Big screens: games with fixed-size pieces (cards, tiles, dots) are scaled up
+   so they use the space. --game-zoom is set by App.jsx from the window size
+   (1 on laptops, up to 1.6 on large monitors). ── */
+.domino-screen, .uno-screen, .dotsboxes-screen, .race-screen, .foursomes-screen,
+.letterhunt-screen, .numberquest-screen {
+  zoom: var(--game-zoom, 1);
+  height: calc(100% / var(--game-zoom, 1));
 }

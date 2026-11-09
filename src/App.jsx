@@ -31,8 +31,42 @@ const screenVariants = {
 
 const IDLE_MS = 15000 // 15s of no activity → screensaver
 
+// Every game can be opened directly with a link, e.g. …pages.dev/#memory
+const GAME_IDS = ['adventure', 'quiz', 'race', 'uno', 'foursomes', 'checkers', 'chess', 'domino',
+  'backgammon', 'memory', 'dotsboxes', 'snakes', 'life', 'draw']
+const screenFromHash = () => {
+  const id = typeof window !== 'undefined' ? window.location.hash.slice(1) : ''
+  return GAME_IDS.includes(id) ? id : 'menu'
+}
+// These boards only work in landscape: on a phone held upright the whole app is shown sideways
+const LANDSCAPE_ONLY = ['adventure', 'quiz']
+
 function App() {
-  const [screen, setScreen] = useState('menu')
+  const [screen, setScreen] = useState(screenFromHash)
+
+  // Keep the address bar in step with the open game (shareable links, browser Back button)
+  useEffect(() => {
+    const want = screen === 'menu' ? '' : '#' + screen
+    if (window.location.hash !== want) {
+      history.pushState(null, '', want || window.location.pathname + window.location.search)
+    }
+    document.body.dataset.landscapeOnly = LANDSCAPE_ONLY.includes(screen) ? 'true' : 'false'
+  }, [screen])
+  // Scale for games with fixed-size pieces: 1 at laptop size (1366×768), up to 1.6 on big monitors
+  useEffect(() => {
+    const setZoom = () => {
+      const z = Math.min((window.innerWidth - 220) / 1146, window.innerHeight / 768)
+      document.documentElement.style.setProperty('--game-zoom', Math.max(1, Math.min(1.6, z)).toFixed(3))
+    }
+    setZoom()
+    window.addEventListener('resize', setZoom)
+    return () => window.removeEventListener('resize', setZoom)
+  }, [])
+  useEffect(() => {
+    const onPop = () => setScreen(screenFromHash())
+    window.addEventListener('popstate', onPop)
+    return () => window.removeEventListener('popstate', onPop)
+  }, [])
   // Small screens (phones / portrait tablets): start with the menu folded away.
   const isNarrow = () => typeof window !== 'undefined' && window.innerWidth < 900
   const [collapsed, setCollapsed] = useState(isNarrow)

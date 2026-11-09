@@ -569,7 +569,8 @@
 }
 
 /* ── Phones turned sideways: everything must fit in ~330px of height ── */
-@media (max-height: 500px) and (orientation: landscape) {
+/* also used when a phone is held upright, because the game is then shown sideways */
+@media (max-height: 500px) and (orientation: landscape), (orientation: portrait) and (max-width: 820px) {
   .qr-vtrack { min-width: 84px; padding: 4px 2px; gap: 2px; }
   .qr-main { padding: 4px 8px; gap: 2px; }
   .quest-card.qr-card { padding: 8px 12px; gap: 6px; max-width: none; }

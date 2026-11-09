@@ -995,7 +995,6 @@ export default function AdventureGame({ onBack }) {
   return (
     <div className="adventure-screen screen">
       <div className="adv-play">
-        <div className="adv-rotate-tip">🔄 Tip: turn your phone sideways for a bigger board</div>
         {/* ── Board ── */}
         <div className="board-wrapper">
           <div

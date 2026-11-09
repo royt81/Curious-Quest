@@ -179,3 +179,22 @@ button {
 
 .btn-danger  { background: #ef4444; color: #fff; }
 .btn-danger:hover { background: #f87171; }
+
+/* ── Landscape-only games (Adventure, Quiz Race) on a phone held upright ──
+   The whole app is turned sideways, so the child simply rotates the phone.
+   Once the phone is actually turned, this rule no longer applies. */
+@media (orientation: portrait) and (max-width: 820px) {
+  body[data-landscape-only="true"] {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100dvh;
+    height: 100vw;
+    transform-origin: top left;
+    transform: translateX(100vw) rotate(90deg);
+  }
+  body[data-landscape-only="true"] #root,
+  body[data-landscape-only="true"] .app-layout {
+    height: 100vw;
+  }
+}
