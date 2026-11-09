@@ -15,6 +15,7 @@ const SECTIONS = [
       { id: 'adventure',  name: 'Adventure!',       emoji: '🗺️' },
       { id: 'quiz',       name: 'Quiz Race',         emoji: '🧮' },
       { id: 'memory',     name: 'Memory',            emoji: '🧠' },
+      { id: 'mahjong',    name: 'Mahjong',           emoji: '🀄' },
       { id: 'dotsboxes',  name: 'Dots & Boxes',      emoji: '⬛' },
       { id: 'draw',       name: 'Draw & Paint',      emoji: '🎨' },
     ],

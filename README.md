@@ -6,7 +6,7 @@
 
 Works in any browser on computers, tablets and phones — and can be installed as an app ("Add to Home screen").
 
-Curious Quest is a collection of 16 games for children aged about 4–10, built by a dad for his child.
+Curious Quest is a collection of 17 games for children aged about 4–10, built by a dad for his child.
 Every game comes in five worlds (Animals, Dinosaurs, Space, Robots, Under the Sea), each with its own
 painted characters, music and animated background, guided by Fox, the explorer mascot.
 

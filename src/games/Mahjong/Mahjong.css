@@ -1,0 +1,95 @@
+@import '../../components/shared.css';
+@import '../Memory/Memory.css'; /* level toggle + stars */
+
+.mahjong-screen {
+  gap: 8px;
+  justify-content: flex-start;
+  padding: 10px 16px 12px;
+  overflow: hidden;
+}
+
+.mj-area {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mj-board { position: relative; }
+
+/* ── Tile ── */
+.mj-tile {
+  position: absolute;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  border-radius: calc(var(--tw) * 0.14);
+  background: linear-gradient(150deg, #fffdf6 0%, #f4ead2 100%);
+  /* thin world-coloured frame + 3-D side of the tile */
+  box-shadow:
+    inset 0 0 0 calc(var(--tw) * 0.035) color-mix(in srgb, var(--world) 70%, white),
+    calc(var(--tw) * 0.05) calc(var(--tw) * 0.07) 0 #c9b48a,
+    calc(var(--tw) * 0.07) calc(var(--tw) * 0.10) calc(var(--tw) * 0.08) rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease, filter 0.2s ease, opacity 0.35s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.mj-tile img {
+  width: 86%;
+  height: 86%;
+  object-fit: contain;
+  pointer-events: none;
+  user-select: none;
+}
+
+/* blocked tiles are a little darker so children can see which ones they can take */
+.mj-tile.blocked { filter: brightness(0.68) saturate(0.8); cursor: default; }
+.mj-tile.free:hover { transform: translateY(-2px); }
+
+.mj-tile.selected {
+  transform: translateY(-4px);
+  box-shadow:
+    0 0 0 calc(var(--tw) * 0.06) #ffd23f,
+    0 0 calc(var(--tw) * 0.35) #ffd23f,
+    calc(var(--tw) * 0.05) calc(var(--tw) * 0.07) 0 #c9b48a;
+}
+.mj-tile.hint { animation: mj-hint 0.8s ease-in-out infinite alternate; }
+.mj-tile.wrong { animation: mj-shake 0.35s ease; }
+.mj-tile.gone { opacity: 0; transform: scale(0.6) translateY(-20px); pointer-events: none; }
+
+@keyframes mj-hint {
+  from { box-shadow: 0 0 0 calc(var(--tw) * 0.05) #5ef08a, 0 0 6px #5ef08a; }
+  to   { box-shadow: 0 0 0 calc(var(--tw) * 0.08) #5ef08a, 0 0 calc(var(--tw) * 0.5) #5ef08a; transform: translateY(-3px); }
+}
+@keyframes mj-shake {
+  0%, 100% { translate: 0; }
+  25% { translate: -4px 0; }
+  75% { translate: 4px 0; }
+}
+
+/* ── Bottom bar ── */
+.mj-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.mj-bar .btn { padding: 8px 14px; font-size: 0.95rem; }
+.mj-stuck { color: #ffd23f; }
+.mj-pulse { animation: mj-pulse 1s ease-in-out infinite alternate; }
+@keyframes mj-pulse { to { transform: scale(1.08); } }
+
+/* phones: keep the header and bar compact so the tiles get the space */
+@media (max-height: 500px), (max-width: 600px) {
+  .mahjong-screen { padding: 6px 8px; gap: 4px; }
+  .mahjong-screen .game-header { gap: 8px; }
+  .mahjong-screen .game-header h2 { font-size: 1.2rem; }
+  .mj-bar { gap: 6px; }
+  .mj-bar .btn { padding: 6px 10px; font-size: 0.85rem; }
+  .mj-bar .turn-banner { padding: 6px 12px; font-size: 0.85rem; }
+}

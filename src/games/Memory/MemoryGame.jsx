@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useTheme } from '../../context/ThemeContext'
 import ThemeIcon from '../../components/ThemeIcon'
+import { WORLD_PICTURES, worldPictures } from '../../data/pictures'
 import './Memory.css'
 import { playCard, playMatch, playWin } from '../../sound/sfx'
 
@@ -116,51 +117,10 @@ const SYMBOLS = [
 ]
 
 // ── Theme-specific image symbols ───────────────────────────────────────────────
-// For each theme, 12 painted pictures (.png) in its public/themes/<Folder> directory
-// are the card images.
-// Helper to build a symbol entry for a given theme folder/file with shared colours.
-function img(folder, file, color, bg) {
-  return { id: `${folder}-${file}`.replace(/[^a-zA-Z0-9]/g, ''), color, bg, image: `/themes/${folder}/${/\.\w+$/.test(file) ? file : file + '.svg'}` }
-}
-
-const ROBOT_IMAGE_SYMBOLS = [
-  'head-rusty.png', 'head-pixel.png', 'head-dot.png', 'mem-robodog.png',
-  'mem-arm.png', 'mem-drone.png', 'mem-chip.png', 'mem-gear.png',
-  'mem-battery.png', 'mem-windup.png', 'mem-magnet.png', 'mem-vacuum.png',
-].map(f => img('Robots', f, '#8ae0ff', '#0a1c2e'))
-
-const DINO_IMAGE_SYMBOLS = [
-  'head-spino.png', 'head-para.png', 'head-trice.png', 'trex.png',
-  'stego.png', 'ptero.png', 'egg.png', 'ankylo.png',
-  'brachio.png', 'mem-raptor.png', 'mem-ammonite.png', 'mem-volcano.png',
-].map(f => img('Dino', f, '#ffcf80', '#2e1c00'))
-
-const ANIMALS_IMAGE_SYMBOLS = [
-  'head-buffalo.png', 'head-sloth.png', 'head-gorilla.png', 'mem-raccoon.png',
-  'mem-koala.png', 'mem-owl.png', 'mem-giraffe.png', 'mem-tiger.png',
-  'mem-parrot.png', 'mem-kangaroo.png', 'mem-bee.png', 'mem-walrus.png',
-].map(f => img('Animals', f, '#ffd966', '#2e2200'))
-
-const SPACE_IMAGE_SYMBOLS = [
-  'head-rover.png', 'head-alien.png', 'head-shuttle.png', 'mem-astronaut.png',
-  'mem-rocket.png', 'mem-ufo.png', 'mem-saturn.png', 'mem-moon.png',
-  'mem-earth.png', 'mem-satellite.png', 'mem-station.png', 'mem-comet.png',
-].map(f => img('Space', f, '#9fd1ff', '#001830'))
-
-const SEA_IMAGE_SYMBOLS = [
-  'head-stingray.png', 'head-marlin.png', 'head-anglerfish.png', 'mem-octopus.png',
-  'mem-crab.png', 'mem-dolphin.png', 'mem-turtle.png', 'mem-seahorse.png',
-  'mem-puffer.png', 'mem-shark.png', 'mem-clownfish.png', 'mem-submarine.png',
-].map(f => img('Underwater', f, '#ffb39e', '#2e0f06'))
-
-// Map theme id -> image symbol pool
-const THEME_IMAGE_SYMBOLS = {
-  animals:   ANIMALS_IMAGE_SYMBOLS,
-  dinosaurs: DINO_IMAGE_SYMBOLS,
-  space:     SPACE_IMAGE_SYMBOLS,
-  robots:    ROBOT_IMAGE_SYMBOLS,
-  sea:       SEA_IMAGE_SYMBOLS,
-}
+// Each world has 12 painted pictures (see data/pictures.js) used as card images.
+const THEME_IMAGE_SYMBOLS = Object.fromEntries(
+  Object.keys(WORLD_PICTURES).map(id => [id, worldPictures(id)]),
+)
 
 // Render one crisp SVG symbol (or an image-based symbol)
 function SymbolIcon({ symbol, size = '58%' }) {

@@ -46,6 +46,13 @@ const GAMES = [
     color: 'var(--game-color-1, #f59e0b)',
   },
   {
+    id: 'mahjong',
+    name: 'Mahjong',
+    emoji: '🀄',
+    desc: 'Find two free tiles with the same picture and clear the whole pile!',
+    color: 'var(--game-color-4, #10b981)',
+  },
+  {
     id: 'uno',
     name: 'Colour Clash',
     emoji: '🎴',

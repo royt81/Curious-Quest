@@ -9,11 +9,11 @@ automatically — no new app upload is needed for game changes.
 **App name** (max 30): `Curious Quest – Kids Games`
 
 **Short description** (max 80):
-`16 free learning games for kids. No ads, no purchases, no data collected.`
+`17 free learning games for kids. No ads, no purchases, no data collected.`
 
 **Full description:**
 
-Curious Quest is a free collection of 16 games for curious kids aged about 4 to 10 — made by a dad for his child.
+Curious Quest is a free collection of 17 games for curious kids aged about 4 to 10 — made by a dad for his child.
 
 Explore five colourful worlds with Fox, the explorer: Animal Kingdom, Dinosaurs, Space, Robots and Under the Sea. Every game changes its look, characters and music to match the world you pick.
 

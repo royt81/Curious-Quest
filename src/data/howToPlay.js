@@ -51,6 +51,18 @@ export const HOW_TO_PLAY = {
       ['🏆', 'Find every pair to win. Try to use as few moves as you can.'],
     ],
   },
+  mahjong: {
+    title: 'Mahjong',
+    goal: 'Take away all the tiles from the pile!',
+    steps: [
+      ['👆', 'Tap a bright tile, then tap another bright tile with the same picture.'],
+      ['🔓', 'A tile is free when no tile lies on top of it and its left or right side is open. Dark tiles are stuck for now.'],
+      ['✨', 'Same picture? Both tiles disappear!'],
+      ['💡', 'Stuck? Tap Hint to see a pair, or Shuffle to mix the pictures. ↩️ Undo takes back your last pair.'],
+      ['🏆', 'Clear the whole board to win. Fewer helps = more stars!'],
+    ],
+    tip: 'Start with tiles on top of the pile and at the ends of long rows.',
+  },
   uno: {
     title: 'Colour Clash',
     goal: 'Be the first to play all of your cards!',
