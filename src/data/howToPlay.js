@@ -61,7 +61,7 @@ export const HOW_TO_PLAY = {
       ['💡', 'Stuck? Tap Hint to see a pair, or Shuffle to mix the pictures. ↩️ Undo takes back your last pair.'],
       ['🏆', 'Clear the whole board to win. Fewer helps = more stars!'],
     ],
-    tip: 'Start with tiles on top of the pile and at the ends of long rows.',
+    tip: 'Start with tiles on top of the pile and at the ends of long rows. On Hard, think before you take a pair — the wrong pair can leave you stuck!',
   },
   uno: {
     title: 'Colour Clash',

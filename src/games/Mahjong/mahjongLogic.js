@@ -33,6 +33,8 @@ export const LAYOUTS = {
   },
   hard: {
     label: 'Hard', icon: '🐉',
+    // dealt at random: like real Mahjong, a game can end with no way out
+    random: true,
     // 8×6 → 6×4 → 4×2 → 2, plus wings = 84 tiles
     positions: [
       ...rect(0, 0, 8, 6, 0),
@@ -91,13 +93,18 @@ function tryDeal(positions, pairPictures) {
   return result
 }
 
-export function deal(positions, pairPictures) {
+function randomDeal(positions, pairPictures) {
+  return shuffle(positions.map((_, i) => pairPictures[i >> 1]))
+}
+
+export function deal(positions, pairPictures, random = false) {
+  if (random) return randomDeal(positions, pairPictures)
   for (let attempt = 0; attempt < 200; attempt++) {
     const r = tryDeal(positions, pairPictures)
     if (r) return r
   }
   // practically never happens; fall back to a plain shuffle
-  return shuffle(positions.map((_, i) => pairPictures[i >> 1]))
+  return randomDeal(positions, pairPictures)
 }
 
 // Builds a new board: [{ id, x, y, z, pic, removed }]
@@ -108,19 +115,20 @@ export function newBoard(layoutId, pictures) {
   let picks = shuffle(pictures)
   while (picks.length < pairs) picks = [...picks, ...shuffle(pictures)]
   const pairPictures = shuffle(picks.slice(0, pairs).map((_, i) => i))
-  const assigned = deal(positions, pairPictures)
+  const assigned = deal(positions, pairPictures, !!LAYOUTS[layoutId].random)
   return {
     pictures: picks.slice(0, pairs),
     tiles: positions.map((p, i) => ({ id: i, ...p, pic: assigned[i], removed: false })),
   }
 }
 
-// New pictures for the tiles still on the board, again in a way that can be cleared.
-export function reshuffle(tiles) {
+// New pictures for the tiles still on the board — in a way that can be cleared,
+// unless `random` is set (Hard level).
+export function reshuffle(tiles, random = false) {
   const rest = tiles.filter(t => !t.removed)
   const pics = rest.map(t => t.pic).sort((a, b) => a - b)
   const pairPictures = shuffle(Array.from({ length: pics.length / 2 }, (_, i) => pics[i * 2]))
-  const assigned = deal(rest, pairPictures)
+  const assigned = deal(rest, pairPictures, random)
   const byId = Object.fromEntries(rest.map((t, i) => [t.id, assigned[i]]))
   return tiles.map(t => (t.removed ? t : { ...t, pic: byId[t.id] }))
 }

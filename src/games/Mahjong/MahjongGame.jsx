@@ -97,7 +97,8 @@ export default function MahjongGame({ onBack }) {
   const doShuffle = () => {
     setBoard(b => ({ ...b, tiles: reshuffle(b.tiles) }))
     setSelected(null); setHint(null)
-    if (!stuck) setHelps(n => n + 1) // shuffling when stuck is free
+    // shuffling when stuck is free — except on Hard, where getting stuck is part of the game
+    if (!stuck || LAYOUTS[level].random) setHelps(n => n + 1)
   }
 
   const undo = () => {
