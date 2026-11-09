@@ -2,6 +2,7 @@
 .app-layout {
   display: flex;
   height: 100vh;
+  height: 100dvh; /* visible height on phones (excludes browser bars) */
   overflow: hidden;
 }
 

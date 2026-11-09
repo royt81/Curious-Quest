@@ -44,7 +44,7 @@
 .sl-board-wrap {
   position: relative;
   flex: 0 1 auto;
-  width: min(100%, calc(100vh - 140px), calc(100vw - 300px));
+  width: min(100%, calc(100dvh - 140px), calc(100vw - 300px));
   aspect-ratio: 1;
   min-width: 0;
   margin-left: 6%;

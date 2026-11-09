@@ -567,3 +567,23 @@
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
+
+/* ── Phones turned sideways: everything must fit in ~330px of height ── */
+@media (max-height: 500px) and (orientation: landscape) {
+  .qr-vtrack { min-width: 84px; padding: 4px 2px; gap: 2px; }
+  .qr-main { padding: 4px 8px; gap: 2px; }
+  .quest-card.qr-card { padding: 8px 12px; gap: 6px; max-width: none; }
+  .qr-card .quest-prompt { font-size: 1rem; }
+  .qr-card .quest-equation { font-size: 1.8rem; }
+  .qr-card .seq-row { gap: 6px; flex-wrap: nowrap; }
+  .qr-card .seq-tile { min-width: 44px; height: 46px; font-size: 1.4rem; padding: 0 8px; }
+  .qr-card .word-picture { font-size: 1.8rem; }
+  .qr-card .word-row { gap: 4px; }
+  .qr-card .letter-tile { width: 36px; height: 44px; font-size: 1.3rem; }
+  .qr-card .count-objects { padding: 4px 8px; gap: 4px; font-size: 1.4rem; max-width: none; }
+  .qr-card .word-meaning-word { font-size: 1.6rem; }
+  .qr-card .option-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+  .qr-card .option-btn { padding: 8px 6px; font-size: 1.4rem; }
+  .qr-card .option-btn.opt-text { font-size: 0.85rem; padding: 6px 6px; }
+  .qr-q-tag { font-size: 0.7rem; }
+}

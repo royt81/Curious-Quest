@@ -500,3 +500,14 @@
 /* Dice picture before the first roll — same as Snakes & Ladders (Nov 7) */
 .bg-dice-row { justify-content: center; min-height: 50px; align-items: center; }
 .bg-dice-empty { color: inherit; font-size: 2.4rem; padding: 0; line-height: 1; }
+
+/* ── Fit the whole board on screen (the old height:100% + margin pushed it
+   past the bottom edge, most visible on phones turned sideways) ── */
+.bg-table { height: auto; align-self: stretch; box-sizing: border-box; }
+@media (max-height: 500px) and (orientation: landscape) {
+  .bg-sidebar { width: 150px; padding: 8px; gap: 6px; }
+  .bg-off { width: 58px; padding: 6px 4px; }
+  .bg-off-count { font-size: 1.1rem; }
+  .bg-table { margin: 4px 6px; padding: 5px; border-width: 4px; }
+  .bg-table-wrap { gap: 4px; }
+}
