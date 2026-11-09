@@ -1,16 +1,67 @@
 {
+  "id": "/",
   "name": "Curious Quest",
   "short_name": "Curious Quest",
   "description": "Free games for curious kids. No ads, no purchases, no data collected.",
+  "lang": "en",
+  "dir": "ltr",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "any",
   "background_color": "#1b1430",
   "theme_color": "#1b1430",
+  "categories": [
+    "education",
+    "games",
+    "kids"
+  ],
   "icons": [
-    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "/icons/maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/1-menu.webp",
+      "sizes": "1280x720",
+      "type": "image/webp",
+      "form_factor": "wide",
+      "label": "Choose from 16 games in five worlds"
+    },
+    {
+      "src": "/screenshots/2-adventure.webp",
+      "sizes": "1280x720",
+      "type": "image/webp",
+      "form_factor": "wide",
+      "label": "Adventure: roll the dice and answer questions"
+    },
+    {
+      "src": "/screenshots/3-memory.webp",
+      "sizes": "1280x720",
+      "type": "image/webp",
+      "form_factor": "wide",
+      "label": "Memory with painted pictures"
+    },
+    {
+      "src": "/screenshots/5-draw.webp",
+      "sizes": "1280x720",
+      "type": "image/webp",
+      "form_factor": "wide",
+      "label": "Draw & Paint colouring pages"
+    }
   ]
 }

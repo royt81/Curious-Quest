@@ -44,6 +44,7 @@ export default function AboutPage({ open, onClose }) {
               <li>You have the right to information, correction, deletion and to complain to a data protection
                 supervisory authority. Questions: {LEGAL.email}</li>
             </ul>
+            <p><a href="/privacy.html" target="_blank" rel="noreferrer">Full privacy policy (web page)</a></p>
 
             <h4>🎨 Credits</h4>
             <ul className="about-list">
