@@ -9,6 +9,7 @@ import {
 } from './chessEngine'
 import './Chess.css'
 import { playMove, playCapture, playWin } from '../../sound/sfx'
+import { useT } from '../../i18n'
 
 const AI_DELAY = 650
 
@@ -18,6 +19,7 @@ const gameoverVariants = {
 }
 
 export default function ChessGame({ onBack }) {
+  const t = useT()
   const { theme } = useTheme()
 
   const [phase, setPhase] = useState('setup')     // 'setup' | 'playing'
@@ -39,8 +41,8 @@ export default function ChessGame({ onBack }) {
 
   const addLog = (msg) => setLog(prev => [msg, ...prev].slice(0, 5))
 
-  const p1Label = mode === 'cpu' ? 'You' : 'Player 1'
-  const p2Label = mode === 'cpu' ? 'Computer' : 'Player 2'
+  const p1Label = mode === 'cpu' ? t('You') : t('Player 1')
+  const p2Label = mode === 'cpu' ? t('Computer') : t('Player 2')
 
   const startGame = () => {
     if (aiTimer.current) { clearTimeout(aiTimer.current); aiTimer.current = null }
@@ -48,8 +50,8 @@ export default function ChessGame({ onBack }) {
     setTurn(WHITE); setEnPassant(null); setSelected(null)
     setGameOver(false); setWinner(null); setEndKind(null); setAiThinking(false)
     setLog(mode === 'cpu'
-      ? ['Your move! White goes first — tap a piece.']
-      : ['♙ Player 1 (White) — tap a piece.'])
+      ? [t('Your move! White goes first — tap a piece.')]
+      : ['♙ ' + t('Player 1 (White) — tap a piece.')])
     setPhase('playing')
   }
 
@@ -71,15 +73,15 @@ export default function ChessGame({ onBack }) {
     if (status === 'checkmate') {
       playWin()
       setGameOver(true); setWinner(mover); setEndKind('checkmate')
-      addLog(`Checkmate! ${mover === WHITE ? p1Label : p2Label} wins! 🏆`)
+      addLog((mover === WHITE && mode === 'cpu' ? t('Checkmate! You win!') : t('Checkmate! {name} wins!', { name: mover === WHITE ? p1Label : p2Label })) + ' 🏆')
       return
     }
     if (status === 'stalemate' || status === 'insufficient') {
       setGameOver(true); setWinner('draw'); setEndKind(status)
-      addLog(status === 'stalemate' ? 'Stalemate — it\'s a draw! 🤝' : 'Not enough pieces left to checkmate — it\'s a draw! 🤝')
+      addLog((status === 'stalemate' ? t("Stalemate — it's a draw!") : t("Not enough pieces left to checkmate — it's a draw!")) + ' 🤝')
       return
     }
-    if (inCheck(resBoard, nextSide)) addLog('Check! 👑')
+    if (inCheck(resBoard, nextSide)) addLog(t('Check!') + ' 👑')
     setTurn(nextSide)
   }
 
@@ -92,9 +94,11 @@ export default function ChessGame({ onBack }) {
 
     const who = mover === WHITE ? p1Label : p2Label
     const tag = mover === WHITE ? '♙' : '♟'
-    if (res.castle) addLog(`${tag} ${who} castled! 🏰`)
-    else if (res.promoted) addLog(`${tag} ${who} promoted a Pawn to Queen! 👑`)
-    else if (res.captured) addLog(`${tag} ${who} captured a piece! 💥`)
+    const you = mover === WHITE && mode === 'cpu'
+    const say = (en, enYou) => `${tag} ` + (you ? t(enYou) : t(en, { name: who }))
+    if (res.castle) addLog(say('{name} castled!', 'You castled!') + ' 🏰')
+    else if (res.promoted) addLog(say('{name} promoted a Pawn to Queen!', 'You promoted a Pawn to Queen!') + ' 👑')
+    else if (res.captured) addLog(say('{name} captured a piece!', 'You captured a piece!') + ' 💥')
 
     finishTurn(res.board, mover, move)
   }
@@ -124,10 +128,11 @@ export default function ChessGame({ onBack }) {
     const res = applyMove(b, move)
     if (res.captured) playCapture(); else playMove()
     setBoard(res.board)
-    if (res.castle) addLog('🤖 Computer castled! 🏰')
-    else if (res.promoted) addLog('🤖 Computer promoted to Queen! 👑')
-    else if (res.captured) addLog('🤖 Computer captured a piece! 💥')
-    else addLog('🤖 Computer moved.')
+    const cpu = { name: t('Computer') }
+    if (res.castle) addLog('🤖 ' + t('{name} castled!', cpu) + ' 🏰')
+    else if (res.promoted) addLog('🤖 ' + t('{name} promoted a Pawn to Queen!', cpu) + ' 👑')
+    else if (res.captured) addLog('🤖 ' + t('{name} captured a piece!', cpu) + ' 💥')
+    else addLog('🤖 ' + t('Computer moved.'))
     setAiThinking(false)
     finishTurn(res.board, BLACK, move)
   }
@@ -148,10 +153,10 @@ export default function ChessGame({ onBack }) {
 
   const status = gameOver
     ? ''
-    : aiThinking ? '🤖 Computer is thinking...'
+    : aiThinking ? '🤖 ' + t('Computer is thinking…')
     : mode === 'cpu'
-      ? (turn === WHITE ? 'Your turn — tap a piece, then a glowing square.' : '')
-      : `${turn === WHITE ? '♙ Player 1 (White)' : '♟ Player 2 (Black)'} — tap a piece, then a glowing square.`
+      ? (turn === WHITE ? t('Your turn — tap a piece, then a glowing square.') : '')
+      : `${turn === WHITE ? '♙ ' + t('Player 1 (White)') : '♟ ' + t('Player 2 (Black)')} — ` + t('tap a piece, then a glowing square.')
 
   // ── Setup screen ──
   if (phase === 'setup') {
@@ -163,30 +168,30 @@ export default function ChessGame({ onBack }) {
             initial={{ opacity: 0, y: 24, scale: 0.93 }}
             animate={{ opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 280, damping: 24 } }}
           >
-            <div className="cs-setup-title">{theme.emoji} Chess</div>
-            <div className="cs-setup-label">Choose mode</div>
+            <div className="cs-setup-title">{theme.emoji} {t('Chess')}</div>
+            <div className="cs-setup-label">{t('Choose mode')}</div>
             <div className="cs-mode-btns">
               <button
                 className={`cs-mode-btn${mode === 'cpu' ? ' selected' : ''}`}
                 onClick={() => setMode('cpu')}
               >
                 <span className="cs-mode-icon">🤖</span>
-                <span className="cs-mode-name">1 vs PC</span>
-                <span className="cs-mode-desc">Play against the computer</span>
+                <span className="cs-mode-name">{t('1 vs PC')}</span>
+                <span className="cs-mode-desc">{t('Play against the computer')}</span>
               </button>
               <button
                 className={`cs-mode-btn${mode === 'friends' ? ' selected' : ''}`}
                 onClick={() => setMode('friends')}
               >
                 <span className="cs-mode-icon">🆚</span>
-                <span className="cs-mode-name">1 vs 1</span>
-                <span className="cs-mode-desc">Two players, same screen</span>
+                <span className="cs-mode-name">{t('1 vs 1')}</span>
+                <span className="cs-mode-desc">{t('Two players, same screen')}</span>
               </button>
             </div>
             <button className="btn btn-primary cs-start-btn" onClick={startGame}>
-              Start Game
+              {t('Start Game')}
             </button>
-            <button className="btn btn-secondary cs-back-setup-btn" onClick={onBack}>← Back</button>
+            <button className="btn btn-secondary cs-back-setup-btn" onClick={onBack}>← {t('Back')}</button>
           </motion.div>
         </div>
       </div>
@@ -199,21 +204,21 @@ export default function ChessGame({ onBack }) {
 
       {/* ── Side panel ── */}
       <div className="cs-side">
-        <button className="btn btn-secondary back-btn" onClick={restart}>← Menu</button>
-        <div className="cs-side-title">{theme.emoji} Chess</div>
+        <button className="btn btn-secondary back-btn" onClick={restart}>← {t('Menu')}</button>
+        <div className="cs-side-title">{theme.emoji} {t('Chess')}</div>
         <div className="cs-players">
           <span className={`cs-player p1${turn === WHITE && !gameOver ? ' active' : ''}`}>♙ {p1Label}</span>
           <span className={`cs-player p2${turn === BLACK && !gameOver ? ' active' : ''}`}>♟ {p2Label}</span>
         </div>
         {!gameOver && (
           <div className={`turn-banner cs-turn${checkedSide ? ' check-alert' : ''}`}>
-            {checkedSide ? 'Check!' : status}
+            {checkedSide ? t('Check!') : status}
           </div>
         )}
         {gameOver && (
           <div className="cs-gameover-btns">
-            <button className="btn btn-primary" onClick={startGame}>Play Again</button>
-            <button className="btn btn-secondary" onClick={restart}>Menu</button>
+            <button className="btn btn-primary" onClick={startGame}>{t('Play Again')}</button>
+            <button className="btn btn-secondary" onClick={restart}>{t('Menu')}</button>
           </div>
         )}
         <div className="log-box">
@@ -235,17 +240,17 @@ export default function ChessGame({ onBack }) {
               <div className="gameover-emoji">{winner === 'draw' ? '🤝' : (winner === WHITE ? '🏆' : (mode === 'cpu' ? '🤖' : '🏆'))}</div>
               <h2>
                 {winner === 'draw'
-                  ? 'Draw!'
-                  : winner === WHITE ? `${p1Label} wins!` : `${p2Label} wins!`}
+                  ? t('Draw!')
+                  : winner === WHITE && mode === 'cpu' ? t('You win!') : t('{name} wins!', { name: winner === WHITE ? p1Label : p2Label })}
               </h2>
               <p>
                 {endKind === 'stalemate'
-                  ? 'Stalemate — nobody can move. 🤝'
+                  ? t('Stalemate — nobody can move.') + ' 🤝'
                   : endKind === 'insufficient'
-                  ? 'Not enough pieces left to checkmate. 🤝'
+                  ? t('Not enough pieces left to checkmate.') + ' 🤝'
                   : winner === WHITE
-                    ? (mode === 'cpu' ? 'Checkmate! Great game! 🎉' : '♙ Player 1 checkmates! 🎉')
-                    : (mode === 'cpu' ? 'Checkmate — nice try, play again!' : '♟ Player 2 checkmates! 🎉')}
+                    ? (mode === 'cpu' ? t('Checkmate! Great game!') + ' 🎉' : '♙ ' + t('{name} checkmates!', { name: t('Player 1') }) + ' 🎉')
+                    : (mode === 'cpu' ? t('Checkmate — nice try, play again!') : '♟ ' + t('{name} checkmates!', { name: t('Player 2') }) + ' 🎉')}
               </p>
             </motion.div>
           ) : (

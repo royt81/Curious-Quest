@@ -5,12 +5,16 @@ import RacerAvatar from '../../components/RacerAvatar'
 import './QuizRace.css'
 import { playCorrect, playWrong, playWin } from '../../sound/sfx'
 import { speakSteps, stopSpeaking, canSpeak } from '../../sound/speech'
+import { WORD_BANKS } from './quizWords'
+import { useT, tr, getLang } from '../../i18n'
 
 const TRACK_LENGTH = 10 // spaces from start (0) to finish (10)
 
 const MEDALS = ['🥇', '🥈', '🥉', '🏅']
 
+// i18n: list
 const CHEERS = ['Great job! 🎉', 'You got it! ⭐', 'Well done! 🙌', 'Awesome! ✨', 'Nice work! 👏', 'Brilliant! 🌟']
+// i18n: list
 const TRY_AGAIN = ['Not quite — keep going! 💪', 'Almost! Have another try next time.', 'Oops! Better luck next turn. 🙂', 'Nice try — you can do it!']
 
 // ── Difficulty definitions ──────────────────────────────────────────────────
@@ -43,129 +47,8 @@ const DIFFICULTIES = {
 }
 const DIFF_LIST = [DIFFICULTIES.easy, DIFFICULTIES.hard]
 
-// ── Vocabulary bank for HARD 'what does this word mean?' questions ────────────
-// meaning is the correct answer; `wrong` holds three plausible distractors.
-const VOCAB = [
-  { word: 'ENORMOUS',    meaning: 'Very big',                  wrong: ['Very small', 'Very fast', 'Very loud'] },
-  { word: 'GIGANTIC',    meaning: 'Huge',                      wrong: ['Tiny', 'Quiet', 'Slow'] },
-  { word: 'ANCIENT',     meaning: 'Very old',                  wrong: ['Brand new', 'Very fast', 'Very tall'] },
-  { word: 'RAPID',       meaning: 'Very fast',                 wrong: ['Very slow', 'Very old', 'Very soft'] },
-  { word: 'FREEZING',    meaning: 'Very cold',                 wrong: ['Very hot', 'Very bright', 'Very heavy'] },
-  { word: 'SCORCHING',   meaning: 'Very hot',                  wrong: ['Very cold', 'Very wet', 'Very dark'] },
-  { word: 'BRAVE',       meaning: 'Not afraid',                wrong: ['Very scared', 'Very sleepy', 'Very hungry'] },
-  { word: 'TERRIFIED',   meaning: 'Very scared',               wrong: ['Very brave', 'Very calm', 'Very happy'] },
-  { word: 'DELICIOUS',   meaning: 'Tastes very good',          wrong: ['Smells bad', 'Looks ugly', 'Feels cold'] },
-  { word: 'EXHAUSTED',   meaning: 'Very tired',                wrong: ['Wide awake', 'Very happy', 'Very angry'] },
-  { word: 'FURIOUS',     meaning: 'Very angry',                wrong: ['Very calm', 'Very happy', 'Very tired'] },
-  { word: 'DELIGHTED',   meaning: 'Very happy',                wrong: ['Very sad', 'Very tired', 'Very angry'] },
-  { word: 'TIMID',       meaning: 'Shy',                       wrong: ['Loud', 'Brave', 'Strong'] },
-  { word: 'FRAGILE',     meaning: 'Easily broken',             wrong: ['Very strong', 'Very heavy', 'Very fast'] },
-  { word: 'TRANSPARENT', meaning: 'You can see through it',    wrong: ['Very colourful', 'Very loud', 'Very heavy'] },
-  { word: 'INVISIBLE',   meaning: 'Cannot be seen',            wrong: ['Very loud', 'Very tall', 'Very heavy'] },
-  { word: 'GENEROUS',    meaning: 'Likes to share and give',   wrong: ['Greedy', 'Lazy', 'Grumpy'] },
-  { word: 'CURIOUS',     meaning: 'Wanting to learn or know',  wrong: ['Bored', 'Sleepy', 'Sad'] },
-  { word: 'PECULIAR',    meaning: 'Strange or odd',            wrong: ['Normal', 'Boring', 'Tasty'] },
-  { word: 'MASSIVE',     meaning: 'Very large',                wrong: ['Very small', 'Very quiet', 'Very quick'] },
-  { word: 'SILENT',      meaning: 'Making no sound',           wrong: ['Very loud', 'Very bright', 'Very fast'] },
-  { word: 'WEARY',       meaning: 'Tired',                     wrong: ['Excited', 'Hungry', 'Brave'] },
-  { word: 'BRILLIANT',   meaning: 'Very clever or bright',     wrong: ['Very dull', 'Very slow', 'Very sad'] },
-  { word: 'VICTORY',     meaning: 'A win',                     wrong: ['A loss', 'A draw', 'A rest'] },
-  { word: 'JOURNEY',     meaning: 'A trip from place to place',wrong: ['A short nap', 'A meal', 'A song'] },
-  { word: 'ANNUAL',      meaning: 'Happens once a year',       wrong: ['Happens every day', 'Never happens', 'Happens twice a day'] },
-]
-
-// ── Word + picture banks for "Which letter is missing?" ───────────────────────
-// RULE for every entry: a child must be able to say the word just by looking at
-// the picture. So: concrete nouns only, one word per picture, no abstract words
-// (CODE, GRAVITY…), no "close enough" pictures (RUN as a T-Rex, EEL as a snake),
-// British spelling, and only emoji that also show on older Windows/Android
-// (nothing from Emoji 14+, e.g. no 🪸 coral or 🪼 jellyfish).
-//
-// Generic bank — tops up a world that is short on words of a given length.
-const WORDS = [
-  { word: 'CAT', emoji: '🐱' }, { word: 'DOG', emoji: '🐶' }, { word: 'SUN', emoji: '☀️' },
-  { word: 'BEE', emoji: '🐝' }, { word: 'EGG', emoji: '🥚' }, { word: 'CAR', emoji: '🚗' },
-  { word: 'KEY', emoji: '🔑' }, { word: 'HAT', emoji: '🎩' }, { word: 'BUS', emoji: '🚌' },
-  { word: 'PIG', emoji: '🐷' }, { word: 'COW', emoji: '🐄' }, { word: 'BED', emoji: '🛏️' },
-  { word: 'BOX', emoji: '📦' }, { word: 'MAP', emoji: '🗺️' }, { word: 'PEN', emoji: '🖊️' },
-  { word: 'BOOK', emoji: '📖' }, { word: 'TREE', emoji: '🌳' }, { word: 'CAKE', emoji: '🎂' },
-  { word: 'BALL', emoji: '⚽' }, { word: 'SOCK', emoji: '🧦' }, { word: 'BOAT', emoji: '⛵' },
-  { word: 'MOON', emoji: '🌙' }, { word: 'STAR', emoji: '⭐' }, { word: 'GIFT', emoji: '🎁' },
-  { word: 'DRUM', emoji: '🥁' }, { word: 'KITE', emoji: '🪁' }, { word: 'RING', emoji: '💍' },
-  { word: 'SHOE', emoji: '👟' }, { word: 'BIRD', emoji: '🐦' }, { word: 'FROG', emoji: '🐸' },
-  { word: 'APPLE', emoji: '🍎' }, { word: 'HOUSE', emoji: '🏠' }, { word: 'TRAIN', emoji: '🚂' },
-  { word: 'PIZZA', emoji: '🍕' }, { word: 'CROWN', emoji: '👑' }, { word: 'LEMON', emoji: '🍋' },
-  { word: 'CLOCK', emoji: '🕐' }, { word: 'GLOVE', emoji: '🧤' }, { word: 'JUICE', emoji: '🧃' },
-  { word: 'PLANT', emoji: '🌱' }, { word: 'ROBOT', emoji: '🤖' }, { word: 'CHAIR', emoji: '🪑' },
-  { word: 'GRAPES', emoji: '🍇' }, { word: 'FLOWER', emoji: '🌸' }, { word: 'GUITAR', emoji: '🎸' },
-  { word: 'ROCKET', emoji: '🚀' }, { word: 'BANANA', emoji: '🍌' }, { word: 'CARROT', emoji: '🥕' },
-  { word: 'PENCIL', emoji: '✏️' }, { word: 'BALLOON', emoji: '🎈' }, { word: 'UMBRELLA', emoji: '☂️' },
-]
-
-// Theme banks — letter questions use the current world first (Sea → SHARK…).
-const THEME_WORDS = {
-  animals: [
-    { word: 'CAT', emoji: '🐱' }, { word: 'DOG', emoji: '🐶' }, { word: 'COW', emoji: '🐄' },
-    { word: 'PIG', emoji: '🐷' }, { word: 'BEE', emoji: '🐝' }, { word: 'FOX', emoji: '🦊' },
-    { word: 'OWL', emoji: '🦉' }, { word: 'HEN', emoji: '🐔' }, { word: 'BAT', emoji: '🦇' },
-    { word: 'ANT', emoji: '🐜' },
-    { word: 'FROG', emoji: '🐸' }, { word: 'LION', emoji: '🦁' }, { word: 'BEAR', emoji: '🐻' },
-    { word: 'DUCK', emoji: '🦆' }, { word: 'GOAT', emoji: '🐐' }, { word: 'WOLF', emoji: '🐺' },
-    { word: 'DEER', emoji: '🦌' }, { word: 'SNAIL', emoji: '🐌' }, { word: 'MOUSE', emoji: '🐭' },
-    { word: 'TIGER', emoji: '🐯' }, { word: 'HORSE', emoji: '🐴' }, { word: 'ZEBRA', emoji: '🦓' },
-    { word: 'PANDA', emoji: '🐼' }, { word: 'SNAKE', emoji: '🐍' }, { word: 'KOALA', emoji: '🐨' },
-    { word: 'SHEEP', emoji: '🐑' }, { word: 'CAMEL', emoji: '🐫' }, { word: 'EAGLE', emoji: '🦅' },
-    { word: 'RHINO', emoji: '🦏' }, { word: 'HIPPO', emoji: '🦛' }, { word: 'OTTER', emoji: '🦦' },
-    { word: 'MONKEY', emoji: '🐒' }, { word: 'RABBIT', emoji: '🐰' }, { word: 'PARROT', emoji: '🦜' },
-    { word: 'TURKEY', emoji: '🦃' }, { word: 'GORILLA', emoji: '🦍' }, { word: 'GIRAFFE', emoji: '🦒' },
-    { word: 'HAMSTER', emoji: '🐹' }, { word: 'PEACOCK', emoji: '🦚' }, { word: 'PENGUIN', emoji: '🐧' },
-    { word: 'ELEPHANT', emoji: '🐘' }, { word: 'FLAMINGO', emoji: '🦩' }, { word: 'KANGAROO', emoji: '🦘' },
-  ],
-  dinosaurs: [
-    { word: 'EGG', emoji: '🥚' }, { word: 'REX', emoji: '🦖' },
-    { word: 'DINO', emoji: '🦕' }, { word: 'BONE', emoji: '🦴' }, { word: 'ROCK', emoji: '🪨' },
-    { word: 'LEAF', emoji: '🍃' }, { word: 'PALM', emoji: '🌴' }, { word: 'FIRE', emoji: '🔥' },
-    { word: 'CROC', emoji: '🐊' }, { word: 'TREE', emoji: '🌳' },
-    { word: 'TOOTH', emoji: '🦷' }, { word: 'CLOUD', emoji: '☁️' },
-    { word: 'LIZARD', emoji: '🦎' }, { word: 'TURTLE', emoji: '🐢' }, { word: 'METEOR', emoji: '☄️' },
-    { word: 'VOLCANO', emoji: '🌋' }, { word: 'MOUNTAIN', emoji: '⛰️' },
-  ],
-  space: [
-    { word: 'SUN', emoji: '☀️' }, { word: 'UFO', emoji: '🛸' },
-    { word: 'STAR', emoji: '⭐' }, { word: 'MOON', emoji: '🌙' },
-    { word: 'EARTH', emoji: '🌍' }, { word: 'COMET', emoji: '☄️' }, { word: 'ALIEN', emoji: '👽' },
-    { word: 'ROCKET', emoji: '🚀' }, { word: 'PLANET', emoji: '🪐' }, { word: 'GALAXY', emoji: '🌌' },
-    { word: 'TELESCOPE', emoji: '🔭' }, { word: 'SATELLITE', emoji: '🛰️' }, { word: 'ASTRONAUT', emoji: '🧑‍🚀' },
-  ],
-  robots: [
-    { word: 'ARM', emoji: '🦾' }, { word: 'LEG', emoji: '🦿' }, { word: 'KEY', emoji: '🔑' },
-    { word: 'GEAR', emoji: '⚙️' }, { word: 'BOLT', emoji: '🔩' }, { word: 'PLUG', emoji: '🔌' },
-    { word: 'BULB', emoji: '💡' },
-    { word: 'ROBOT', emoji: '🤖' }, { word: 'CLOCK', emoji: '⏰' }, { word: 'PHONE', emoji: '📱' },
-    { word: 'MAGNET', emoji: '🧲' }, { word: 'HAMMER', emoji: '🔨' }, { word: 'LAPTOP', emoji: '💻' },
-    { word: 'SCREEN', emoji: '🖥️' }, { word: 'CAMERA', emoji: '📷' },
-    { word: 'BATTERY', emoji: '🔋' }, { word: 'TOOLBOX', emoji: '🧰' },
-  ],
-  sea: [
-    { word: 'SEA', emoji: '🌊' },
-    { word: 'FISH', emoji: '🐟' }, { word: 'CRAB', emoji: '🦀' }, { word: 'WAVE', emoji: '🌊' },
-    { word: 'SHIP', emoji: '🚢' }, { word: 'BOAT', emoji: '⛵' }, { word: 'SEAL', emoji: '🦭' },
-    { word: 'SHARK', emoji: '🦈' }, { word: 'WHALE', emoji: '🐳' }, { word: 'SHELL', emoji: '🐚' },
-    { word: 'SQUID', emoji: '🦑' },
-    { word: 'TURTLE', emoji: '🐢' }, { word: 'ANCHOR', emoji: '⚓' }, { word: 'ISLAND', emoji: '🏝️' },
-    { word: 'OYSTER', emoji: '🦪' }, { word: 'LOBSTER', emoji: '🦞' }, { word: 'DOLPHIN', emoji: '🐬' },
-    { word: 'OCTOPUS', emoji: '🐙' }, { word: 'PENGUIN', emoji: '🐧' }, { word: 'MERMAID', emoji: '🧜' },
-  ],
-}
-
-const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
-
-// Every word the game knows — used so a wrong letter option never spells a
-// different real word (e.g. "_AT" for a cat must not offer B → BAT).
-const KNOWN_WORDS = new Set([
-  ...WORDS.map(w => w.word),
-  ...Object.values(THEME_WORDS).flat().map(w => w.word),
-])
+// Word lists (English + German) live in quizWords.js
+const bank = () => WORD_BANKS[getLang()] ?? WORD_BANKS.en
 
 function rand(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min }
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)] }
@@ -201,7 +84,7 @@ function makeQuestion(diff, theme) {
   const family = pick(diff.families ?? ['number', 'number', 'letter'])
 
   if (family === 'meaning') {
-    const entry = pick(VOCAB)
+    const entry = pick(bank().VOCAB)
     return {
       family: 'meaning', kind: 'meaning',
       word: entry.word, answer: entry.meaning,
@@ -211,11 +94,14 @@ function makeQuestion(diff, theme) {
   }
 
   if (family === 'letter') {
+    const { THEME_WORDS, WORDS, ALPHABET, KNOWN_WORDS } = bank()
+    // German has few 3-letter words a child can name from a picture, so Easy allows 4 there
+    const maxLen = getLang() === 'de' ? Math.max(diff.maxLen, 4) : diff.maxLen
     const themeWords = THEME_WORDS[theme?.id] ?? []
     // theme words of the right length first…
-    let pool = themeWords.filter(w => w.word.length <= diff.maxLen)
+    let pool = themeWords.filter(w => w.word.length <= maxLen)
     // …topped up with generic words so there's always plenty of variety.
-    if (pool.length < 5) pool = [...pool, ...WORDS.filter(w => w.word.length <= diff.maxLen)]
+    if (pool.length < 5) pool = [...pool, ...WORDS.filter(w => w.word.length <= maxLen)]
     if (pool.length === 0) pool = WORDS
     const entry = pick(pool)
     const word = entry.word
@@ -318,7 +204,22 @@ function makeQuestionUnique(diff, theme, seen, lastKind) {
 
 // ── What the voice says for each kind of question ────────────────────────────
 const anA = (w) => (/^[aeiou]/i.test(w) ? 'an' : 'a')
+const nounCase = (w) => w.charAt(0) + w.slice(1).toLowerCase()   // HUND → Hund
+function spokenQuestionDe(t) {
+  switch (t.kind) {
+    case 'letter':         return `Welcher Buchstabe fehlt? Auf dem Bild siehst du: ${nounCase(t.word)}.`
+    case 'meaning':        return `Was bedeutet das Wort ${t.word.toLowerCase()}?`
+    case 'sequence':       return `${t.terms.map((n, i) => (i === t.hideIdx ? 'was' : n)).join(', ')}? Welche Zahl fehlt?`
+    case 'addition':       return `Wie viel ist ${t.a} plus ${t.b}?`
+    case 'subtraction':    return `Wie viel ist ${t.a} minus ${t.b}?`
+    case 'multiplication': return `Wie viel ist ${t.a} mal ${t.b}?`
+    case 'compare':        return `Welche Zahl ist größer: ${t.a} oder ${t.b}?`
+    case 'count':          return 'Wie viele siehst du? Zähl sie!'
+    default:               return tr(t.prompt)
+  }
+}
 function spokenQuestion(t) {
+  if (getLang() === 'de') return spokenQuestionDe(t)
   switch (t.kind) {
     case 'letter': {
       const w = t.word.toLowerCase()
@@ -375,7 +276,7 @@ function PlayerTrack({ player, position, isActive, place, color }) {
       <div className="qr-vtrack-label" style={{ color: player.color }}>
         {finished && <span className="qr-lane-medal">{MEDALS[place]}</span>}
         <RacerAvatar racer={player} />
-        <span className="qr-vtrack-name">{player.name}</span>
+        <span className="qr-vtrack-name">{tr(player.name)}</span>
         <span className="qr-vtrack-pos">{position}/{TRACK_LENGTH}</span>
       </div>
     </div>
@@ -394,7 +295,7 @@ function RaceTrack({ players, positions, currentIdx, finishOrder, phase }) {
           <div key={p.id} className={`qr-lane${isActive ? ' active' : ''}${finished ? ' finished' : ''}`}>
             <div className="qr-lane-label">
               <span className="qr-lane-emoji"><RacerAvatar racer={p} /></span>
-              <span className="qr-lane-name">{p.name}</span>
+              <span className="qr-lane-name">{tr(p.name)}</span>
               {finished && <span className="qr-lane-medal">{MEDALS[place]}</span>}
             </div>
             <div className="qr-lane-bar">
@@ -445,6 +346,7 @@ function Confetti() {
 }
 
 export default function QuizRaceGame({ onBack }) {
+  const t = useT()
   const { theme } = useTheme()
 
   // ── setup choices ──
@@ -509,7 +411,7 @@ export default function QuizRaceGame({ onBack }) {
     setPicked(null)
     setLocked(false)
     setCpuThinking(false)
-    setFeedback({ text: 'Answer to move ahead!', tone: 'try' })
+    setFeedback({ text: tr('Answer to move ahead!'), tone: 'try' })
     setPhase('playing')
   }, [buildPlayers, nextQuestion])
 
@@ -527,7 +429,7 @@ export default function QuizRaceGame({ onBack }) {
     setTask(nextQuestion())
     setPicked(null)
     setLocked(false)
-    setFeedback({ text: 'Answer to move ahead!', tone: 'try' })
+    setFeedback({ text: tr('Answer to move ahead!'), tone: 'try' })
   }, [players, nextQuestion])
 
   // Resolve one answer (correct?) for the active player, then pass the turn.
@@ -537,10 +439,10 @@ export default function QuizRaceGame({ onBack }) {
 
     if (correct) {
       playCorrect()
-      setFeedback({ text: pick(CHEERS), tone: 'good' })
+      setFeedback({ text: tr(pick(CHEERS)), tone: 'good' })
     } else {
       playWrong()
-      setFeedback({ text: pick(TRY_AGAIN), tone: 'try' })
+      setFeedback({ text: tr(pick(TRY_AGAIN)), tone: 'try' })
     }
 
     setTimeout(() => {
@@ -584,7 +486,7 @@ export default function QuizRaceGame({ onBack }) {
     speakSteps([
       { text: spokenQuestion(t), onStart: () => setReadingIdx(-1) },
       ...t.options.map((o, i) => ({
-        text: `${i === t.options.length - 1 ? 'or ' : ''}${o}${i === t.options.length - 1 ? '?' : ','}`,
+        text: `${i === t.options.length - 1 ? tr('or') + ' ' : ''}${o}${i === t.options.length - 1 ? '?' : ','}`,
         onStart: () => setReadingIdx(i),
       })),
     ], () => setReadingIdx(null))
@@ -616,7 +518,7 @@ export default function QuizRaceGame({ onBack }) {
     if (!active || !active.isCpu) return
 
     setCpuThinking(true)
-    setFeedback({ text: '🤖 Computer is thinking…', tone: 'try' })
+    setFeedback({ text: '🤖 ' + tr('Computer is thinking…'), tone: 'try' })
     const t = setTimeout(() => {
       const getsItRight = Math.random() < diff.cpuOdds
       let chosen
@@ -644,14 +546,14 @@ export default function QuizRaceGame({ onBack }) {
           animate={{ opacity: 1, y: 0, transition: { type: 'spring', stiffness: 280, damping: 24 } }}
         >
           <div className="qr-setup-header">
-            <button className="btn btn-secondary back-btn" onClick={onBack}>← Back</button>
-            <h2 className="qr-setup-title">🏁 Quiz Race</h2>
+            <button className="btn btn-secondary back-btn" onClick={onBack}>← {t('Back')}</button>
+            <h2 className="qr-setup-title">🏁 {t('Quiz Race')}</h2>
             <div />
           </div>
-          <p className="qr-setup-tagline">Answer number &amp; letter questions to race to the finish!</p>
+          <p className="qr-setup-tagline">{t('Answer number & letter questions to race to the finish!')}</p>
 
           {/* Difficulty */}
-          <h3 className="qr-setup-h">Choose difficulty</h3>
+          <h3 className="qr-setup-h">{t('Choose difficulty')}</h3>
           <div className="qr-diff-btns">
             {DIFF_LIST.map(d => (
               <motion.button
@@ -666,14 +568,14 @@ export default function QuizRaceGame({ onBack }) {
                     ? <img src={d.image} alt="" style={{ width: '1em', height: '1em', objectFit: 'contain', display: 'block' }} />
                     : d.emoji}
                 </span>
-                <span className="qr-diff-label">{d.label}</span>
-                <span className="qr-diff-desc">{d.desc}</span>
+                <span className="qr-diff-label">{t(d.label)}</span>
+                <span className="qr-diff-desc">{t(d.desc)}</span>
               </motion.button>
             ))}
           </div>
 
           {/* Mode */}
-          <h3 className="qr-setup-h">Who is playing?</h3>
+          <h3 className="qr-setup-h">{t('Who is playing?')}</h3>
           <div className="qr-mode-btns">
             <motion.button
               className={`qr-mode-btn ${mode === 'cpu' ? 'selected' : ''}`}
@@ -683,10 +585,10 @@ export default function QuizRaceGame({ onBack }) {
             >
               <span className="qr-mode-racers">
                 <RacerAvatar racer={theme.raceRacers[0]} />
-                <span className="qr-vs">vs</span>
+                <span className="qr-vs">{t('vs')}</span>
                 <img src="/other-icons/vs-pc.svg" alt="" style={{ width: '1em', height: '1em', objectFit: 'contain', display: 'block' }} />
               </span>
-              <span className="qr-mode-label">1 vs Computer</span>
+              <span className="qr-mode-label">{t('1 vs Computer')}</span>
             </motion.button>
             <motion.button
               className={`qr-mode-btn ${mode === 'hotseat' ? 'selected' : ''}`}
@@ -697,7 +599,7 @@ export default function QuizRaceGame({ onBack }) {
               <span className="qr-mode-racers">
                 {theme.raceRacers.slice(0, 2).map(r => <RacerAvatar key={r.id} racer={r} />)}
               </span>
-              <span className="qr-mode-label">Friends (hot-seat)</span>
+              <span className="qr-mode-label">{t('Friends (pass & play)')}</span>
             </motion.button>
           </div>
 
@@ -708,15 +610,15 @@ export default function QuizRaceGame({ onBack }) {
                 const v = !readAloud
                 setReadAloud(v)
                 try { localStorage.setItem('qr-read', v ? '1' : '0') } catch { /* ignore */ }
-                if (v) speakSteps([{ text: 'I will read the questions to you.' }])
+                if (v) speakSteps([{ text: tr('I will read the questions to you.') }])
               }}
               role="switch"
               aria-checked={readAloud}
             >
               <span className="qr-read-icon">{readAloud ? '🔊' : '🔇'}</span>
               <span className="qr-read-text">
-                <b>Read the questions to me</b>
-                <small>{readAloud ? 'On — every question is read aloud' : 'Off — tap 🔊 on a question to hear it'}</small>
+                <b>{t('Read the questions to me')}</b>
+                <small>{readAloud ? t('On — every question is read aloud') : t('Off — tap 🔊 on a question to hear it')}</small>
               </span>
               <span className="sound-switch"><span className="sound-knob" /></span>
             </button>
@@ -728,7 +630,7 @@ export default function QuizRaceGame({ onBack }) {
             whileHover={{ scale: 1.06, transition: { duration: 0.15 } }}
             whileTap={{ scale: 0.95 }}
           >
-            Start Race! 🏁
+            {t('Start Race!')} 🏁
           </motion.button>
         </motion.div>
       </div>
@@ -742,8 +644,8 @@ export default function QuizRaceGame({ onBack }) {
     const winnerIdx = finishOrder[0]
     const winner = players[winnerIdx]
     const youWon = winner && !winner.isCpu && winner.id === 'you'
-    let title = '🏁 Race Finished!'
-    if (mode === 'cpu') title = youWon ? '🎉 You Won the Race!' : '🤖 Computer Wins!'
+    let title = '🏁 ' + t('Race Finished!')
+    if (mode === 'cpu') title = youWon ? '🎉 ' + t('You Won the Race!') : '🤖 ' + t('{name} wins!', { name: t('Computer') })
 
     return (
       <div className="quizrace-screen screen">
@@ -751,22 +653,22 @@ export default function QuizRaceGame({ onBack }) {
           <Confetti />
           <div className="gameover-emoji">{winner ? <RacerAvatar racer={winner} /> : '🏆'}</div>
           <h2>{title}</h2>
-          {winner && <p>{winner.name} crossed the finish line first!</p>}
+          {winner && <p>{winner.id === 'you' ? t('You crossed the finish line first!') : t('{name} crossed the finish line first!', { name: t(winner.name) })}</p>}
 
           <div className="qr-results">
             {finishOrder.map((pIdx, place) => (
               <div key={players[pIdx].id} className={`qr-result-row place-${place + 1}`}>
                 <span className="qr-result-medal">{MEDALS[place] ?? `${place + 1}.`}</span>
                 <span className="qr-result-emoji"><RacerAvatar racer={players[pIdx]} /></span>
-                <span className="qr-result-name">{players[pIdx].name}</span>
+                <span className="qr-result-name">{t(players[pIdx].name)}</span>
               </div>
             ))}
           </div>
 
           <div className="gameover-btns">
-            <button className="btn btn-primary" onClick={startGame}>Play Again</button>
-            <button className="btn btn-secondary" onClick={() => setPhase('setup')}>Change Setup</button>
-            <button className="btn btn-secondary" onClick={onBack}>Menu</button>
+            <button className="btn btn-primary" onClick={startGame}>{t('Play Again')}</button>
+            <button className="btn btn-secondary" onClick={() => setPhase('setup')}>{t('Change Setup')}</button>
+            <button className="btn btn-secondary" onClick={onBack}>{t('Menu')}</button>
           </div>
         </div>
       </div>
@@ -798,10 +700,10 @@ export default function QuizRaceGame({ onBack }) {
       <div className="qr-main">
         <div className={`quest-feedback ${feedback.tone}`}>{feedback.text}</div>
         <div className="quest-card qr-card">
-          <div className="qr-q-tag">{task.family === 'letter' ? '🔤 Letter' : task.family === 'meaning' ? '📖 Word' : '🔢 Number'}</div>
-          <div className={`quest-prompt${readingIdx === -1 ? ' reading' : ''}`}>{task.prompt}</div>
+          <div className="qr-q-tag">{task.family === 'letter' ? '🔤 ' + t('Letter') : task.family === 'meaning' ? '📖 ' + t('Word') : '🔢 ' + t('Number')}</div>
+          <div className={`quest-prompt${readingIdx === -1 ? ' reading' : ''}`}>{t(task.prompt)}</div>
           {canSpeak && (
-            <button className="qr-listen-btn" onClick={() => readTask(task)} disabled={cpuTurn} title="Read it to me">
+            <button className="qr-listen-btn" onClick={() => readTask(task)} disabled={cpuTurn} title={t('Read it to me')}>
               🔊
             </button>
           )}

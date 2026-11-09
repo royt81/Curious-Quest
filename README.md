@@ -6,7 +6,7 @@
 
 Works in any browser on computers, tablets and phones — and can be installed as an app ("Add to Home screen").
 
-Curious Quest is a collection of 17 games for children aged about 4–10, built by a dad for his child.
+Curious Quest is a collection of 14 games for children aged about 4–10, built by a dad for his child.
 Every game comes in five worlds (Animals, Dinosaurs, Space, Robots, Under the Sea), each with its own
 painted characters, music and animated background, guided by Fox, the explorer mascot.
 
@@ -16,12 +16,24 @@ painted characters, music and animated background, guided by Fox, the explorer m
 |---|---|
 | 🗺️ **Adventure** – roll the dice, answer questions, race to the trophy | 🧠 **Memory** – 12 painted pictures per world |
 | 🧮 **Quiz Race** – maths and letters for readers and non-readers | 🎨 **Draw & Paint** – free drawing and colouring pages |
-| 🐍 **Snakes & Ladders**, 🏁 **Race**, 🎴 **Foursomes** (Quartett) | ♟️ **Chess**, **Checkers**, **Backgammon**, **Domino**, **Uno**, **Dots & Boxes** |
-| 🔬 **Game of Life**, 🔤 **Letter Hunt**, 🔢 **Number Quest** | |
+| 🐍 **Snakes & Ladders**, 🏁 **Race**, 🀄 **Mahjong** | ♟️ **Chess**, **Checkers**, **Backgammon**, **Domino**, **Colour Clash**, **Dots & Boxes** |
+| 🔬 **Game of Life** | |
 
 Made for small hands: big touch targets, a reading voice for children who can't read yet,
 "How to play" cards for every game, a calm-colours / black & white mode for bedtime,
 and play against the computer or pass-and-play with friends.
+
+## Languages
+
+English and German. The game starts in German when the device is set to German, and
+Settings → Language switches at any time (the reading voice switches too).
+
+- Every text goes through `t('English text')` (`src/i18n/`); the English text is the key,
+  so anything not yet translated simply stays English.
+- `npm run i18n:check` lists texts that still need a German line.
+- Quiz content is written per language, not translated word by word:
+  German trivia (`challengeQuestions.de.js`), German spelling words with umlauts
+  (`QuizRace/quizWords.js`) and German picture questions with der/die/das and plurals.
 
 ## Privacy by design
 

@@ -5,8 +5,10 @@ import RacerAvatar from '../../components/RacerAvatar'
 import { playTap, playDiceRoll, playDiceClack, playDiceSettle, playClimb, playWin } from '../../sound/sfx'
 import './Adventure.css'
 import { CHALLENGES_BY_THEME, GENERAL_CHALLENGES } from './challengeQuestions'
+import { CHALLENGES_BY_THEME_DE, GENERAL_CHALLENGES_DE } from './challengeQuestions.de'
 import { makePictureQuestion } from './pictureQuestions'
 import { speak, announce, speakSteps, stopSpeaking, canSpeak } from '../../sound/speech'
+import { useT, useLang, tr, getLang } from '../../i18n'
 
 // ─── Board constants ───────────────────────────────────────────────────────────
 const STEP_MS      = 170  // ms per tile during piece movement
@@ -218,10 +220,12 @@ function createShuffleBag(items) {
 }
 
 function pickSurprise(bag) {
-  return { type: 'surprise', ...bag.next() }
+  const c = bag.next()
+  return { type: 'surprise', ...c, text: tr(c.text), desc: tr(c.desc) }
 }
 function pickBonus(bag) {
-  return { type: 'bonus', ...bag.next() }
+  const c = bag.next()
+  return { type: 'bonus', ...c, text: tr(c.text), desc: tr(c.desc) }
 }
 
 // Overshoot → bounce back from 80
@@ -479,11 +483,14 @@ const T_OFF = [
 // One difficulty for everyone — every theme has its own pool of trivia that
 // matches the board. Falls back to the general pool if a theme has no list.
 function getQuestionPool(themeId) {
-  const pool = CHALLENGES_BY_THEME[themeId]
-  return (pool && pool.length) ? pool : GENERAL_CHALLENGES
+  const de = getLang() === 'de'
+  const pool = (de ? CHALLENGES_BY_THEME_DE : CHALLENGES_BY_THEME)[themeId]
+  return (pool && pool.length) ? pool : (de ? GENERAL_CHALLENGES_DE : GENERAL_CHALLENGES)
 }
 
 const pickOne = (arr) => arr[Math.floor(Math.random() * arr.length)]
+// i18n: list
+const PRAISE = ['Yes! Great job!', 'Well done!', "That's right! Brilliant!", 'Super! You got it!']
 
 // ─── Challenge picker ─────────────────────────────────────────────────────────
 function pickChallenge(bag) {
@@ -565,6 +572,7 @@ const gameoverVariants = {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 export default function AdventureGame({ onBack }) {
+  const t = useT()
   const { theme } = useTheme()
   const { path: PATH, road: ROAD_D, road2: ROAD_D2, ang: ANG } = useMemo(() => getPathForTheme(theme.id), [theme.id])
 
@@ -620,6 +628,13 @@ export default function AdventureGame({ onBack }) {
     bonusBagRef.current    = createShuffleBag(THEME_BONUS_CARDS[theme.id]    ?? BIG_BONUS_CARDS)
   }, [theme.id])
 
+  // Switching language mid-game: the next questions come in the new language
+  const lang = useLang()
+  useEffect(() => {
+    if (questionBagRef.current) questionBagRef.current = createShuffleBag(getQuestionPool(theme.id))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang])
+
   // Clean up timers (and any speech) on unmount
   useEffect(() => () => {
     stopSpeaking()
@@ -664,7 +679,7 @@ export default function AdventureGame({ onBack }) {
     let guard = 0
     while (flags[next] && guard++ < playerCount) {
       flags[next] = false
-      addLog(`💤 ${racers[next]?.emoji} ${racers[next]?.name} is fast asleep — turn skipped!`)
+      addLog(`💤 ${racers[next]?.emoji} ` + tr('{name} is fast asleep — turn skipped!', { name: tr(racers[next]?.name ?? '') }))
       next = (next + 1) % playerCount
     }
     skipRef.current = flags
@@ -683,7 +698,7 @@ export default function AdventureGame({ onBack }) {
     setCurrentPlayer(0)
     setDiceValue(null)
     setRolling(false)
-    setLog(['🗺️ Adventure begins! Roll the dice!'])
+    setLog(['🗺️ ' + tr('Adventure begins! Roll the dice!')])
     setWinner(null)
     setAnimating(false)
     setChallenge(null)
@@ -735,9 +750,9 @@ export default function AdventureGame({ onBack }) {
 
           // Log the roll
           if (isBounce) {
-            addLog(`🎲 ${racer.emoji} ${racer.name} rolls ${finalRoll} — bounces back!`)
+            addLog(`🎲 ${racer.emoji} ` + tr('{name} rolls {n} — bounces back!', { name: tr(racer.name), n: finalRoll }))
           } else {
-            addLog(`🎲 ${racer.emoji} ${racer.name} rolls ${finalRoll}`)
+            addLog(`🎲 ${racer.emoji} ` + tr('{name} rolls {n}', { name: tr(racer.name), n: finalRoll }))
           }
 
           // Store final game-logic position immediately
@@ -780,7 +795,7 @@ export default function AdventureGame({ onBack }) {
           const afterLand = () => {
             if (shortDest != null) {
               playClimb()
-              addLog(`🛤️ Shortcut! ${landPos} → ${shortDest}!`)
+              addLog('🛤️ ' + tr('Shortcut!') + ` ${landPos} → ${shortDest}!`)
               animateSteps(cp, landPos, shortDest, STEP_MS * 0.55, afterMove)
             } else {
               afterMove()
@@ -809,7 +824,7 @@ export default function AdventureGame({ onBack }) {
 
     // 💤 Sleep card → no movement, but the player misses their next turn.
     if (challenge.skip) {
-      addLog(`${challenge.emoji} ${challenge.text} ${racers[cp].emoji} ${racers[cp].name} will snooze!`)
+      addLog(`${challenge.emoji} ${challenge.text} ${racers[cp].emoji} ` + tr('{name} will snooze!', { name: tr(racers[cp].name) }))
       setChallenge(null)
       passTurn(cp, true)
       return
@@ -818,7 +833,7 @@ export default function AdventureGame({ onBack }) {
     const fromPos = positions[cp]
     const toPos   = applyBounce(fromPos, challenge.delta)
 
-    addLog(`${challenge.emoji} ${challenge.text} ${racers[cp].emoji} ${challenge.delta >= 0 ? '+' : ''}${challenge.delta} steps!`)
+    addLog(`${challenge.emoji} ${challenge.text} ${racers[cp].emoji} ` + tr('{n} steps!', { n: `${challenge.delta >= 0 ? '+' : ''}${challenge.delta}` }))
     setPositions(prev => prev.map((p, i) => i === cp ? toPos : p))
     setChallenge(null)
 
@@ -838,8 +853,8 @@ export default function AdventureGame({ onBack }) {
     setChallenge(prev => ({ ...prev, answered: chosenIdx }))
     setReadingIdx(null)
     if (!challenge.picture) stopSpeaking()
-    if (chosenIdx === challenge.correctIdx) talk(pickOne(['Yes! Great job!', 'Well done!', 'That\'s right! Brilliant!', 'Super! You got it!']))
-    else talk(challenge.picture ? `Oh, not quite. It was ${challenge.label}.` : 'Oh, not quite. Good try!')
+    if (chosenIdx === challenge.correctIdx) talk(tr(pickOne(PRAISE)))
+    else talk(challenge.picture ? tr('Oh, not quite. It was {answer}.', { answer: challenge.label }) : tr('Oh, not quite. Good try!'))
 
     setTimeout(() => {
       const correct  = chosenIdx === challenge.correctIdx
@@ -849,8 +864,8 @@ export default function AdventureGame({ onBack }) {
       const toPos    = applyBounce(fromPos, delta)
 
       addLog(correct
-        ? `✨ Correct! ${racers[cp].emoji} +3 steps!`
-        : `❌ Wrong! ${racers[cp].emoji} -1 step!`)
+        ? '✨ ' + tr('Correct!') + ` ${racers[cp].emoji} ` + tr('{n} steps!', { n: '+3' })
+        : '❌ ' + tr('Wrong!') + ` ${racers[cp].emoji} ` + tr('-1 step!'))
 
       setPositions(prev => prev.map((p, i) => i === cp ? toPos : p))
 
@@ -879,12 +894,12 @@ export default function AdventureGame({ onBack }) {
   useEffect(() => {
     if (phase !== 'playing' || animating || challenge) return
     const r = racers[currentPlayer]
-    if (r) talk(`${r.name}, it's your turn! Tap the dice.`)
+    if (r) talk(tr("{name}, it's your turn! Tap the dice.", { name: tr(r.name) }))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentPlayer, phase])
 
   useEffect(() => {
-    if (phase === 'gameover' && winner != null) talk(`Hooray! ${racers[winner]?.name} wins the adventure!`)
+    if (phase === 'gameover' && winner != null) talk(tr('Hooray! {name} wins the adventure!', { name: tr(racers[winner]?.name ?? '') }))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase, winner])
 
@@ -898,13 +913,13 @@ export default function AdventureGame({ onBack }) {
           animate={{ opacity: 1, y: 0, transition: { type: 'spring', stiffness: 280, damping: 24 } }}
         >
           <div className="adv-setup-header">
-            <button className="btn btn-secondary back-btn" onClick={onBack}>← Back</button>
-            <h2 className="adv-setup-title">🗺️ Adventure!</h2>
+            <button className="btn btn-secondary back-btn" onClick={onBack}>← {t('Back')}</button>
+            <h2 className="adv-setup-title">🗺️ {t('Adventure!')}</h2>
             <div />
           </div>
 
           {/* Reading level */}
-          <h3 className="adv-setup-h">Who's playing?</h3>
+          <h3 className="adv-setup-h">{t("Who's playing?")}</h3>
           <div className="adv-mode-btns">
             {[
               { id: 'read',    icon: '📖', title: 'I can read',       sub: 'Fun trivia questions' },
@@ -916,20 +931,20 @@ export default function AdventureGame({ onBack }) {
                 onClick={() => {
                   setMode(m.id)
                   try { localStorage.setItem('adv-mode', m.id) } catch { /* ignore */ }
-                  if (m.id === 'picture' && voiceOn) speak('Little explorer! I will read everything to you.')
+                  if (m.id === 'picture' && voiceOn) speak(tr('Little explorer! I will read everything to you.'))
                 }}
                 whileHover={{ scale: 1.04, transition: { duration: 0.15 } }}
                 whileTap={{ scale: 0.96 }}
               >
                 <span className="adv-mode-icon">{m.icon}</span>
-                <span className="adv-mode-title">{m.title}</span>
-                <span className="adv-mode-sub">{m.sub}</span>
+                <span className="adv-mode-title">{t(m.title)}</span>
+                <span className="adv-mode-sub">{t(m.sub)}</span>
               </motion.button>
             ))}
           </div>
 
           {/* Player count */}
-          <h3 className="adv-setup-h">How many adventurers?</h3>
+          <h3 className="adv-setup-h">{t('How many adventurers?')}</h3>
           <div className="player-count-btns">
             {[2, 3, 4].map(n => (
               <motion.button
@@ -944,7 +959,7 @@ export default function AdventureGame({ onBack }) {
                     <RacerAvatar key={r.id} racer={r} />
                   ))}
                 </div>
-                <div className="pcb-label">{n} Players</div>
+                <div className="pcb-label">{t('{n} Players', { n })}</div>
               </motion.button>
             ))}
           </div>
@@ -954,7 +969,7 @@ export default function AdventureGame({ onBack }) {
             whileHover={{ scale: 1.06, transition: { duration: 0.15 } }}
             whileTap={{ scale: 0.95 }}
           >
-            Start Adventure!
+            {t('Start Adventure!')}
           </motion.button>
         </motion.div>
       </div>
@@ -966,8 +981,8 @@ export default function AdventureGame({ onBack }) {
     return (
       <div className="adventure-screen screen">
         <div className="game-header">
-          <button className="btn btn-secondary back-btn" onClick={onBack}>← Back</button>
-          <h2>🗺️ Adventure!</h2>
+          <button className="btn btn-secondary back-btn" onClick={onBack}>← {t('Back')}</button>
+          <h2>🗺️ {t('Adventure!')}</h2>
           <div />
         </div>
         <motion.div
@@ -977,12 +992,12 @@ export default function AdventureGame({ onBack }) {
           animate="animate"
         >
           <div className="gameover-emoji"><RacerAvatar racer={racers[winner]} /></div>
-          <h2>{racers[winner]?.name} wins the Adventure!</h2>
-          <p>Landed exactly on step 80! 🏆</p>
+          <h2>{t('{name} wins the Adventure!', { name: t(racers[winner]?.name ?? '') })}</h2>
+          <p>{t('Landed exactly on step 80!')} 🏆</p>
           <div className="gameover-btns">
-            <button className="btn btn-primary"   onClick={() => startGame(playerCount)}>Play Again</button>
-            <button className="btn btn-secondary" onClick={() => setPhase('setup')}>Change Players</button>
-            <button className="btn btn-secondary" onClick={onBack}>Menu</button>
+            <button className="btn btn-primary"   onClick={() => startGame(playerCount)}>{t('Play Again')}</button>
+            <button className="btn btn-secondary" onClick={() => setPhase('setup')}>{t('Change Players')}</button>
+            <button className="btn btn-secondary" onClick={onBack}>{t('Menu')}</button>
           </div>
         </motion.div>
       </div>
@@ -1054,8 +1069,8 @@ export default function AdventureGame({ onBack }) {
                 tileKind ? `is-${tileKind}` : '',
                 isCosmic ? 'is-cosmic' : '',
               ].filter(Boolean).join(' ')
-              const label = isStart             ? 'START'
-                          : isFinish            ? <><span className="finish-trophy">🏆</span><span className="finish-label">FINISH</span></>
+              const label = isStart             ? t('START')
+                          : isFinish            ? <><span className="finish-trophy">🏆</span><span className="finish-label">{t('FINISH')}</span></>
                           : tileKind === 'shortcut' ? `↑${SHORTCUTS[idx]}`
                           : tileKind === 'bonus'    ? '🌟'
                           : tileKind === 'surprise' ? <img src="/themes/other-icons/exclamation.svg" alt="" style={{ width: '1em', height: '1em', objectFit: 'contain', display: 'block' }} />
@@ -1115,14 +1130,14 @@ export default function AdventureGame({ onBack }) {
         {/* ── Sidebar ── */}
         <div className="adv-sidebar">
           <div className="adv-sidebar-header">
-            <div className="adv-game-title">🗺️ Adventure!</div>
+            <div className="adv-game-title">🗺️ {t('Adventure!')}</div>
             {pictureMode && canSpeak && (
               <button
                 className={`adv-voice-btn${voiceOn ? ' on' : ''}`}
-                onClick={() => { const v = !voiceOn; setVoiceOn(v); if (v) speak('I will read to you.'); else stopSpeaking() }}
-                title={voiceOn ? 'Voice on' : 'Voice off'}
+                onClick={() => { const v = !voiceOn; setVoiceOn(v); if (v) speak(tr('I will read to you.')); else stopSpeaking() }}
+                title={voiceOn ? t('Voice on') : t('Voice off')}
               >
-                {voiceOn ? '🔊 Voice on' : '🔇 Voice off'}
+                {voiceOn ? '🔊 ' + t('Voice on') : '🔇 ' + t('Voice off')}
               </button>
             )}
             <AnimatePresence mode="wait" initial={false}>
@@ -1135,7 +1150,7 @@ export default function AdventureGame({ onBack }) {
                 exit={{ opacity: 0, y: 8, transition: { duration: 0.14, ease: 'easeIn' } }}
               >
                 <span className="adv-turn-emoji"><RacerAvatar racer={currentRacer} /></span>
-                {currentRacer?.name}'s turn
+                {t("{name}'s turn", { name: t(currentRacer?.name ?? '') })}
               </motion.div>
             </AnimatePresence>
           </div>
@@ -1149,7 +1164,7 @@ export default function AdventureGame({ onBack }) {
               >
                 {i === currentPlayer && <span className="adv-player-arrow">▶</span>}
                 <span className="adv-player-emoji"><RacerAvatar racer={r} /></span>
-                <span className="adv-player-name">{r.name}</span>
+                <span className="adv-player-name">{t(r.name)}</span>
                 {sleepers[i] && <span className="adv-player-sleep">💤</span>}
                 <AnimatePresence mode="wait" initial={false}>
                 <motion.span
@@ -1175,7 +1190,7 @@ export default function AdventureGame({ onBack }) {
             whileHover={(!animating && !rolling && !challenge) ? { scale: 1.06, transition: { duration: 0.15 } } : {}}
             whileTap={(!animating && !rolling && !challenge) ? { scale: 0.95 } : {}}
           >
-            {rolling ? '🎲 Rolling...' : animating ? '✨ Moving...' : '🎲 Roll Dice!'}
+            {rolling ? '🎲 ' + t('Rolling…') : animating ? '✨ ' + t('Moving…') : '🎲 ' + t('Roll Dice!')}
           </motion.button>
 
           <div className="log-box">
@@ -1215,10 +1230,10 @@ export default function AdventureGame({ onBack }) {
                 <>
                   <div className="challenge-header">
                     <div className="challenge-stars">{'⭐'.repeat(Math.max(1, challenge.stars || 1))}</div>
-                    <div className="challenge-reward">Answer right for +3 steps!</div>
+                    <div className="challenge-reward">{t('Answer right for +3 steps!')}</div>
                   </div>
                   <div className="challenge-who">
-                    <RacerAvatar racer={currentRacer} /> {currentRacer?.name}'s turn
+                    <RacerAvatar racer={currentRacer} /> {t("{name}'s turn", { name: t(currentRacer?.name ?? '') })}
                   </div>
                   {challenge.picture ? (
                     <div className="challenge-question pic-question">
@@ -1230,7 +1245,7 @@ export default function AdventureGame({ onBack }) {
                   )}
                   {canSpeak && (
                     <button className="btn btn-secondary listen-btn" onClick={() => readChallenge(challenge)}>
-                      🔊 {challenge.picture ? 'Listen again' : 'Read it to me'}
+                      🔊 {challenge.picture ? t('Listen again') : t('Read it to me')}
                     </button>
                   )}
                   <div className={`challenge-options${challenge.picture ? ' pic-options' : ''}${challenge.options.length === 2 ? ' two' : ''}`}>
@@ -1264,23 +1279,23 @@ export default function AdventureGame({ onBack }) {
               ) : (
                 <div className="card-reveal">
                   <div className={`card-reveal-badge ${challenge.type === 'bonus' ? 'bonus' : 'surprise'}`}>
-                    {challenge.type === 'bonus' ? 'BIG BONUS' : 'SURPRISE'}
+                    {challenge.type === 'bonus' ? t('BIG BONUS') : t('SURPRISE')}
                   </div>
                   <div className="card-reveal-emoji">{challenge.emoji}</div>
                   <div className="card-reveal-title">{challenge.text}</div>
                   <div className="card-reveal-desc">{challenge.desc}</div>
                   {challenge.delta !== 0 && (
                     <div className="card-reveal-delta">
-                      {challenge.delta >= 0 ? '+' : ''}{challenge.delta} steps
+                      {t('{n} steps', { n: `${challenge.delta >= 0 ? '+' : ''}${challenge.delta}` })}
                     </div>
                   )}
                   {pictureMode && canSpeak && (
                     <button className="btn btn-secondary listen-btn" onClick={() => speak(`${challenge.text}! ${challenge.desc}`)}>
-                      🔊 Listen again
+                      🔊 {t('Listen again')}
                     </button>
                   )}
                   <button className="btn btn-primary" onClick={collectCard}>
-                    Collect!
+                    {t('Collect!')}
                   </button>
                 </div>
               )}

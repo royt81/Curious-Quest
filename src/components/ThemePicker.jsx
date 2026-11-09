@@ -3,10 +3,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from '../context/ThemeContext'
 import { THEME_LIST } from '../data/themes'
 import ThemeIcon from './ThemeIcon'
+import { useT } from '../i18n'
 import './ThemePicker.css'
 
 export default function ThemePicker({ open, onClose }) {
   const { themeId, setThemeId } = useTheme()
+  const t = useT()
 
   useEffect(() => {
     if (!open) return
@@ -33,17 +35,17 @@ export default function ThemePicker({ open, onClose }) {
             exit={{ opacity: 0, scale: 0.88, y: 18 }}
             transition={{ type: 'spring', stiffness: 400, damping: 28 }}
           >
-            <div className="tp-title">🎨 Choose Your Theme</div>
+            <div className="tp-title">🎨 {t('Choose Your Theme')}</div>
             <div className="tp-grid">
-              {THEME_LIST.map(t => (
+              {THEME_LIST.map(w => (
                 <button
-                  key={t.id}
-                  className={`tp-opt${themeId === t.id ? ' active' : ''}`}
-                  onClick={() => { setThemeId(t.id); onClose() }}
+                  key={w.id}
+                  className={`tp-opt${themeId === w.id ? ' active' : ''}`}
+                  onClick={() => { setThemeId(w.id); onClose() }}
                 >
-                  <ThemeIcon themeId={t.id} size={36} />
-                  <span className="tp-name">{t.label}</span>
-                  {themeId === t.id && <span className="tp-check">✓</span>}
+                  <ThemeIcon themeId={w.id} size={36} />
+                  <span className="tp-name">{t(w.label)}</span>
+                  {themeId === w.id && <span className="tp-check">✓</span>}
                 </button>
               ))}
             </div>

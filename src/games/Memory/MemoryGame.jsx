@@ -4,6 +4,7 @@ import ThemeIcon from '../../components/ThemeIcon'
 import { WORLD_PICTURES, worldPictures } from '../../data/pictures'
 import './Memory.css'
 import { playCard, playMatch, playWin } from '../../sound/sfx'
+import { useT } from '../../i18n'
 
 // ── Board sizes ───────────────────────────────────────────────────────────────
 const BOARD_SIZES = {
@@ -171,6 +172,7 @@ function starsFor(moves, pairs) {
 }
 
 export default function MemoryGame({ onBack }) {
+  const t = useT()
   const { themeId } = useTheme()
   const [size, setSize]       = useState(DEFAULT_SIZE)
   const [boardThemeId, setBoardThemeId] = useState(themeId) // frozen at game start
@@ -246,13 +248,13 @@ export default function MemoryGame({ onBack }) {
   return (
     <div className="memory-screen screen">
       <div className="game-header">
-        <button className="btn btn-secondary back-btn" onClick={onBack}>← Back</button>
-        <h2><span style={{ display: 'inline-flex', verticalAlign: '-0.2em' }}><ThemeIcon themeId={themeId} size={28} /></span> Memory</h2>
+        <button className="btn btn-secondary back-btn" onClick={onBack}>← {t('Back')}</button>
+        <h2><span style={{ display: 'inline-flex', verticalAlign: '-0.2em' }}><ThemeIcon themeId={themeId} size={28} /></span> {t('Memory')}</h2>
         <div className="scores">
-          <span className="score p1">🔄 {moves} moves</span>
-          <span className="score p2">✅ {pairsFound}/{totalPairs} pairs</span>
+          <span className="score p1">🔄 {t('{n} moves', { n: moves })}</span>
+          <span className="score p2">✅ {t('{a}/{b} pairs', { a: pairsFound, b: totalPairs })}</span>
         </div>
-        <div className="memory-size-toggle" role="group" aria-label="Board size">
+        <div className="memory-size-toggle" role="group" aria-label={t('Board size')}>
           {[16, 24].map(s => (
             <button
               key={s}
@@ -270,9 +272,9 @@ export default function MemoryGame({ onBack }) {
       {won ? (
         <div className="gameover">
           <div className="gameover-emoji">🏆</div>
-          <h2>You did it!</h2>
-          <p>You found all {totalPairs} pairs in {moves} moves!</p>
-          <div className="memory-stars" aria-label={`${stars} out of 3 stars`}>
+          <h2>{t('You did it!')}</h2>
+          <p>{t('You found all {pairs} pairs in {moves} moves!', { pairs: totalPairs, moves })}</p>
+          <div className="memory-stars" aria-label={t('{n} out of 3 stars', { n: stars })}>
             {[0, 1, 2].map(i => (
               <span key={i} className={`memory-star ${i < stars ? 'on' : 'off'}`}>
                 {i < stars ? '⭐' : '☆'}
@@ -280,8 +282,8 @@ export default function MemoryGame({ onBack }) {
             ))}
           </div>
           <div className="gameover-btns">
-            <button className="btn btn-primary" onClick={initGame}>Play Again</button>
-            <button className="btn btn-secondary" onClick={onBack}>Menu</button>
+            <button className="btn btn-primary" onClick={initGame}>{t('Play Again')}</button>
+            <button className="btn btn-secondary" onClick={onBack}>{t('Menu')}</button>
           </div>
         </div>
       ) : (
@@ -301,7 +303,7 @@ export default function MemoryGame({ onBack }) {
                   className={`memory-card ${isUp ? 'is-up' : ''} ${isMatched ? 'is-matched' : ''}`}
                   onClick={() => handleFlip(idx)}
                   disabled={isUp || locked}
-                  aria-label={isUp ? sym.id : 'face-down card'}
+                  aria-label={isUp ? sym.id : t('face-down card')}
                   style={isUp ? { '--sym-bg': sym.bg, '--sym-color': sym.color } : undefined}
                 >
                   <span className="memory-card-face">
@@ -315,7 +317,7 @@ export default function MemoryGame({ onBack }) {
           </div>
 
           <div className="turn-banner">
-            {flipped.length === 1 ? 'Find the matching card!' : 'Tap two cards to find a pair!'}
+            {flipped.length === 1 ? t('Find the matching card!') : t('Tap two cards to find a pair!')}
           </div>
         </div>
       )}

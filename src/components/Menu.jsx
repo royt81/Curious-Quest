@@ -4,6 +4,7 @@ import { useTheme } from '../context/ThemeContext'
 import ThemeIcon from './ThemeIcon'
 import ThemePicker from './ThemePicker'
 import AboutPage from './AboutPage'
+import { useT } from '../i18n'
 import './Menu.css'
 
 // Game list for the main menu. Each game shows ONE clear icon (matching the
@@ -125,6 +126,8 @@ export default function Menu({ onSelect }) {
   const { theme, themeId } = useTheme()
   const [showPicker, setShowPicker] = useState(false)
   const [showAbout, setShowAbout] = useState(false)
+  const t = useT()
+  const worldName = t(theme.world)
 
   return (
     <div className="menu-screen screen">
@@ -139,17 +142,17 @@ export default function Menu({ onSelect }) {
         <button
           className="menu-theme-btn"
           onClick={() => setShowPicker(p => !p)}
-          title="Change theme"
+          title={t('Change theme')}
         >
           {/* Same wordmark style for every world: icon + name in the logo's colours */}
           <span className="menu-title-emoji"><ThemeIcon themeId={themeId} size={56} /></span>
-          <span className="menu-world" aria-label={theme.world}>
-            {theme.world.split(' ').map((w, i, all) => (
+          <span className="menu-world" aria-label={worldName}>
+            {worldName.split(' ').map((w, i, all) => (
               <span key={i} className={i === all.length - 1 ? 'mw-last' : 'mw-first'}>{w}{i < all.length - 1 ? ' ' : ''}</span>
             ))}
           </span>
         </button>
-        <p className="menu-subtitle">Choose a game to play</p>
+        <p className="menu-subtitle">{t('Choose a game to play')}</p>
       </motion.div>
 
       <motion.div
@@ -174,8 +177,8 @@ export default function Menu({ onSelect }) {
                 : <span className="game-card-icon-emoji">{g.emoji}</span>}
             </div>
             <div className="game-card-body">
-              <span className="game-card-title">{g.name}</span>
-              <span className="game-card-desc">{g.desc}</span>
+              <span className="game-card-title">{t(g.name)}</span>
+              <span className="game-card-desc">{t(g.desc)}</span>
             </div>
           </motion.button>
         ))}
@@ -183,7 +186,7 @@ export default function Menu({ onSelect }) {
 
       <footer className="menu-footer">
         <button className="about-link" onClick={() => setShowAbout(true)}>
-          About · Privacy · Impressum
+          {t('About · Privacy · Impressum')}
         </button>
       </footer>
       <AboutPage open={showAbout} onClose={() => setShowAbout(false)} />

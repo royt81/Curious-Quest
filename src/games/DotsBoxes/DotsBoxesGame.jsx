@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext'
 import RacerAvatar from '../../components/RacerAvatar'
 import './DotsBoxes.css'
 import { playMove, playMatch, playWin } from '../../sound/sfx'
+import { useT } from '../../i18n'
 
 /* ════════════════════════════════════════════════════════════════════════════
    DOTS & BOXES — the classic pen-and-paper travel game.
@@ -112,6 +113,7 @@ const gameoverVariants = {
 }
 
 export default function DotsBoxesGame({ onBack }) {
+  const t = useT()
   const { theme } = useTheme()
 
   const [phase, setPhase] = useState('setup')      // 'setup' | 'playing' | 'gameover'
@@ -220,12 +222,12 @@ export default function DotsBoxesGame({ onBack }) {
           animate={{ opacity: 1, y: 0, transition: { type: 'spring', stiffness: 280, damping: 24 } }}
         >
           <div className="db-setup-header">
-            <button className="btn btn-secondary back-btn" onClick={onBack}>← Back</button>
-            <h2 className="db-setup-title">⬛ Dots &amp; Boxes</h2>
+            <button className="btn btn-secondary back-btn" onClick={onBack}>← {t('Back')}</button>
+            <h2 className="db-setup-title">⬛ {t('Dots & Boxes')}</h2>
             <div />
           </div>
 
-          <h3 className="db-setup-h">Board size</h3>
+          <h3 className="db-setup-h">{t('Board size')}</h3>
           <div className="db-size-btns">
             {SIZES.map(s => (
               <motion.button
@@ -236,13 +238,13 @@ export default function DotsBoxesGame({ onBack }) {
                 whileTap={{ scale: 0.95 }}
               >
                 <span className="db-size-emoji">{s.emoji}</span>
-                <span className="db-size-label">{s.label}</span>
-                <span className="db-size-desc">{s.desc}</span>
+                <span className="db-size-label">{t(s.label)}</span>
+                <span className="db-size-desc">{t(s.desc)}</span>
               </motion.button>
             ))}
           </div>
 
-          <h3 className="db-setup-h">Who is playing?</h3>
+          <h3 className="db-setup-h">{t('Who is playing?')}</h3>
           <div className="db-mode-btns">
             <motion.button
               className={`db-mode-btn ${mode === 'cpu' ? 'selected' : ''}`}
@@ -252,10 +254,10 @@ export default function DotsBoxesGame({ onBack }) {
             >
               <span className="db-mode-racers">
                 <RacerAvatar racer={theme.raceRacers[0]} />
-                <span className="db-vs">vs</span>
+                <span className="db-vs">{t('vs')}</span>
                 <img src="/other-icons/vs-pc.svg" alt="" style={{ width: '1em', height: '1em', objectFit: 'contain', display: 'block' }} />
               </span>
-              <span className="db-mode-label">1 vs Computer</span>
+              <span className="db-mode-label">{t('1 vs Computer')}</span>
             </motion.button>
             <motion.button
               className={`db-mode-btn ${mode === 'hotseat' ? 'selected' : ''}`}
@@ -266,7 +268,7 @@ export default function DotsBoxesGame({ onBack }) {
               <span className="db-mode-racers">
                 {theme.raceRacers.slice(0, 2).map(r => <RacerAvatar key={r.id} racer={r} />)}
               </span>
-              <span className="db-mode-label">Friends (pass &amp; play)</span>
+              <span className="db-mode-label">{t('Friends (pass & play)')}</span>
             </motion.button>
           </div>
 
@@ -276,7 +278,7 @@ export default function DotsBoxesGame({ onBack }) {
             whileHover={{ scale: 1.06, transition: { duration: 0.15 } }}
             whileTap={{ scale: 0.95 }}
           >
-            Start Game!
+            {t('Start Game!')}
           </motion.button>
         </motion.div>
       </div>
@@ -291,26 +293,26 @@ export default function DotsBoxesGame({ onBack }) {
     return (
       <div className="dotsboxes-screen screen">
         <div className="game-header">
-          <button className="btn btn-secondary back-btn" onClick={onBack}>← Back</button>
-          <h2>⬛ Dots &amp; Boxes</h2>
+          <button className="btn btn-secondary back-btn" onClick={onBack}>← {t('Back')}</button>
+          <h2>⬛ {t('Dots & Boxes')}</h2>
           <div />
         </div>
         <motion.div className="gameover" variants={gameoverVariants} initial="initial" animate="animate">
           <div className="gameover-emoji">{tie ? '🤝' : <RacerAvatar racer={winners[0]} />}</div>
-          <h2>{tie ? "It's a tie!" : `${winners[0].name} win${winners[0].name === 'You' ? '' : 's'}!`}</h2>
+          <h2>{tie ? t("It's a tie!") : winners[0].id === 'you' ? t('You win!') : t('{name} wins!', { name: t(winners[0].name) })}</h2>
           <div className="db-final-scores">
             {players.map((p, i) => (
               <div key={p.id} className="db-final-row" style={{ '--p-col': p.color }}>
                 <span className="db-final-emoji"><RacerAvatar racer={p} /></span>
-                <span className="db-final-name">{p.name}</span>
-                <span className="db-final-pts">{scores[i]} boxes</span>
+                <span className="db-final-name">{t(p.name)}</span>
+                <span className="db-final-pts">{t('{n} boxes', { n: scores[i] })}</span>
               </div>
             ))}
           </div>
           <div className="gameover-btns">
-            <button className="btn btn-primary" onClick={startGame}>Play Again</button>
-            <button className="btn btn-secondary" onClick={() => setPhase('setup')}>Change Setup</button>
-            <button className="btn btn-secondary" onClick={onBack}>Menu</button>
+            <button className="btn btn-primary" onClick={startGame}>{t('Play Again')}</button>
+            <button className="btn btn-secondary" onClick={() => setPhase('setup')}>{t('Change Setup')}</button>
+            <button className="btn btn-secondary" onClick={onBack}>{t('Menu')}</button>
           </div>
         </motion.div>
       </div>
@@ -333,7 +335,7 @@ export default function DotsBoxesGame({ onBack }) {
           {players.map((p, i) => (
             <div key={p.id} className={`db-score${turn === i ? ' active' : ''}`} style={{ '--p-col': p.color }}>
               <span className="db-score-emoji"><RacerAvatar racer={p} /></span>
-              <span className="db-score-name">{p.name}</span>
+              <span className="db-score-name">{t(p.name)}</span>
               <span className="db-score-pts">{scores[i]}</span>
               {turn === i && <span className="db-score-turn">●</span>}
             </div>
@@ -342,8 +344,8 @@ export default function DotsBoxesGame({ onBack }) {
 
         <div className="db-turn-banner" style={{ '--turn-col': turnCol }}>
           {active?.isCpu
-            ? '🤖 Computer is thinking…'
-            : <><RacerAvatar racer={active} /> {active?.name}'s turn</>}
+            ? '🤖 ' + t('Computer is thinking…')
+            : <><RacerAvatar racer={active} /> {active?.id === 'you' ? t('Your turn') : t("{name}'s turn", { name: t(active?.name) })}</>}
         </div>
 
         {/* Board */}
@@ -449,8 +451,8 @@ export default function DotsBoxesGame({ onBack }) {
         </div>
 
         <div className="db-controls">
-          <button className="btn btn-secondary" onClick={() => setPhase('setup')}>↺ New Game</button>
-          <button className="btn btn-secondary back-btn" onClick={onBack}>← Menu</button>
+          <button className="btn btn-secondary" onClick={() => setPhase('setup')}>↺ {t('New Game')}</button>
+          <button className="btn btn-secondary back-btn" onClick={onBack}>← {t('Menu')}</button>
         </div>
       </div>
     </div>

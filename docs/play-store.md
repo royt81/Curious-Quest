@@ -9,21 +9,24 @@ automatically — no new app upload is needed for game changes.
 **App name** (max 30): `Curious Quest – Kids Games`
 
 **Short description** (max 80):
-`17 free learning games for kids. No ads, no purchases, no data collected.`
+`14 free learning games for kids. No ads, no purchases, no data collected.`
 
 **Full description:**
 
-Curious Quest is a free collection of 17 games for curious kids aged about 4 to 10 — made by a dad for his child.
+Curious Quest is a free collection of 14 games for curious kids aged about 4 to 10 — made by a dad for his child.
 
 Explore five colourful worlds with Fox, the explorer: Animal Kingdom, Dinosaurs, Space, Robots and Under the Sea. Every game changes its look, characters and music to match the world you pick.
 
 🗺️ Adventure – roll the dice, answer simple questions and race to the trophy
 🧠 Memory – 12 painted pictures in every world
+🀄 Mahjong – match the painted pictures and clear the pile, in three levels
 🏁 Quiz Race – numbers and letters, with a reading voice for children who can't read yet
 🎨 Draw & Paint – free drawing and 20 colouring pages
-🐍 Snakes & Ladders, Race, Foursomes (Quartett)
+🐍 Snakes & Ladders and Race
 ♟️ Chess, Checkers, Backgammon, Domino, Colour Clash, Dots & Boxes
-🔤 Letter Hunt, 🔢 Number Quest, 🔬 Game of Life
+🔬 Game of Life
+
+In English and German (Deutsch).
 
 Made for small hands:
 • Big buttons and a "How to play" card for every game
@@ -39,6 +42,43 @@ Safe for children:
 **Category:** Education (or Games › Educational) · **Tags:** kids, learning, family
 **Contact e-mail:** roytate.berlin@gmail.com
 **Privacy policy URL:** https://curious-quest-mda.pages.dev/privacy.html
+
+## Store listing – German (Deutsch)
+
+Add it in Play Console under *Store presence → Main store listing → Manage translations → German (de-DE)*.
+
+**App name** (max 30): `Curious Quest – Kinderspiele`
+
+**Short description** (max 80):
+`14 kostenlose Lernspiele für Kinder. Ohne Werbung, ohne Käufe, ohne Daten.`
+
+**Full description:**
+
+Curious Quest ist eine kostenlose Sammlung von 14 Spielen für neugierige Kinder von etwa 4 bis 10 Jahren – gemacht von einem Papa für sein Kind.
+
+Entdecke mit dem Fuchs fünf bunte Welten: Tierreich, Dinosaurier, Weltraum, Roboter und Unterwasserreich. Jedes Spiel passt Aussehen, Figuren und Musik an die gewählte Welt an.
+
+🗺️ Abenteuer – würfeln, einfache Fragen beantworten und zum Pokal rennen
+🧠 Memory – 12 gemalte Bilder in jeder Welt
+🀄 Mahjong – gleiche Bilder finden und den Stapel abräumen, in drei Stufen
+🏁 Quiz-Rennen – Zahlen und Buchstaben, mit Vorlesestimme für Kinder, die noch nicht lesen können
+🎨 Malen & Zeichnen – freies Malen und 20 Ausmalbilder
+🐍 Schlangen & Leitern und Wettrennen
+♟️ Schach, Dame, Backgammon, Domino, Farben-Duell, Käsekästchen
+🔬 Spiel des Lebens
+
+Auf Deutsch und Englisch.
+
+Für kleine Hände gemacht:
+• Große Knöpfe und eine Spielanleitung für jedes Spiel
+• Gegen den Computer spielen oder das Gerät an Freunde weitergeben
+• Ruhige Farben und Schwarz-Weiß-Modus für den Abend
+• Funktioniert nach dem ersten Start auch offline
+
+Sicher für Kinder:
+• Keine Werbung, keine In-App-Käufe, keine Konten
+• Es werden keine persönlichen Daten gesammelt – Einstellungen bleiben auf dem Gerät
+• Keine Links zu sozialen Netzwerken
 
 ## Graphics
 - App icon 512×512: `public/icons/icon-512.png`

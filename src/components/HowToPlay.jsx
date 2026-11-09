@@ -3,11 +3,19 @@ import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { HOW_TO_PLAY, spokenRules } from '../data/howToPlay'
 import { speakSteps, stopSpeaking, canSpeak } from '../sound/speech'
+import { useT } from '../i18n'
 import './HowToPlay.css'
 
 // The "How to play" window for any game (see data/howToPlay.js for the texts).
 export default function HowToPlay({ gameId, open, onClose }) {
-  const info = HOW_TO_PLAY[gameId]
+  const t = useT()
+  const raw = HOW_TO_PLAY[gameId]
+  // every text of the rules goes through the dictionary
+  const info = raw && {
+    ...raw,
+    title: t(raw.title), goal: t(raw.goal), tip: raw.tip && t(raw.tip),
+    steps: raw.steps.map(([icon, text]) => [icon, t(text)]),
+  }
 
   useEffect(() => {
     if (!open) return undefined
@@ -22,13 +30,13 @@ export default function HowToPlay({ gameId, open, onClose }) {
       {open && info && (
         <motion.div className="htp-overlay" onClick={onClose}
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-          <motion.div className="htp-panel" onClick={e => e.stopPropagation()} role="dialog" aria-label={`How to play ${info.title}`}
+          <motion.div className="htp-panel" onClick={e => e.stopPropagation()} role="dialog" aria-label={t('How to play {game}', { game: info.title })}
             initial={{ y: 30, scale: 0.95 }} animate={{ y: 0, scale: 1 }} exit={{ y: 20, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 360, damping: 28 }}>
             <div className="htp-head">
-              <h3>❓ How to play {info.title}</h3>
+              <h3>❓ {t('How to play {game}', { game: info.title })}</h3>
               {canSpeak && (
-                <button className="htp-listen" title="Read it to me"
+                <button className="htp-listen" title={t('Read it to me')}
                   onClick={() => speakSteps([{ text: spokenRules(info) }], null, { force: true })}>
                   🔊
                 </button>
@@ -41,7 +49,7 @@ export default function HowToPlay({ gameId, open, onClose }) {
               ))}
             </ol>
             {info.tip && <p className="htp-tip">💡 {info.tip}</p>}
-            <button className="btn btn-primary htp-ok" onClick={onClose}>Let's play!</button>
+            <button className="btn btn-primary htp-ok" onClick={onClose}>{t("Let's play!")}</button>
           </motion.div>
         </motion.div>
       )}
@@ -52,10 +60,11 @@ export default function HowToPlay({ gameId, open, onClose }) {
 
 // Sidebar button (same look as the Settings button, also when collapsed).
 export function HowToPlayButton({ onClick }) {
+  const t = useT()
   return (
-    <button className="settings-btn htp-btn" onClick={onClick} title="How to play">
+    <button className="settings-btn htp-btn" onClick={onClick} title={t('How to play')}>
       <span className="settings-btn-icon">❓</span>
-      <span>How to play</span>
+      <span>{t('How to play')}</span>
     </button>
   )
 }

@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext'
 import ThemeIcon from '../../components/ThemeIcon'
 import './Domino.css'
 import { playMove, playDraw, playWin } from '../../sound/sfx'
+import { tr, useT } from '../../i18n'
 
 // ─── domino helpers ───────────────────────────────────────────────────────────
 // A tile is { a, b, id }. The "line" stores oriented tiles { left, right, id }.
@@ -71,6 +72,7 @@ function DominoTile({ a, b, vertical, unit = 44, className = '', onClick, style 
 const HAND_UNIT = 56  // hand tiles are fixed and chunky
 
 export default function DominoGame({ onBack }) {
+  const tt = useT()
   const { themeId } = useTheme()
 
   const [hand,    setHand]    = useState([])   // human
@@ -83,7 +85,7 @@ export default function DominoGame({ onBack }) {
   const [winReason, setWinReason] = useState('')
   const [pendingTile, setPendingTile] = useState(null) // tile awaiting end choice
   const [aiThinking, setAiThinking] = useState(false)
-  const [log,     setLog]     = useState(['New game! Match the open ends.'])
+  const [log,     setLog]     = useState(() => [tr('New game! Match the open ends.')])
 
   const aiTimer = useRef(null)
   const stateRef = useRef({})
@@ -124,7 +126,7 @@ export default function DominoGame({ onBack }) {
     setLine([]); setTurn('human')
     setGameOver(false); setWinner(null); setWinReason('')
     setPendingTile(null); setAiThinking(false)
-    setLog(['New game! Play any tile to start.'])
+    setLog([tr('New game! Play any tile to start.')])
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -163,14 +165,14 @@ export default function DominoGame({ onBack }) {
     if (fromHuman) {
       const nh = hand.filter(t => t.id !== tile.id)
       setHand(nh)
-      addLog(`You played ${tile.a}|${tile.b}.`)
-      if (nh.length === 0) return endGame('human', 'emptied their hand')
+      addLog(tr('You played {tile}.', { tile: `${tile.a}|${tile.b}` }))
+      if (nh.length === 0) return endGame('human', tr('You played all your tiles.'))
       setTurn('ai')
     } else {
       const nh = aiHand.filter(t => t.id !== tile.id)
       setAiHand(nh)
-      addLog(`🤖 played ${tile.a}|${tile.b}.`)
-      if (nh.length === 0) return endGame('comp', 'emptied their hand')
+      addLog('🤖 ' + tr('Computer played {tile}.', { tile: `${tile.a}|${tile.b}` }))
+      if (nh.length === 0) return endGame('comp', tr('The computer played all its tiles.'))
       setTurn('human')
     }
     return newLine
@@ -185,9 +187,9 @@ export default function DominoGame({ onBack }) {
   // resolve a blocked game by pip count
   const resolveBlocked = (humanHand, compHand) => {
     const hp = pipTotal(humanHand), cp = pipTotal(compHand)
-    if (hp < cp)      endGame('human', `lower pips (${hp} vs ${cp})`)
-    else if (cp < hp) endGame('comp',  `lower pips (${cp} vs ${hp})`)
-    else              endGame('human', `tie on pips (${hp}) — you win!`)
+    if (hp < cp)      endGame('human', tr('Fewer dots: {a} vs {b}.', { a: hp, b: cp }))
+    else if (cp < hp) endGame('comp',  tr('Fewer dots: {a} vs {b}.', { a: cp, b: hp }))
+    else              endGame('human', tr('Same number of dots ({n}) — you win!', { n: hp }))
   }
 
   // ── human actions ─────────────────────────────────────────────────────────
@@ -241,11 +243,11 @@ export default function DominoGame({ onBack }) {
     setBoneyard(yard)
     setHand(h)
     if (hasMove(h, line)) {
-      addLog(drew ? 'You drew a tile — now play it!' : 'You can play!')
+      addLog(drew ? tr('You drew a tile — now play it!') : tr('You can play!'))
       return // stay on human turn to play the drawn tile
     }
     // cannot move at all → pass
-    addLog(drew ? 'You drew but still cannot play — pass.' : 'No moves — you pass.')
+    addLog(drew ? tr('You drew but still cannot play — pass.') : tr('No moves — you pass.'))
     // if neither side can move and boneyard empty → blocked
     if (yard.length === 0 && !hasMove(aiHand, line)) {
       return resolveBlocked(h, aiHand)
@@ -270,12 +272,12 @@ export default function DominoGame({ onBack }) {
     if (yard.length !== by.length) {
       setBoneyard(yard)
       setAiHand(hand2)
-      addLog('🤖 drew from the boneyard.')
+      addLog('🤖 ' + tr('Computer drew a tile.'))
     }
 
     if (!hasMove(hand2, ln)) {
       // AI passes
-      addLog('🤖 cannot play — passes.')
+      addLog('🤖 ' + tr('Computer cannot play — passes.'))
       setAiThinking(false)
       // blocked check: human also stuck & yard empty
       if (yard.length === 0 && !hasMove(hand, ln)) {
@@ -327,8 +329,8 @@ export default function DominoGame({ onBack }) {
     playMove()
     const nh = aiHandNow.filter(t => t.id !== tile.id)
     setAiHand(nh)
-    addLog(`🤖 played ${tile.a}|${tile.b}.`)
-    if (nh.length === 0) return endGame('comp', 'emptied their hand')
+    addLog('🤖 ' + tr('Computer played {tile}.', { tile: `${tile.a}|${tile.b}` }))
+    if (nh.length === 0) return endGame('comp', tr('The computer played all its tiles.'))
     setTurn('human')
   }
 
@@ -341,16 +343,16 @@ export default function DominoGame({ onBack }) {
 
   const status = gameOver
     ? ''
-    : aiThinking ? '🤖 Computer is thinking...'
+    : aiThinking ? '🤖 ' + tt('Computer is thinking…')
     : turn === 'human'
-      ? (humanCanPlay ? 'Your turn — tap a playable tile.' : 'No play — tap Draw / Pass.')
-      : "Computer's turn"
+      ? (humanCanPlay ? tt('Your turn — tap a playable tile.') : tt('No play — tap Draw / Pass.'))
+      : tt("{name}'s turn", { name: tt('Computer') })
 
   return (
     <div className="domino-screen screen">
       <div className="game-header">
-        <button className="btn btn-secondary back-btn" onClick={onBack}>← Back</button>
-        <h2><span style={{ display: 'inline-flex', verticalAlign: '-0.2em' }}><ThemeIcon themeId={themeId} size={28} /></span> Dominoes</h2>
+        <button className="btn btn-secondary back-btn" onClick={onBack}>← {tt('Back')}</button>
+        <h2><span style={{ display: 'inline-flex', verticalAlign: '-0.2em' }}><ThemeIcon themeId={themeId} size={28} /></span> {tt('Domino')}</h2>
         <div className="scores">
           <span className="score p1">🙂 {hand.length}</span>
           <span className="score p2">🤖 {aiHand.length}</span>
@@ -367,11 +369,11 @@ export default function DominoGame({ onBack }) {
             animate="animate"
           >
             <div className="gameover-emoji">{winner === 'human' ? '🏆' : '🤖'}</div>
-            <h2>{winner === 'human' ? 'You win!' : 'Computer wins!'}</h2>
-            <p>{winReason ? `Won by ${winReason}.` : ''}</p>
+            <h2>{winner === 'human' ? tt('You win!') : tt('{name} wins!', { name: tt('Computer') })}</h2>
+            <p>{winReason}</p>
             <div className="gameover-btns">
-              <button className="btn btn-primary" onClick={restart}>Play Again</button>
-              <button className="btn btn-secondary" onClick={onBack}>Menu</button>
+              <button className="btn btn-primary" onClick={restart}>{tt('Play Again')}</button>
+              <button className="btn btn-secondary" onClick={onBack}>{tt('Menu')}</button>
             </div>
           </motion.div>
         ) : (
@@ -391,7 +393,7 @@ export default function DominoGame({ onBack }) {
             {/* played line */}
             <div className="domino-line-wrap" ref={lineWrapRef}>
               <div className="domino-line">
-                {line.length === 0 && <div className="domino-empty">Play your first tile here ↓</div>}
+                {line.length === 0 && <div className="domino-empty">{tt('Play your first tile here')} ↓</div>}
                 <AnimatePresence>
                   {line.map(t => {
                     const isDouble = t.left === t.right
@@ -421,16 +423,16 @@ export default function DominoGame({ onBack }) {
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
                 >
-                  <span>Play {pendingTile.a}|{pendingTile.b} on which end?</span>
-                  <button className="btn btn-primary" onClick={() => chooseEnd('left')}>Left ({leftEnd})</button>
-                  <button className="btn btn-primary" onClick={() => chooseEnd('right')}>Right ({rightEnd})</button>
-                  <button className="btn btn-secondary" onClick={() => setPendingTile(null)}>Cancel</button>
+                  <span>{tt('Play {tile} on which end?', { tile: `${pendingTile.a}|${pendingTile.b}` })}</span>
+                  <button className="btn btn-primary" onClick={() => chooseEnd('left')}>{tt('Left')} ({leftEnd})</button>
+                  <button className="btn btn-primary" onClick={() => chooseEnd('right')}>{tt('Right')} ({rightEnd})</button>
+                  <button className="btn btn-secondary" onClick={() => setPendingTile(null)}>{tt('Cancel')}</button>
                 </motion.div>
               )}
             </AnimatePresence>
 
             {/* human hand */}
-            <div className="domino-hand-label">Your tiles</div>
+            <div className="domino-hand-label">{tt('Your tiles')}</div>
             <div className="domino-hand">
               <AnimatePresence>
                 {hand.map(t => {
@@ -462,7 +464,7 @@ export default function DominoGame({ onBack }) {
 
             {turn === 'human' && !humanCanPlay && !gameOver && (
               <button className="btn btn-primary" onClick={handleDrawOrPass}>
-                {boneyard.length ? 'Draw a tile' : 'Pass'}
+                {boneyard.length ? tt('Draw a tile') : tt('Pass')}
               </button>
             )}
 

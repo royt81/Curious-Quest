@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext'
 import { themePieces } from '../../data/pieces'
 import './Backgammon.css'
 import { playMove, playCapture, playWin, playDiceRoll, playDiceSettle } from '../../sound/sfx'
+import { useT, tr } from '../../i18n'
 
 /* ════════════════════════════════════════════════════════════════════════════
    BACKGAMMON — human (HUMAN, positive checkers) vs computer (COMP, negative).
@@ -307,6 +308,7 @@ function aiChooseSequence(startState, dice) {
 // ════════════════════════════════════════════════════════════════════════════
 
 export default function BackgammonGame({ onBack }) {
+  const t = useT()
   const { theme } = useTheme()
 
   const [state, setState] = useState(() => ({
@@ -319,7 +321,7 @@ export default function BackgammonGame({ onBack }) {
   const [selected, setSelected] = useState(null) // source index or 'bar'
   const [gameOver, setGameOver] = useState(false)
   const [winner, setWinner] = useState(null)
-  const [log, setLog] = useState(['Roll the dice to begin!'])
+  const [log, setLog] = useState(() => [tr('Roll the dice to begin!')])
   const [aiThinking, setAiThinking] = useState(false)
 
   const stateRef = useRef({})
@@ -364,7 +366,7 @@ export default function BackgammonGame({ onBack }) {
     setState({ points: startingPoints(), barH: 0, barC: 0, offH: 0, offC: 0 })
     setDice([]); setAllDice([]); setTurn(HUMAN); setRolled(false)
     setSelected(null); setGameOver(false); setWinner(null)
-    setLog(['Roll the dice to begin!']); setAiThinking(false)
+    setLog([tr('Roll the dice to begin!')]); setAiThinking(false)
   }
 
   // ── Roll dice for the current player ────────────────────────────────────────
@@ -377,11 +379,11 @@ export default function BackgammonGame({ onBack }) {
     setDice(roll)
     setRolled(true)
     setSelected(null)
-    addLog(`${turn === HUMAN ? 'You' : 'Computer'} rolled ${a} & ${b}${a === b ? ' (doubles!)' : ''}`)
+    addLog((turn === HUMAN ? tr('You rolled {a} & {b}', { a, b }) : tr('Computer rolled {a} & {b}', { a, b })) + (a === b ? ' ' + tr('(doubles!)') : ''))
 
     // If no legal move at all, skip turn.
     if (!anyLegalMove(state, turn, roll)) {
-      addLog(`${turn === HUMAN ? 'You have' : 'Computer has'} no legal moves — turn skipped.`)
+      addLog(turn === HUMAN ? tr('You have no legal moves — turn skipped.') : tr('Computer has no legal moves — turn skipped.'))
       // small delay so the player sees the dice
       setTimeout(() => endTurn(), 700)
     }
@@ -447,12 +449,12 @@ export default function BackgammonGame({ onBack }) {
           const di = remaining.indexOf(d)
           if (di !== -1) remaining.splice(di, 1)
         }
-        addLog(`You moved ${combo.uses[0]} + ${combo.uses[1]} = ${combo.die} steps!`)
+        addLog(tr('You moved {a} + {b} = {n} steps!', { a: combo.uses[0], b: combo.uses[1], n: combo.die }))
       }
 
       if (newState.barC > state.barC) playCapture(); else playMove()
-      if (finalDest.kind === 'off') addLog('You bear off a checker!')
-      else if (newState.barC > state.barC) addLog('You hit a blot! 🎯')
+      if (finalDest.kind === 'off') addLog(tr('You bear off a checker!'))
+      else if (newState.barC > state.barC) addLog(tr('You hit a blot!') + ' 🎯')
 
       setState(newState)
       setDice(remaining)
@@ -460,7 +462,7 @@ export default function BackgammonGame({ onBack }) {
       if (checkWin(newState)) return
 
       if (remaining.length === 0 || !anyLegalMove(newState, HUMAN, remaining)) {
-        if (remaining.length > 0) addLog('No more legal moves — turn passes.')
+        if (remaining.length > 0) addLog(tr('No more legal moves — turn passes.'))
         setTimeout(() => endTurn(), 500)
       }
     })
@@ -476,11 +478,11 @@ export default function BackgammonGame({ onBack }) {
       const roll = a === b ? [a, a, a, a] : [a, b]
       playDiceRoll(); playDiceSettle()
       setAllDice([a, b]); setDice(roll); setRolled(true)
-      addLog(`Computer rolled ${a} & ${b}${a === b ? ' (doubles!)' : ''}`)
+      addLog(tr('Computer rolled {a} & {b}', { a, b }) + (a === b ? ' ' + tr('(doubles!)') : ''))
 
       const s0 = stateRef.current.state
       if (!anyLegalMove(s0, COMP, roll)) {
-        addLog('Computer has no legal moves — turn skipped.')
+        addLog(tr('Computer has no legal moves — turn skipped.'))
         aiTimer.current = setTimeout(() => { setAiThinking(false); endTurn() }, 800)
         return
       }
@@ -502,7 +504,7 @@ export default function BackgammonGame({ onBack }) {
         flyAndCommit(m.src, destIdx, false, () => {
           const before = s
           s = applyMove(s, COMP, m.src, m.die)
-          if (s.barH > before.barH) { playCapture(); addLog('Computer hit your blot! 😬') } else playMove()
+          if (s.barH > before.barH) { playCapture(); addLog(tr('Computer hit your blot!') + ' 😬') } else playMove()
           setState(s)
           setDice(prev => {
             const r = [...prev]; const di = r.indexOf(m.die); if (di !== -1) r.splice(di, 1); return r
@@ -608,12 +610,12 @@ export default function BackgammonGame({ onBack }) {
 
       {/* ── Side panel ── */}
       <div className="bg-sidebar">
-        <button className="btn btn-secondary back-btn" onClick={onBack}>← Back</button>
+        <button className="btn btn-secondary back-btn" onClick={onBack}>← {t('Back')}</button>
         <div className="bg-sidebar-title">{theme?.emoji || '🎲'} Backgammon</div>
         <div className="bg-legend">
-          <span><img src={pieces.human.image} alt="" /> You</span>
-          <span className="bg-legend-vs">vs</span>
-          <span><img src={pieces.comp.image} alt="" /> Computer</span>
+          <span><img src={pieces.human.image} alt="" /> {t('You')}</span>
+          <span className="bg-legend-vs">{t('vs')}</span>
+          <span><img src={pieces.comp.image} alt="" /> {t('Computer')}</span>
         </div>
 
         {/* Turn info */}
@@ -625,11 +627,11 @@ export default function BackgammonGame({ onBack }) {
             animate={{ opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeOut' } }}
             exit={{ opacity: 0, y: 6, transition: { duration: 0.18 } }}
           >
-            {gameOver ? 'Game over'
-              : aiThinking ? '🤖 Thinking…'
+            {gameOver ? t('Game over')
+              : aiThinking ? '🤖 ' + t('Thinking…')
               : turn === HUMAN
-                ? (rolled ? 'Your move' : 'Your roll')
-                : 'Computer'}
+                ? (rolled ? t('Your move') : t('Your roll'))
+                : t('Computer')}
           </motion.div>
         </AnimatePresence>
 
@@ -658,7 +660,7 @@ export default function BackgammonGame({ onBack }) {
         {!gameOver && (
           <>
             <button className="btn btn-primary bg-roll-btn" disabled={!humanCanRoll} onClick={doRoll}>
-              🎲 Roll
+              🎲 {t('Roll')}
             </button>
             <AnimatePresence>
               {turn === HUMAN && rolled && dice.length > 0 && (
@@ -667,7 +669,7 @@ export default function BackgammonGame({ onBack }) {
                   animate={{ opacity: 1, height: 'auto', transition: { duration: 0.28, ease: 'easeOut' } }}
                   exit={{ opacity: 0, height: 0, transition: { duration: 0.18 } }}
                 >
-                  Dice left: {dice.join(' · ')}
+                  {t('Dice left:')} {dice.join(' · ')}
                 </motion.div>
               )}
             </AnimatePresence>
@@ -678,7 +680,7 @@ export default function BackgammonGame({ onBack }) {
                   animate={{ opacity: 1, y: 0, transition: { duration: 0.22 } }}
                   exit={{ opacity: 0, y: 6, transition: { duration: 0.15 } }}
                   onClick={() => setSelected(null)}
-                >Deselect</motion.button>
+                >{t('Deselect')}</motion.button>
               )}
             </AnimatePresence>
           </>
@@ -690,8 +692,8 @@ export default function BackgammonGame({ onBack }) {
               animate={{ opacity: 1, y: 0, transition: { duration: 0.35, ease: 'easeOut' } }}
               exit={{ opacity: 0 }}
             >
-              <button className="btn btn-primary" onClick={reset}>Play Again</button>
-              <button className="btn btn-secondary" onClick={onBack}>Menu</button>
+              <button className="btn btn-primary" onClick={reset}>{t('Play Again')}</button>
+              <button className="btn btn-secondary" onClick={onBack}>{t('Menu')}</button>
             </motion.div>
           )}
         </AnimatePresence>
@@ -708,25 +710,25 @@ export default function BackgammonGame({ onBack }) {
           {gameOver ? (
             <motion.div key="over" className="gameover" variants={gameoverVariants} initial="initial" animate="animate">
               <div className="gameover-emoji">{winner === HUMAN ? '🏆' : '🤖'}</div>
-              <h2>{winner === HUMAN ? 'You win!' : 'Computer wins!'}</h2>
-              <p>{winner === HUMAN ? 'All 15 checkers borne off!' : 'Better luck next time!'}</p>
+              <h2>{winner === HUMAN ? t('You win!') : t('{name} wins!', { name: t('Computer') })}</h2>
+              <p>{winner === HUMAN ? t('All 15 checkers borne off!') : t('Better luck next time!')}</p>
             </motion.div>
           ) : (
             <motion.div key="play" className="bg-table-wrap" initial={{ opacity: 0 }} animate={{ opacity: 1, transition: { duration: 0.3 } }}>
               <LayoutGroup>
               {/* Off trays */}
               <div className="bg-side">
-                <div className="bg-off comp" title="Computer borne off">
-                  <span className="bg-off-label">🤖 off</span>
+                <div className="bg-off comp" title={t('Computer borne off')}>
+                  <span className="bg-off-label">🤖 {t('off')}</span>
                   <span className="bg-off-count">{state.offC}</span>
                 </div>
                 <div
                   className={`bg-off human ${highlightDest.off ? 'highlight' : ''}`}
                   style={highlightDest.off ? { '--off-accent': accentInk } : undefined}
                   onClick={() => highlightDest.off && handleMoveTo({ kind: 'off' })}
-                  title="Your bear-off tray"
+                  title={t('Your bear-off tray')}
                 >
-                  <span className="bg-off-label">🙂 off</span>
+                  <span className="bg-off-label">🙂 {t('off')}</span>
                   <span className="bg-off-count">{state.offH}</span>
                 </div>
               </div>
@@ -763,7 +765,7 @@ export default function BackgammonGame({ onBack }) {
                   {topRow.slice(6).map(renderPoint)}
                 </div>
                 <div className="bg-bar">
-                  <div className="bg-bar-cell comp" ref={barCRef} title="Computer bar">
+                  <div className="bg-bar-cell comp" ref={barCRef} title={t('Computer bar')}>
                     {state.barC > 0 && (
                       <motion.div layoutId="checker-c-bar-0" layout
                         transition={{ type: 'spring', stiffness: 90, damping: 22, mass: 1.2 }}
@@ -775,7 +777,7 @@ export default function BackgammonGame({ onBack }) {
                     className={`bg-bar-cell human ${state.barH > 0 && movableSources.has('bar') ? 'movable' : ''} ${selected === 'bar' ? 'selected' : ''}`}
                     ref={barHRef}
                     onClick={() => handleSelectSource('bar')}
-                    title="Your bar — re-enter first!"
+                    title={t('Your bar — re-enter first!')}
                   >
                     {state.barH > 0 && (
                       <motion.div layoutId="checker-h-bar-0" layout

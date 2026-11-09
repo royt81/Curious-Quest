@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext'
 import RacerAvatar from '../../components/RacerAvatar'
 import './Race.css'
 import { playDraw, playWin } from '../../sound/sfx'
+import { useT, tr } from '../../i18n'
 
 const TRACK_LENGTH  = 20
 const PLACES_NEEDED = 3   // race ends once this many racers have finished
@@ -39,15 +40,17 @@ function shuffle(arr) {
 }
 
 function eventLabel(event) {
-  if (event === 'storm') return '⛈️ Storm! Racers still going go back 1 (finishers are safe)'
-  if (event === 'boost') return '🚀 Boost! Leading racer +2'
-  if (event === 'swap') return '🔀 Swap! Leader and last racer swap'
+  if (event === 'storm') return '⛈️ ' + tr('Storm! Racers still going go back 1 (finishers are safe)')
+  if (event === 'boost') return '🚀 ' + tr('Boost! Leading racer +2')
+  if (event === 'swap') return '🔀 ' + tr('Swap! Leader and last racer swap')
   return '?'
 }
 
+// i18n: list
 const PLACE_LABELS = ['1st', '2nd', '3rd', '4th']
 
 export default function RaceGame({ mode, onBack }) {
+  const t = useT()
   const is2P = mode === '2player'
   const { theme } = useTheme()
   const RACERS = theme.raceRacers
@@ -67,7 +70,7 @@ export default function RaceGame({ mode, onBack }) {
     setDeck(shuffle(buildRaceDeck(RACERS)))
     setPositions(RACERS.map(() => 0))
     setCurrentCard(null)
-    setLog(['Race starts! Draw a card!'])
+    setLog([tr('Race starts! Draw a card!')])
     setGameOver(false)
     setFinishOrder([])
     setTurn(0)
@@ -83,7 +86,7 @@ export default function RaceGame({ mode, onBack }) {
     if (card.type === 'move') {
       const idx = RACERS.findIndex(a => a.id === card.animal)
       newPos[idx] = Math.min(TRACK_LENGTH, newPos[idx] + card.steps)
-      addLog(`${RACERS[idx].emoji} ${RACERS[idx].name} moves +${card.steps}!`)
+      addLog(`${RACERS[idx].emoji} ` + tr('{name} moves +{n}!', { name: tr(RACERS[idx].name), n: card.steps }))
     } else if (card.event === 'storm') {
       // Finishers stay put; everyone still racing slips back one.
       newPos = newPos.map(p => isFinished(p) ? p : Math.max(0, p - 1))
@@ -157,7 +160,7 @@ export default function RaceGame({ mode, onBack }) {
         setFinishOrder(updatedOrder)
         newFinishers.forEach((idx, i) => {
           const place = finishOrder.length + i
-          addLog(`${RACERS[idx].emoji} ${RACERS[idx].name} finishes ${PLACE_LABELS[place]}! ${MEDALS[place] ?? ''}`)
+          addLog(`${RACERS[idx].emoji} ` + tr('{name} finishes {place}!', { name: tr(RACERS[idx].name), place: tr(PLACE_LABELS[place]) }) + ` ${MEDALS[place] ?? ''}`)
         })
 
         // Purge finished racers' cards from the remaining deck immediately
@@ -189,7 +192,7 @@ export default function RaceGame({ mode, onBack }) {
     <div className="race-screen screen">
       {is2P && !gameOver && (
         <div className="turn-badge">
-          {turn === 0 ? '🙂 Player 1' : '👤 Player 2'}
+          {turn === 0 ? '🙂 ' + t('Player 1') : '👤 ' + t('Player 2')}
         </div>
       )}
 
@@ -206,7 +209,7 @@ export default function RaceGame({ mode, onBack }) {
                   className={`track-lane${finished ? ' winner-lane' : ''}`}
                 >
                   <div className="lane-label" style={{ color: animal.color }}>
-                    <RacerAvatar racer={animal} /> {animal.name}
+                    <RacerAvatar racer={animal} /> {t(animal.name)}
                     {finished && (
                       <span className="lane-medal">{MEDALS[place]}</span>
                     )}
@@ -275,10 +278,10 @@ export default function RaceGame({ mode, onBack }) {
                 whileTap={!animating && !currentPlayerDone ? { scale: 0.95 } : {}}
               >
                 {animating
-                  ? '✨ Moving...'
+                  ? '✨ ' + t('Moving...')
                   : currentPlayerDone
-                    ? '⏭️ Skipping...'
-                    : `🎴 ${is2P ? (turn === 0 ? 'P1: ' : 'P2: ') : ''}Draw!`}
+                    ? '⏭️ ' + t('Skipping...')
+                    : `🎴 ${is2P ? (turn === 0 ? 'P1: ' : 'P2: ') : ''}${t('Draw!')}`}
               </motion.button>
             </div>
 
@@ -308,7 +311,7 @@ export default function RaceGame({ mode, onBack }) {
                 animate={{ opacity: 1, scale: 1, y: 0,
                   transition: { type: 'spring', stiffness: 300, damping: 24, delay: 0.18 } }}
               >
-                <h2><img src="/other-icons/race.svg" alt="" style={{ width: '1em', height: '1em', objectFit: 'contain', display: 'inline-block', verticalAlign: '-0.15em' }} /> Race Finished!</h2>
+                <h2><img src="/other-icons/race.svg" alt="" style={{ width: '1em', height: '1em', objectFit: 'contain', display: 'inline-block', verticalAlign: '-0.15em' }} /> {t('Race Finished!')}</h2>
 
                 {/* Podium */}
                 <div className="race-podium">
@@ -322,20 +325,20 @@ export default function RaceGame({ mode, onBack }) {
                     >
                       <div className="podium-medal">{MEDALS[place]}</div>
                       <div className="podium-emoji"><RacerAvatar racer={RACERS[racerIdx]} /></div>
-                      <div className="podium-name">{RACERS[racerIdx].name}</div>
+                      <div className="podium-name">{t(RACERS[racerIdx].name)}</div>
                     </motion.div>
                   ))}
                 </div>
 
                 {is2P && (
                   <p className="winner-player">
-                    {finishOrder[0] < 2 ? 'Player 1' : 'Player 2'} wins!
+                    {t('{name} wins!', { name: finishOrder[0] < 2 ? t('Player 1') : t('Player 2') })}
                   </p>
                 )}
 
                 <div className="gameover-btns">
-                  <button className="btn btn-primary"   onClick={initGame}>Race Again</button>
-                  <button className="btn btn-secondary" onClick={onBack}>Menu</button>
+                  <button className="btn btn-primary"   onClick={initGame}>{t('Race Again')}</button>
+                  <button className="btn btn-secondary" onClick={onBack}>{t('Menu')}</button>
                 </div>
               </motion.div>
             </motion.div>

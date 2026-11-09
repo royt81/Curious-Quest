@@ -6,6 +6,7 @@ import ThemeIcon from './ThemeIcon'
 import SettingsButton from './SettingsButton'
 import { HowToPlayButton } from './HowToPlay'
 import { useSettings, setSetting } from '../settings'
+import { useT } from '../i18n'
 import './Sidebar.css'
 
 const SECTIONS = [
@@ -53,22 +54,23 @@ const nearest = (c) => COLOUR_PRESETS.reduce((a, p) => Math.abs(p.v - c) < Math.
 
 function ColourQuick({ compact }) {
   const { colour } = useSettings()
+  const t = useT()
   const current = nearest(colour)
   if (compact) {
     const next = COLOUR_PRESETS[(COLOUR_PRESETS.indexOf(current) + 1) % COLOUR_PRESETS.length]
     return (
       <button className="sb-colour-cycle" onClick={() => setSetting('colour', next.v)}
-        title={`Colours: ${current.label} (tap for ${next.label})`}>
+        title={t('Colours: {now} (tap for {next})', { now: t(current.label), next: t(next.label) })}>
         <Icon p={current} />
       </button>
     )
   }
   return (
-    <div className="sb-colour-row" role="group" aria-label="Colours">
+    <div className="sb-colour-row" role="group" aria-label={t('Colours')}>
       {COLOUR_PRESETS.map(p => (
         <button key={p.v}
           className={`sb-colour-btn${Math.abs(colour - p.v) < 0.03 ? ' active' : ''}`}
-          onClick={() => setSetting('colour', p.v)} title={p.label} aria-label={p.label}>
+          onClick={() => setSetting('colour', p.v)} title={t(p.label)} aria-label={t(p.label)}>
           <Icon p={p} />
         </button>
       ))}
@@ -80,6 +82,7 @@ export default function Sidebar({ activeGame, onSelect, onHome, collapsed, onTog
   const [openSections, setOpenSections] = useState({})
   const [showPicker, setShowPicker] = useState(false)
   const { themeId, setThemeId } = useTheme()
+  const t = useT()
 
   const toggleSection = (id) =>
     setOpenSections(prev => ({ ...prev, [id]: !prev[id] }))
@@ -93,7 +96,7 @@ export default function Sidebar({ activeGame, onSelect, onHome, collapsed, onTog
       <button
         className="sidebar-toggle"
         onClick={onToggleCollapsed}
-        title={collapsed ? 'Expand' : 'Collapse'}
+        title={collapsed ? t('Expand') : t('Collapse')}
       >
         <motion.svg
           viewBox="0 0 24 24" width="16" height="16"
@@ -121,7 +124,7 @@ export default function Sidebar({ activeGame, onSelect, onHome, collapsed, onTog
               <button
                 className="sidebar-theme-icon-btn"
                 onClick={() => setShowPicker(p => !p)}
-                title="Change theme"
+                title={t('Change theme')}
               >
                 <motion.span
                   className="sidebar-logo-emoji"
@@ -131,7 +134,7 @@ export default function Sidebar({ activeGame, onSelect, onHome, collapsed, onTog
                   <ThemeIcon themeId={themeId} size={30} />
                 </motion.span>
               </button>
-              <button className="sidebar-home-btn" onClick={onHome} title="Back to menu">
+              <button className="sidebar-home-btn" onClick={onHome} title={t('Back to menu')}>
                 <span className="sidebar-logo-text">Curious Quest</span>
               </button>
             </div>
@@ -147,16 +150,16 @@ export default function Sidebar({ activeGame, onSelect, onHome, collapsed, onTog
                   transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
                   style={{ overflow: 'hidden' }}
                 >
-                  <div className="sb-theme-label">Theme</div>
-                  {THEME_LIST.map(t => (
+                  <div className="sb-theme-label">{t('Theme')}</div>
+                  {THEME_LIST.map(w => (
                     <button
-                      key={t.id}
-                      className={`sb-theme-item${themeId === t.id ? ' active' : ''}`}
-                      onClick={() => { setThemeId(t.id); setShowPicker(false) }}
+                      key={w.id}
+                      className={`sb-theme-item${themeId === w.id ? ' active' : ''}`}
+                      onClick={() => { setThemeId(w.id); setShowPicker(false) }}
                     >
-                      <ThemeIcon themeId={t.id} size={20} />
-                      <span className="sb-theme-name">{t.label}</span>
-                      {themeId === t.id && <span className="sb-theme-check">✓</span>}
+                      <ThemeIcon themeId={w.id} size={20} />
+                      <span className="sb-theme-name">{t(w.label)}</span>
+                      {themeId === w.id && <span className="sb-theme-check">✓</span>}
                     </button>
                   ))}
                 </motion.div>
@@ -180,7 +183,7 @@ export default function Sidebar({ activeGame, onSelect, onHome, collapsed, onTog
                             ? <img src={section.icon} alt="" style={{ width: '1.2em', height: '1.2em', objectFit: 'contain', display: 'block' }} />
                             : null}
                         </span>
-                        <span className="sidebar-group-name">{section.label}</span>
+                        <span className="sidebar-group-name">{t(section.label)}</span>
                         <motion.svg
                           className="sidebar-group-chevron"
                           viewBox="0 0 24 24" width="14" height="14"
@@ -194,7 +197,7 @@ export default function Sidebar({ activeGame, onSelect, onHome, collapsed, onTog
                       </button>
                     ) : (
                       section.label && (
-                        <div className="sidebar-section-label">{section.label}</div>
+                        <div className="sidebar-section-label">{t(section.label)}</div>
                       )
                     )}
 
@@ -221,7 +224,7 @@ export default function Sidebar({ activeGame, onSelect, onHome, collapsed, onTog
                                   ? <img src={g.image} alt="" style={{ width: '1.2em', height: '1.2em', objectFit: 'contain', display: 'block' }} />
                                   : g.emoji}
                               </span>
-                              <span className="sidebar-item-name">{g.name}</span>
+                              <span className="sidebar-item-name">{t(g.name)}</span>
                             </motion.button>
                           ))}
                         </motion.div>
@@ -252,7 +255,7 @@ export default function Sidebar({ activeGame, onSelect, onHome, collapsed, onTog
                 key={g.id}
                 className={`sidebar-icon-btn ${activeGame === g.id ? 'active' : ''}`}
                 onClick={() => onSelect?.(g.id)}
-                title={g.name}
+                title={t(g.name)}
                 whileHover={{ scale: 1.12 }}
                 whileTap={{ scale: 0.95 }}
               >

@@ -5,6 +5,7 @@ import { useTheme } from '../../context/ThemeContext'
 import ThemeIcon from '../../components/ThemeIcon'
 import './Uno.css'
 import { playCard, playDraw, playWin } from '../../sound/sfx'
+import { tr, useT, getLang } from '../../i18n'
 
 // ─── Card back showing the active theme icon ──────────────────────────────────
 function CardBack({ themeId, small, onClick, clickable }) {
@@ -117,6 +118,12 @@ const gameoverVariants = {
 }
 
 export default function UnoGame({ mode, onBack }) {
+  const tt = useT()
+  // "You play 7!" / "P2 plays 7!" — 'You' needs its own sentence in German
+  const playsMsg = (who, card) => {
+    const name = who === 0 ? (mode === '2player' ? 'P1' : null) : (mode === '2player' ? 'P2' : '🤖')
+    return name ? tr('{name} plays {card}', { name, card }) : tr('You play {card}', { card })
+  }
   const { themeId } = useTheme()
   const is2P = mode === '2player'
   const [colorCount, setColorCount] = useState(4)
@@ -162,7 +169,7 @@ export default function UnoGame({ mode, onBack }) {
     setDeck(rest); setHands([h0, h1]); setPile([top])
     setActiveColor(top.color); setTurn(0)
     setGameOver(false); setWinner(null); setGameScore(null); setNewScoreId(null)
-    setLog(['Game started! Match colour or number.'])
+    setLog([tr('Game started! Match colour or number.')])
     setAiThinking(false); setChoosingColor(false); setPendingWild(null)
   }
 
@@ -185,25 +192,25 @@ export default function UnoGame({ mode, onBack }) {
     const need     = card.value === 'draw2' ? 2 : card.value === 'wild4' ? 4 : 0
     const refill   = refillDeck(d, p, need)
     let   newDeck  = [...refill.deck]
-    if (refill.reshuffled) addLog('🔀 Shuffled the played cards back into the deck.')
+    if (refill.reshuffled) addLog('🔀 ' + tr('Shuffled the played cards back into the deck.'))
     let   goAgain  = false
     const newColor = card.type === 'wild' ? chosenColor : card.color
 
     if (card.value === 'skip' || card.value === 'reverse') {
       goAgain = true
-      addLog(`${t === 0 ? (is2P ? 'P1' : 'You') : (is2P ? 'P2' : '🤖')} plays ${label(card)}!`)
+      addLog(playsMsg(t, label(card)) + '!')
     } else if (card.value === 'draw2') {
       newHands[1 - t] = [...newHands[1 - t], ...newDeck.splice(0, 2)]
       goAgain = true
-      addLog(`${t === 0 ? (is2P ? 'P1' : 'You') : (is2P ? 'P2' : '🤖')} plays +2! 😬`)
+      addLog(playsMsg(t, '+2') + '! 😬')
     } else if (card.value === 'wild4') {
       newHands[1 - t] = [...newHands[1 - t], ...newDeck.splice(0, 4)]
       goAgain = true
-      addLog(`${t === 0 ? (is2P ? 'P1' : 'You') : (is2P ? 'P2' : '🤖')} plays Wild +4! 🌈`)
+      addLog(playsMsg(t, tr('Wild') + ' +4') + '! 🌈')
     } else if (card.value === 'wild') {
-      addLog(`${t === 0 ? (is2P ? 'P1' : 'You') : (is2P ? 'P2' : '🤖')} plays Wild → ${chosenColor}!`)
+      addLog(playsMsg(t, tr('Wild') + ' → ' + tr(chosenColor)) + '!')
     } else {
-      addLog(`${t === 0 ? (is2P ? 'P1' : 'You') : (is2P ? 'P2' : '🤖')} plays ${label(card)} ${UNO_COLOR_EMOJIS[card.color] ?? ''}`)
+      addLog(playsMsg(t, label(card)) + ` ${UNO_COLOR_EMOJIS[card.color] ?? ''}`)
     }
 
     playCard()
@@ -214,11 +221,11 @@ export default function UnoGame({ mode, onBack }) {
 
     if (newHand.length === 0) {
       const pts      = calcScore(newHands[1 - t])
-      const winName  = t === 0 ? (is2P ? 'Player 1' : 'You') : (is2P ? 'Player 2' : 'Computer')
+      const winName  = t === 0 ? (is2P ? 'Player 1' : 'You') : (is2P ? 'Player 2' : 'Computer')   // stored in English, shown translated
       const sid      = Date.now()
       const entry    = {
         winner: winName, score: pts, id: sid,
-        date: new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'short' }),
+        date: new Date().toLocaleDateString(getLang() === 'de' ? 'de-DE' : 'en-GB', { day: 'numeric', month: 'short' }),
       }
       const top5 = persistScore(entry)
       setGameScore(pts)
@@ -248,13 +255,13 @@ export default function UnoGame({ mode, onBack }) {
 
     if (playable.length === 0) {
       const refill = refillDeck(d, p, 1)
-      if (refill.reshuffled) { setPile(refill.pile); addLog('🔀 Shuffled the played cards back into the deck.') }
+      if (refill.reshuffled) { setPile(refill.pile); addLog('🔀 ' + tr('Shuffled the played cards back into the deck.')) }
       if (refill.deck.length > 0) {
         const drawn = refill.deck[0]
         playDraw()
         setHands(prev => prev.map((hh, i) => i === 1 ? [...hh, drawn] : hh))
         setDeck(refill.deck.slice(1))
-        addLog('🤖 Computer draws a card.')
+        addLog('🤖 ' + tr('Computer draws a card.'))
       }
       setTurn(0)
     } else {
@@ -310,15 +317,15 @@ export default function UnoGame({ mode, onBack }) {
     if (!is2P && turn !== 0) return
     const drawer = turn
     const refill = refillDeck(deck, pile, 1)
-    if (refill.reshuffled) { setPile(refill.pile); addLog('🔀 Shuffled the played cards back into the deck.') }
+    if (refill.reshuffled) { setPile(refill.pile); addLog('🔀 ' + tr('Shuffled the played cards back into the deck.')) }
     if (refill.deck.length > 0) {
       const drawn = refill.deck[0]
       playDraw()
       setHands(prev => prev.map((h, i) => i === drawer ? [...h, drawn] : h))
       setDeck(refill.deck.slice(1))
-      addLog(drawer === 0 ? (is2P ? 'Player 1 drew a card.' : 'You drew a card.') : 'Player 2 drew a card.')
+      addLog(drawer === 0 ? (is2P ? tr('{name} drew a card.', { name: tr('Player 1') }) : tr('You drew a card.')) : tr('{name} drew a card.', { name: tr('Player 2') }))
     } else {
-      addLog('No cards left to draw — turn passes.')
+      addLog(tr('No cards left to draw — turn passes.'))
     }
     setTurn(1 - drawer)
   }
@@ -332,12 +339,12 @@ export default function UnoGame({ mode, onBack }) {
   return (
     <div className="uno-screen screen">
       <div className="game-header">
-        <button className="btn btn-secondary back-btn" onClick={onBack}>← Back</button>
-        <h2>🎴 Colour Clash</h2>
+        <button className="btn btn-secondary back-btn" onClick={onBack}>← {tt('Back')}</button>
+        <h2>🎴 {tt('Colour Clash')}</h2>
         <div className="uno-header-right">
           <div className="color-count-toggle">
-            <button className={colorCount === 2 ? 'active' : ''} onClick={() => { setColorCount(2); startGame(UNO_COLORS.slice(0, 2)) }}>2 colours</button>
-            <button className={colorCount === 4 ? 'active' : ''} onClick={() => { setColorCount(4); startGame(UNO_COLORS.slice(0, 4)) }}>4 colours</button>
+            <button className={colorCount === 2 ? 'active' : ''} onClick={() => { setColorCount(2); startGame(UNO_COLORS.slice(0, 2)) }}>{tt('2 colours')}</button>
+            <button className={colorCount === 4 ? 'active' : ''} onClick={() => { setColorCount(4); startGame(UNO_COLORS.slice(0, 4)) }}>{tt('4 colours')}</button>
           </div>
           <div className="scores">
             <span className="score p1">🙂 {hands[0].length}</span>
@@ -356,26 +363,26 @@ export default function UnoGame({ mode, onBack }) {
             animate="animate"
           >
             <div className="gameover-emoji">🎉</div>
-            <h2>{winner === 0 ? (is2P ? 'Player 1 wins!' : 'You win!') : (is2P ? 'Player 2 wins!' : 'Computer wins!')}</h2>
+            <h2>{winner === 0 ? (is2P ? tt('{name} wins!', { name: tt('Player 1') }) : tt('You win!')) : tt('{name} wins!', { name: is2P ? tt('Player 2') : tt('Computer') })}</h2>
 
             {gameScore !== null && (
               <div className="score-earned">
-                Points scored this round
-                <strong>{gameScore} pts</strong>
+                {tt('Points scored this round')}
+                <strong>{tt('{n} pts', { n: gameScore })}</strong>
               </div>
             )}
 
             <div className="scoreboard">
-              <div className="scoreboard-title">Top 5 Games</div>
+              <div className="scoreboard-title">{tt('Top 5 Games')}</div>
               {allScores.length === 0
-                ? <div className="scoreboard-empty">No games recorded yet</div>
+                ? <div className="scoreboard-empty">{tt('No games recorded yet')}</div>
                 : allScores.map((s, i) => (
                     <div key={s.id ?? i} className={`scoreboard-row${s.id === newScoreId ? ' is-new' : ''}`}>
                       <span className={`scoreboard-rank ${i === 0 ? 'gold' : i === 1 ? 'silver' : i === 2 ? 'bronze' : ''}`}>
                         {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`}
                       </span>
-                      <span className="scoreboard-winner">{s.winner}</span>
-                      <span className="scoreboard-pts">{s.score} pts</span>
+                      <span className="scoreboard-winner">{tt(s.winner)}</span>
+                      <span className="scoreboard-pts">{tt('{n} pts', { n: s.score })}</span>
                       <span className="scoreboard-date">{s.date}</span>
                     </div>
                   ))
@@ -383,8 +390,8 @@ export default function UnoGame({ mode, onBack }) {
             </div>
 
             <div className="gameover-btns">
-              <button className="btn btn-primary" onClick={() => startGame(colors)}>Play Again</button>
-              <button className="btn btn-secondary" onClick={onBack}>Menu</button>
+              <button className="btn btn-primary" onClick={() => startGame(colors)}>{tt('Play Again')}</button>
+              <button className="btn btn-secondary" onClick={onBack}>{tt('Menu')}</button>
             </div>
           </motion.div>
         ) : (
@@ -454,14 +461,14 @@ export default function UnoGame({ mode, onBack }) {
               </AnimatePresence>
 
               <div className="active-color-badge" style={{ background: UNO_COLOR_HEX[activeColor] }}>
-                {UNO_COLOR_EMOJIS[activeColor]} {activeColor}
+                {UNO_COLOR_EMOJIS[activeColor]} {tt(activeColor)}
               </div>
             </div>
 
             <div className="turn-banner">
-              {aiThinking ? 'Thinking...'
-                : turn === 0 ? (is2P ? "Player 1's turn" : 'Your turn — tap a card or draw!')
-                : (is2P ? "Player 2's turn" : "Computer's turn")}
+              {aiThinking ? tt('Thinking…')
+                : turn === 0 ? (is2P ? tt("{name}'s turn", { name: tt('Player 1') }) : tt('Your turn — tap a card or draw!'))
+                : tt("{name}'s turn", { name: is2P ? tt('Player 2') : tt('Computer') })}
             </div>
 
             {/* Player hand */}
@@ -509,7 +516,7 @@ export default function UnoGame({ mode, onBack }) {
                     exit={{ scale: 0.8, y: 20 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 26 }}
                   >
-                    <p>Choose a colour!</p>
+                    <p>{tt('Choose a colour!')}</p>
                     <div className="color-btns">
                       {colors.map(c => (
                         <motion.button

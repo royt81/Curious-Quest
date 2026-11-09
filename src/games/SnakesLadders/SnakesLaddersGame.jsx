@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext'
 import RacerAvatar from '../../components/RacerAvatar'
 import { playTap, playDiceRoll, playDiceClack, playDiceSettle, playClimb, playSlide, playWin } from '../../sound/sfx'
 import './SnakesLadders.css'
+import { useT, tr } from '../../i18n'
 
 /* ════════════════════════════════════════════════════════════════════════════
    SNAKES & LADDERS — a 64-square dice climb. Pure luck, great for travel.
@@ -70,6 +71,7 @@ const gameoverVariants = {
 }
 
 export default function SnakesLaddersGame({ onBack }) {
+  const t = useT()
   const { theme } = useTheme()
 
   const [phase, setPhase] = useState('setup')   // 'setup' | 'playing' | 'gameover'
@@ -120,7 +122,7 @@ export default function SnakesLaddersGame({ onBack }) {
     setRolling(false)
     setAnimating(false)
     setWinner(null)
-    setLog(['🎲 Roll the dice to begin!'])
+    setLog(['🎲 ' + tr('Roll the dice to begin!')])
     setPhase('playing')
   }, [mode, playerCount, buildPlayers])
 
@@ -157,12 +159,12 @@ export default function SnakesLaddersGame({ onBack }) {
     const racer = players[pIdx]
 
     if (target > BOARD_SIZE) {
-      addLog(`${racer.emoji} ${racer.name} rolls ${roll} — needs the exact number, stays put.`)
+      addLog(`${racer.emoji} ` + tr('{name} rolls {n} — needs the exact number, stays put.', { name: tr(racer.name), n: roll }))
       moveTimer.current = setTimeout(() => finishTurn(pIdx, from), 600)
       return
     }
 
-    addLog(`${racer.emoji} ${racer.name} rolls ${roll} → square ${target}`)
+    addLog(`${racer.emoji} ` + tr('{name} rolls {n} → square {sq}', { name: tr(racer.name), n: roll, sq: target }))
     setPositions(prev => prev.map((p, i) => i === pIdx ? target : p))
 
     animateSteps(pIdx, from, target, STEP_MS, () => {
@@ -172,8 +174,8 @@ export default function SnakesLaddersGame({ onBack }) {
         if (isLadder) playClimb()
         else playSlide()
         addLog(isLadder
-          ? `🪜 Ladder! ${racer.emoji} climbs ${target} → ${dest}!`
-          : `🐍 Snake! ${racer.emoji} slides ${target} → ${dest}!`)
+          ? '🪜 ' + tr('Ladder!') + ` ${racer.emoji} ${target} → ${dest}!`
+          : '🐍 ' + tr('Snake!') + ` ${racer.emoji} ${target} → ${dest}!`)
         setPositions(prev => prev.map((p, i) => i === pIdx ? dest : p))
         setDisplayPos(prev => prev.map((p, i) => i === pIdx ? dest : p))
         moveTimer.current = setTimeout(() => finishTurn(pIdx, dest), 780)
@@ -227,20 +229,20 @@ export default function SnakesLaddersGame({ onBack }) {
           animate={{ opacity: 1, y: 0, transition: { type: 'spring', stiffness: 280, damping: 24 } }}
         >
           <div className="sl-setup-header">
-            <button className="btn btn-secondary back-btn" onClick={onBack}>← Back</button>
-            <h2 className="sl-setup-title"><img src="/other-icons/snake.svg" alt="" style={{ width: '1em', height: '1em', objectFit: 'contain', display: 'inline-block', verticalAlign: '-0.15em' }} /> Snakes &amp; Ladders</h2>
+            <button className="btn btn-secondary back-btn" onClick={onBack}>← {t('Back')}</button>
+            <h2 className="sl-setup-title"><img src="/other-icons/snake.svg" alt="" style={{ width: '1em', height: '1em', objectFit: 'contain', display: 'inline-block', verticalAlign: '-0.15em' }} /> {t('Snakes & Ladders')}</h2>
             <div />
           </div>
 
-          <h3 className="sl-setup-h">Who is playing?</h3>
+          <h3 className="sl-setup-h">{t('Who is playing?')}</h3>
           <div className="sl-mode-btns">
             <motion.button
               className={`sl-mode-btn ${mode === 'cpu' ? 'selected' : ''}`}
               onClick={() => setMode('cpu')}
               whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
             >
-              <span className="sl-mode-racers"><RacerAvatar racer={theme.raceRacers[0]} /><span className="sl-vs">vs</span><img src="/other-icons/vs-pc.svg" alt="" style={{ width: '1em', height: '1em', objectFit: 'contain', display: 'inline-block', verticalAlign: '-0.15em' }} /></span>
-              <span className="sl-mode-label">1 vs Computer</span>
+              <span className="sl-mode-racers"><RacerAvatar racer={theme.raceRacers[0]} /><span className="sl-vs">{t('vs')}</span><img src="/other-icons/vs-pc.svg" alt="" style={{ width: '1em', height: '1em', objectFit: 'contain', display: 'inline-block', verticalAlign: '-0.15em' }} /></span>
+              <span className="sl-mode-label">{t('1 vs Computer')}</span>
             </motion.button>
             <motion.button
               className={`sl-mode-btn ${mode === 'friends' ? 'selected' : ''}`}
@@ -248,13 +250,13 @@ export default function SnakesLaddersGame({ onBack }) {
               whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}
             >
               <span className="sl-mode-racers">{theme.raceRacers.slice(0, 2).map(r => <RacerAvatar key={r.id} racer={r} />)}</span>
-              <span className="sl-mode-label">Friends (pass &amp; play)</span>
+              <span className="sl-mode-label">{t('Friends (pass & play)')}</span>
             </motion.button>
           </div>
 
           {mode === 'friends' && (
             <>
-              <h3 className="sl-setup-h">How many players?</h3>
+              <h3 className="sl-setup-h">{t('How many players?')}</h3>
               <div className="sl-count-btns">
                 {[2, 3, 4].map(n => (
                   <motion.button
@@ -264,7 +266,7 @@ export default function SnakesLaddersGame({ onBack }) {
                     whileHover={{ scale: 1.08 }} whileTap={{ scale: 0.95 }}
                   >
                     <div className="sl-count-racers">{theme.raceRacers.slice(0, n).map(r => <RacerAvatar key={r.id} racer={r} />)}</div>
-                    <div className="sl-count-label">{n} Players</div>
+                    <div className="sl-count-label">{t('{n} Players', { n })}</div>
                   </motion.button>
                 ))}
               </div>
@@ -276,7 +278,7 @@ export default function SnakesLaddersGame({ onBack }) {
             onClick={startGame}
             whileHover={{ scale: 1.06 }} whileTap={{ scale: 0.95 }}
           >
-            Start Climbing!
+            {t('Start Climbing!')}
           </motion.button>
         </motion.div>
       </div>
@@ -288,17 +290,17 @@ export default function SnakesLaddersGame({ onBack }) {
     return (
       <div className="snakes-screen screen">
         <div className="game-header">
-          <button className="btn btn-secondary back-btn" onClick={onBack}>← Back</button>
-          <h2><img src="/other-icons/snake.svg" alt="" style={{ width: '1em', height: '1em', objectFit: 'contain', display: 'inline-block', verticalAlign: '-0.15em' }} /> Snakes &amp; Ladders</h2>
+          <button className="btn btn-secondary back-btn" onClick={onBack}>← {t('Back')}</button>
+          <h2><img src="/other-icons/snake.svg" alt="" style={{ width: '1em', height: '1em', objectFit: 'contain', display: 'inline-block', verticalAlign: '-0.15em' }} /> {t('Snakes & Ladders')}</h2>
           <div />
         </div>
         <motion.div className="gameover" variants={gameoverVariants} initial="initial" animate="animate">
           <div className="gameover-emoji"><RacerAvatar racer={players[winner]} /></div>
-          <h2>{players[winner]?.name} reach{players[winner]?.name === 'You' ? '' : 'es'} square {BOARD_SIZE}! 🏆</h2>
+          <h2>{players[winner]?.pid === 'you' ? t('You reach square {n}!', { n: BOARD_SIZE }) : t('{name} reaches square {n}!', { name: t(players[winner]?.name ?? ''), n: BOARD_SIZE })} 🏆</h2>
           <div className="gameover-btns">
-            <button className="btn btn-primary" onClick={startGame}>Play Again</button>
-            <button className="btn btn-secondary" onClick={() => setPhase('setup')}>Change Players</button>
-            <button className="btn btn-secondary" onClick={onBack}>Menu</button>
+            <button className="btn btn-primary" onClick={startGame}>{t('Play Again')}</button>
+            <button className="btn btn-secondary" onClick={() => setPhase('setup')}>{t('Change Players')}</button>
+            <button className="btn btn-secondary" onClick={onBack}>{t('Menu')}</button>
           </div>
         </motion.div>
       </div>
@@ -397,8 +399,8 @@ export default function SnakesLaddersGame({ onBack }) {
                 <div key={n} className={`sl-cell${n === BOARD_SIZE ? ' finish' : ''}${n % 2 === 0 ? ' even' : ' odd'}`}>
                   <span className="sl-cell-num">{n}</span>
                   {n === BOARD_SIZE && <span className="sl-cell-flag">🏁</span>}
-                  {isLadderFoot && <span className="sl-cell-mark sl-mark-ladder"><img src="/other-icons/goal.svg" alt="ladder" style={{ width: '1.1em', height: '1.1em', objectFit: 'contain', display: 'block' }} /></span>}
-                  {isSnakeHead && <span className="sl-cell-mark sl-mark-snake"><img src="/other-icons/snake-1.svg" alt="snake" style={{ width: '1.1em', height: '1.1em', objectFit: 'contain', display: 'block' }} /></span>}
+                  {isLadderFoot && <span className="sl-cell-mark sl-mark-ladder"><img src="/other-icons/goal.svg" alt={t('ladder')} style={{ width: '1.1em', height: '1.1em', objectFit: 'contain', display: 'block' }} /></span>}
+                  {isSnakeHead && <span className="sl-cell-mark sl-mark-snake"><img src="/other-icons/snake-1.svg" alt={t('snake')} style={{ width: '1.1em', height: '1.1em', objectFit: 'contain', display: 'block' }} /></span>}
                 </div>
               )
             })}
@@ -408,7 +410,7 @@ export default function SnakesLaddersGame({ onBack }) {
           {/* START tile — sits just outside the board, bottom-left */}
           <div className="sl-start-tile">
             <span className="sl-start-emoji">🏁</span>
-            <span className="sl-start-label">START</span>
+            <span className="sl-start-label">{t('START')}</span>
           </div>
 
           {/* Tokens — positioned relative to sl-board-wrap so the START tile isn't clipped */}
@@ -433,7 +435,7 @@ export default function SnakesLaddersGame({ onBack }) {
 
         {/* Sidebar */}
         <div className="sl-sidebar">
-          <div className="sl-sidebar-title"><img src="/other-icons/snake.svg" alt="" style={{ width: '1em', height: '1em', objectFit: 'contain', display: 'inline-block', verticalAlign: '-0.15em' }} /> Snakes &amp; Ladders</div>
+          <div className="sl-sidebar-title"><img src="/other-icons/snake.svg" alt="" style={{ width: '1em', height: '1em', objectFit: 'contain', display: 'inline-block', verticalAlign: '-0.15em' }} /> {t('Snakes & Ladders')}</div>
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={current?.pid}
@@ -444,7 +446,7 @@ export default function SnakesLaddersGame({ onBack }) {
               exit={{ opacity: 0, y: 8, transition: { duration: 0.14, ease: 'easeIn' } }}
             >
               <span className="sl-turn-emoji">{animating && !rolling ? '✨' : <RacerAvatar racer={current} />}</span>
-              <span>{animating && !rolling ? 'Moving…' : `${current?.name}'s turn`}</span>
+              <span>{animating && !rolling ? t('Moving…') : current?.pid === 'you' ? t('Your turn') : t("{name}'s turn", { name: t(current?.name ?? '') })}</span>
             </motion.div>
           </AnimatePresence>
 
@@ -453,7 +455,7 @@ export default function SnakesLaddersGame({ onBack }) {
               <div key={p.pid} className={`sl-player-row${i === currentPlayer && !animating ? ' active' : ''}`} style={{ '--row-col': p.color }}>
                 {i === currentPlayer && !animating && <span className="sl-player-arrow">▶</span>}
                 <span className="sl-player-emoji"><RacerAvatar racer={p} /></span>
-                <span className="sl-player-name">{p.name}</span>
+                <span className="sl-player-name">{t(p.name)}</span>
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.span
                     key={positions[i] ?? 0}
@@ -476,7 +478,7 @@ export default function SnakesLaddersGame({ onBack }) {
             whileHover={!animating && !rolling && !current?.isCpu ? { scale: 1.04 } : {}}
             whileTap={!animating && !rolling && !current?.isCpu ? { scale: 0.95 } : {}}
           >
-            {current?.isCpu ? '🤖 Computer…' : rolling ? '🎲 Rolling…' : animating ? '✨ Moving…' : '🎲 Roll Dice!'}
+            {current?.isCpu ? '🤖 ' + t('Computer…') : rolling ? '🎲 ' + t('Rolling…') : animating ? '✨ ' + t('Moving…') : '🎲 ' + t('Roll Dice!')}
           </motion.button>
 
           <div className="log-box sl-log">

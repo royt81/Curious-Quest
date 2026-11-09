@@ -4,6 +4,8 @@
 // unsupported. Kept separate from sound effects: muting effects never silences
 // the voice, because a child who can't read depends on it.
 import { duckMusic } from './music'
+import { getLang, tr } from '../i18n'
+import { subscribeSettings } from '../settings'
 
 const synth = typeof window !== 'undefined' ? window.speechSynthesis : null
 let voice = null
@@ -20,11 +22,15 @@ function savePrefs() {
   listeners.forEach(l => l())
 }
 
-// English voices this device offers (the list differs per device/browser).
-export function getEnglishVoices() {
+// The chosen voice is remembered per language (English / German).
+if (prefs.voiceNames == null) prefs.voiceNames = { en: prefs.voiceName || '', de: '' }
+const langRe = () => new RegExp(`^${getLang()}[-_]`, 'i')
+
+// Voices this device offers for the game's language (the list differs per device/browser).
+export function getLangVoices() {
   if (!synth) return []
   return synth.getVoices()
-    .filter(v => /^en[-_]/i.test(v.lang))
+    .filter(v => langRe().test(v.lang))
     .sort((a, b) => a.name.localeCompare(b.name))
 }
 export function onVoicesChanged(cb) { listeners.add(cb); return () => listeners.delete(cb) }
@@ -33,18 +39,25 @@ function pickVoice() {
   if (!synth) return
   const voices = synth.getVoices()
   if (!voices.length) return
-  const chosen = prefs.voiceName && voices.find(v => v.name === prefs.voiceName)
+  const lang = getLang()
+  const wanted = prefs.voiceNames[lang]
+  const chosen = wanted && voices.find(v => v.name === wanted)
   if (chosen) { voice = chosen; listeners.forEach(l => l()); return }
-  const en = voices.filter(v => /^en[-_]/i.test(v.lang))
+  const own = voices.filter(v => langRe().test(v.lang))
   // Prefer friendly, natural-sounding voices when the system has them.
-  const preferred = ['Samantha', 'Google UK English Female', 'Google US English', 'Microsoft Aria', 'Microsoft Jenny', 'Karen', 'Moira', 'Serena']
-  voice = preferred.map(n => en.find(v => v.name.includes(n))).find(Boolean)
-    ?? en.find(v => v.localService) ?? en[0] ?? voices[0]
+  const preferred = lang === 'de'
+    ? ['Anna', 'Google Deutsch', 'Microsoft Katja', 'Microsoft Amala', 'Microsoft Hedda', 'Petra', 'Helena']
+    : ['Samantha', 'Google UK English Female', 'Google US English', 'Microsoft Aria', 'Microsoft Jenny', 'Karen', 'Moira', 'Serena']
+  voice = preferred.map(n => own.find(v => v.name.includes(n))).find(Boolean)
+    ?? own.find(v => v.localService) ?? own[0] ?? null
   listeners.forEach(l => l())
 }
 if (synth) {
   pickVoice()
   synth.addEventListener?.('voiceschanged', pickVoice)
+  // switch voice when the game language changes
+  let lastLang = getLang()
+  subscribeSettings(() => { if (getLang() !== lastLang) { lastLang = getLang(); stopSpeaking(); pickVoice() } })
 }
 
 export const canSpeak = !!synth
@@ -60,7 +73,7 @@ const clean = (t) => String(t).replace(/[\u{1F300}-\u{1FAFF}]|[\u{2600}-\u{27BF}
 function utter(text) {
   const u = new SpeechSynthesisUtterance(clean(text))
   if (voice) u.voice = voice
-  u.lang = voice?.lang ?? 'en-GB'
+  u.lang = voice?.lang ?? (getLang() === 'de' ? 'de-DE' : 'en-GB')
   u.rate = prefs.rate
   u.pitch = prefs.pitch
   u.volume = levelToVolume(prefs.level)
@@ -126,13 +139,19 @@ export function stopSpeaking() {
 }
 
 // ── Settings API ──
-export function getVoicePrefs() { return { ...prefs, current: voice?.name ?? '' } }
+export function getVoicePrefs() {
+  return { ...prefs, voiceName: prefs.voiceNames[getLang()] || '', current: voice?.name ?? '' }
+}
 export function setVoicePrefs(patch) {
-  prefs = { ...prefs, ...patch }
-  if ('voiceName' in patch) pickVoice()
+  const { voiceName, ...rest } = patch
+  prefs = { ...prefs, ...rest }
+  if (voiceName !== undefined) {
+    prefs.voiceNames = { ...prefs.voiceNames, [getLang()]: voiceName }
+    pickVoice()
+  }
   savePrefs()
 }
 // Always plays (even when the voice is switched off) so a parent can try it.
 export function testVoice() {
-  speakSteps([{ text: 'Hello! I will read the questions to you.' }], null, { force: true })
+  speakSteps([{ text: tr('Hello! I will read the questions to you.') }], null, { force: true })
 }

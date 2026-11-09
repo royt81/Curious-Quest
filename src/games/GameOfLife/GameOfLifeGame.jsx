@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useTheme } from '../../context/ThemeContext'
 import { playTap } from '../../sound/sfx'
 import './GameOfLife.css'
+import { useT, tr } from '../../i18n'
 
 /* ════════════════════════════════════════════════════════════════════════════
    CONWAY'S GAME OF LIFE — the famous "no-player" cellular automaton.
@@ -94,16 +95,15 @@ function MiniGrid({ cells }) {
 }
 
 function RulesModal({ onClose }) {
+  const t = useT()
   return (
     <motion.div className="gol-rules-overlay" onClick={onClose}
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
       <motion.div className="gol-rules" onClick={e => e.stopPropagation()}
         initial={{ y: 30, scale: 0.95 }} animate={{ y: 0, scale: 1 }} exit={{ y: 20, scale: 0.95 }}>
-        <h3>🔬 How the Game of Life works</h3>
+        <h3>🔬 {t('How the Game of Life works')}</h3>
         <p className="gol-rules-intro">
-          Every square is a <b>cell</b>. It is either alive 🟩 or empty ⬛.
-          Each cell looks at the <b>8 squares around it</b> — its neighbours.
-          When you press Play, all cells follow these rules at the same time, again and again:
+          {t('Every square is a cell. It is either alive 🟩 or empty ⬛. Each cell looks at the 8 squares around it — its neighbours. When you press Play, all cells follow these rules at the same time, again and again:')}
         </p>
         <div className="gol-rules-list">
           {RULES.map(r => (
@@ -111,17 +111,15 @@ function RulesModal({ onClose }) {
               <div className="gol-rule-pics">
                 <MiniGrid cells={r.before} /><span className="gol-rule-arrow">→</span><MiniGrid cells={r.after} />
               </div>
-              <div className="gol-rule-text"><b>{r.emoji} {r.title}</b><span>{r.text}</span></div>
+              <div className="gol-rule-text"><b>{r.emoji} {t(r.title)}</b><span>{t(r.text)}</span></div>
             </div>
           ))}
         </div>
         <p className="gol-rules-intro">
-          That's all! Nobody wins or loses — you draw a starting shape and watch what grows.
-          The game stops by itself when all cells are gone, when nothing can change any more,
-          or when the same shapes keep repeating.
+          {t("That's all! Nobody wins or loses — you draw a starting shape and watch what grows. The game stops by itself when all cells are gone, when nothing can change any more, or when the same shapes keep repeating.")}
         </p>
-        <p className="gol-rules-tip">💡 Try it: draw 3 cells in a row, then press <b>Step</b> a few times.</p>
-        <button className="btn btn-primary" onClick={onClose}>Got it!</button>
+        <p className="gol-rules-tip">💡 {t('Try it: draw 3 cells in a row, then press Step a few times.')}</p>
+        <button className="btn btn-primary" onClick={onClose}>{t('Got it!')}</button>
       </motion.div>
     </motion.div>
   )
@@ -210,6 +208,7 @@ function stampPattern(cells) {
 }
 
 export default function GameOfLifeGame({ onBack }) {
+  const t = useT()
   const { theme } = useTheme()
   const [grid, setGrid] = useState(() => stampPattern(PATTERNS[0].cells))
   const [running, setRunning] = useState(false)
@@ -256,14 +255,14 @@ export default function GameOfLifeGame({ onBack }) {
     const key = gridKey(next)
     let msg = null
     if (countAlive(next) === 0) {
-      msg = '💤 All the cells are gone — nothing left to grow.'
+      msg = '💤 ' + tr('All the cells are gone — nothing left to grow.')
     } else if (key === gridKey(prev)) {
-      msg = '🧊 Everything froze — no cell can change any more.'
+      msg = '🧊 ' + tr('Everything froze — no cell can change any more.')
     } else if (history.current.has(key)) {
       if (loopSince.current === null) loopSince.current = g
       const period = g - history.current.get(key)
       if (g - loopSince.current >= Math.max(LOOP_GRACE, period * 3)) {
-        msg = `🔁 The shapes are repeating every ${period} step${period > 1 ? 's' : ''} — it would go on forever.`
+        msg = '🔁 ' + (period > 1 ? tr('The shapes are repeating every {n} steps — it would go on forever.', { n: period }) : tr('The shapes are repeating every step — it would go on forever.'))
       }
     }
     history.current.set(key, g)
@@ -346,7 +345,7 @@ export default function GameOfLifeGame({ onBack }) {
     if (!running) {
       // pressing Play again after an auto-stop starts a fresh check
       clearHistory()
-      if (countAlive(grid) === 0) { setEndMsg('✏️ Draw some cells first, or pick a pattern!'); return }
+      if (countAlive(grid) === 0) { setEndMsg('✏️ ' + t('Draw some cells first, or pick a pattern!')); return }
     }
     setRunning(r => !r)
   }
@@ -355,12 +354,12 @@ export default function GameOfLifeGame({ onBack }) {
     <div className="gol-screen screen">
       {/* Header */}
       <div className="game-header gol-header">
-        <button className="btn btn-secondary back-btn" onClick={onBack}>← Back</button>
-        <h2>🔬 Game of Life</h2>
-        <button className="btn btn-secondary gol-rules-btn" onClick={() => setShowRules(true)}>❓ How it works</button>
+        <button className="btn btn-secondary back-btn" onClick={onBack}>← {t('Back')}</button>
+        <h2>🔬 {t('Game of Life')}</h2>
+        <button className="btn btn-secondary gol-rules-btn" onClick={() => setShowRules(true)}>❓ {t('How it works')}</button>
         <div className="gol-stats">
-          <span className="gol-stat" title="Generations elapsed">Gen {gen}</span>
-          <span className="gol-stat" title="Living cells">{alive} alive</span>
+          <span className="gol-stat" title={t('Generations elapsed')}>{t('Gen {n}', { n: gen })}</span>
+          <span className="gol-stat" title={t('Living cells')}>{t('{n} alive', { n: alive })}</span>
         </div>
       </div>
 
@@ -401,11 +400,11 @@ export default function GameOfLifeGame({ onBack }) {
               onClick={togglePlay}
               whileTap={{ scale: 0.95 }}
             >
-              {running ? '⏸ Pause' : '▶ Play'}
+              {running ? '⏸ ' + t('Pause') : '▶ ' + t('Play')}
             </motion.button>
-            <button className="btn btn-secondary" onClick={stepOnce} disabled={running}>⏭ Step</button>
-            <button className="btn btn-secondary" onClick={() => reset(randomGrid())}>🎲 Random</button>
-            <button className="btn btn-secondary" onClick={() => reset(emptyGrid())}>🧹 Clear</button>
+            <button className="btn btn-secondary" onClick={stepOnce} disabled={running}>⏭ {t('Step')}</button>
+            <button className="btn btn-secondary" onClick={() => reset(randomGrid())}>🎲 {t('Random')}</button>
+            <button className="btn btn-secondary" onClick={() => reset(emptyGrid())}>🧹 {t('Clear')}</button>
           </div>
 
           <AnimatePresence>
@@ -418,7 +417,7 @@ export default function GameOfLifeGame({ onBack }) {
           </AnimatePresence>
 
           <div className="gol-row">
-            <span className="gol-row-label">Speed</span>
+            <span className="gol-row-label">{t('Speed')}</span>
             <div className="gol-chip-row">
               {SPEEDS.map(s => (
                 <button
@@ -426,34 +425,34 @@ export default function GameOfLifeGame({ onBack }) {
                   className={`gol-chip ${speedId === s.id ? 'selected' : ''}`}
                   onClick={() => setSpeedId(s.id)}
                 >
-                  <span className="gol-chip-emoji">{s.emoji}</span>{s.label}
+                  <span className="gol-chip-emoji">{s.emoji}</span>{t(s.label)}
                 </button>
               ))}
             </div>
           </div>
 
           <div className="gol-row">
-            <span className="gol-row-label">Draw or stamp</span>
+            <span className="gol-row-label">{t('Draw or stamp')}</span>
             <div className="gol-chip-row">
               <button
                 className={`gol-chip ${stampId === null ? 'selected' : ''}`}
                 onClick={() => { setStampId(null); setHover(null); playTap() }}
               >
-                <span className="gol-chip-emoji">✏️</span>Draw
+                <span className="gol-chip-emoji">✏️</span>{t('Draw')}
               </button>
               {PATTERNS.map(p => (
                 <button
                   key={p.id}
                   className={`gol-chip ${stampId === p.id ? 'selected' : ''}`}
                   onClick={() => { setStampId(p.id); setTurns(0); playTap() }}
-                  title={`Stamp a ${p.label} — tap the board to place it`}
+                  title={t('Stamp a {name} — tap the board to place it', { name: t(p.label) })}
                 >
-                  <span className="gol-chip-emoji">{p.emoji}</span>{p.label}
+                  <span className="gol-chip-emoji">{p.emoji}</span>{t(p.label)}
                 </button>
               ))}
               {stampId && (
-                <button className="gol-chip gol-turn" onClick={() => { setTurns(t => t + 1); playTap() }} title="Turn the stamp">
-                  <span className="gol-chip-emoji">🔄</span>Turn
+                <button className="gol-chip gol-turn" onClick={() => { setTurns(t => t + 1); playTap() }} title={t('Turn the stamp')}>
+                  <span className="gol-chip-emoji">🔄</span>{t('Turn')}
                 </button>
               )}
             </div>
@@ -461,8 +460,8 @@ export default function GameOfLifeGame({ onBack }) {
 
           <p className="gol-hint">
             {stampId
-              ? <>Tap the board to stamp a <b>{PATTERNS.find(p => p.id === stampId)?.label}</b> — as many as you like! Press <b>✏️ Draw</b> to draw again.</>
-              : <>Tap or drag on the grid to draw, or pick a stamp, then press Play to watch {theme?.world ? 'your' : 'the'} cells come alive!</>}
+              ? t('Tap the board to stamp a {name} — as many as you like! Press ✏️ Draw to draw again.', { name: t(PATTERNS.find(p => p.id === stampId)?.label ?? '') })
+              : t('Tap or drag on the grid to draw, or pick a stamp, then press Play to watch your cells come alive!')}
           </p>
         </div>
       </div>

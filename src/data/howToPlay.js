@@ -1,3 +1,4 @@
+import { tr } from '../i18n'
 // ─── "How to play" for every game ─────────────────────────────────────────────
 // Short, child-friendly rules. Each game has a goal and up to ~5 steps,
 // each step an emoji + one short sentence. Shown from the sidebar's
@@ -164,7 +165,7 @@ export const HOW_TO_PLAY = {
 // One string for the read-aloud voice.
 export function spokenRules(info) {
   return [
-    `How to play ${info.title}.`,
+    tr('How to play {game}', { game: info.title }) + '.',
     info.goal,
     ...info.steps.map(([, text]) => text),
     info.tip ?? '',

@@ -2,11 +2,13 @@ import { useEffect } from 'react'
 import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { LEGAL } from '../data/legal'
+import { useLang } from '../i18n'
 import './HowToPlay.css'
 import './AboutPage.css'
 
 // About, privacy and legal notice (Impressum) in one window.
 export default function AboutPage({ open, onClose }) {
+  const lang = useLang()
   useEffect(() => {
     if (!open) return undefined
     const onKey = (e) => { if (e.key === 'Escape') onClose() }
@@ -21,10 +23,40 @@ export default function AboutPage({ open, onClose }) {
         <motion.div className="htp-overlay" onClick={onClose}
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
           <motion.div className="htp-panel about-panel" onClick={e => e.stopPropagation()}
-            role="dialog" aria-label="About, privacy and legal notice"
+            role="dialog" aria-label={lang === 'de' ? 'Über das Spiel, Datenschutz und Impressum' : 'About, privacy and legal notice'}
             initial={{ y: 30, scale: 0.95 }} animate={{ y: 0, scale: 1 }} exit={{ y: 20, scale: 0.95 }}
             transition={{ type: 'spring', stiffness: 360, damping: 28 }}>
 
+            {lang === 'de' ? (<>
+            <h3>🦊 Über Curious Quest</h3>
+            <p>
+              Curious Quest ist eine kostenlose Spielesammlung für neugierige Kinder, gemacht von einem Papa für sein Kind.
+              Es gibt <b>keine Werbung, keine Käufe und keine Konten</b>, und das Spiel sammelt keine persönlichen Daten.
+            </p>
+
+            <h4>🔒 Datenschutz</h4>
+            <ul className="about-list">
+              <li><b>Nichts verlässt dein Gerät.</b> Einstellungen, gewählte Welt und Punktestände werden nur in
+                diesem Browser gespeichert (Local Storage). Du kannst sie jederzeit löschen, indem du die Websitedaten im Browser löschst.</li>
+              <li><b>Keine Cookies, kein Tracking, keine Analyse, keine Werbung.</b> Das Spiel stellt keine Anfragen an andere Firmen:
+                Schriften, Bilder und Töne werden alle mit dem Spiel selbst ausgeliefert.</li>
+              <li><b>Vorlesestimme:</b> Gesprochene Texte nutzen die Stimme deines Geräts. Es wird nichts aufgenommen.</li>
+              <li><b>Hosting:</b> Die Website wird von {LEGAL.hosting} ausgeliefert. Wie jeder Webserver verarbeitet er kurzzeitig
+                technische Daten wie deine IP-Adresse, um die Seiten auszuliefern und vor Angriffen zu schützen
+                (berechtigtes Interesse, Art. 6 Abs. 1 lit. f DSGVO). Wir sehen und speichern diese Daten nicht.</li>
+              <li>Du hast das Recht auf Auskunft, Berichtigung, Löschung und Beschwerde bei einer
+                Datenschutz-Aufsichtsbehörde. Fragen: {LEGAL.email}</li>
+            </ul>
+            <p><a href="/privacy.html" target="_blank" rel="noreferrer">Vollständige Datenschutzerklärung (Webseite)</a></p>
+
+            <h4>🎨 Mitwirkende</h4>
+            <ul className="about-list">
+              <li>Figuren und Memory-Bilder: für Curious Quest mit KI-Bildwerkzeugen erstellt (Canva, FLUX.2).</li>
+              <li>Einige Symbole und Ausmalbilder: <a href="https://www.flaticon.com" target="_blank" rel="noreferrer">Flaticon</a> (lizenziert).</li>
+              <li>Soundeffekte: ZzFX von Frank Force (MIT-Lizenz). Schriften: Nunito, Fredoka, Gloria Hallelujah (SIL Open Font Licence).</li>
+            </ul>
+
+            </>) : (<>
             <h3>🦊 About Curious Quest</h3>
             <p>
               Curious Quest is a free collection of games for curious kids, made by a dad for his child.
@@ -53,7 +85,9 @@ export default function AboutPage({ open, onClose }) {
               <li>Sound effects: ZzFX by Frank Force (MIT licence). Fonts: Nunito, Fredoka, Gloria Hallelujah (SIL Open Font Licence).</li>
             </ul>
 
-            <h4>📄 Legal notice / Impressum</h4>
+            </>)}
+
+            <h4>📄 {lang === 'de' ? 'Impressum' : 'Legal notice / Impressum'}</h4>
             <p className="about-address">
               Angaben gemäß § 5 DDG und § 18 MStV:<br />
               {LEGAL.name}<br />
@@ -63,7 +97,7 @@ export default function AboutPage({ open, onClose }) {
               E-Mail: {LEGAL.email}
             </p>
 
-            <button className="btn btn-primary htp-ok" onClick={onClose}>Back to the games</button>
+            <button className="btn btn-primary htp-ok" onClick={onClose}>{lang === 'de' ? 'Zurück zu den Spielen' : 'Back to the games'}</button>
           </motion.div>
         </motion.div>
       )}

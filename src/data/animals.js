@@ -82,6 +82,7 @@ export const RACE_ANIMALS = [
 ];
 
 // UNO color set
+// i18n: list
 export const UNO_COLORS = ['red', 'blue', 'green', 'yellow'];
 export const UNO_COLOR_EMOJIS = { red: '🔴', blue: '🔵', green: '🟢', yellow: '🟡' };
 export const UNO_COLOR_HEX = { red: '#E53935', blue: '#1E88E5', green: '#43A047', yellow: '#FDD835' };

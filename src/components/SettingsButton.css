@@ -177,7 +177,7 @@
   display: flex; align-items: center; gap: 8px;
   font-size: 0.9rem; font-weight: 700;
 }
-.settings-voice-row > span:first-child { width: 58px; flex-shrink: 0; color: var(--text-dim); }
+.settings-voice-row > span:first-child { min-width: 58px; flex-shrink: 0; color: var(--text-dim); }   /* min: German labels are longer */
 .settings-voice-row input[type="range"] { flex: 1; accent-color: var(--accent); height: 28px; cursor: pointer; }
 .settings-voice-row select {
   flex: 1; min-width: 0;

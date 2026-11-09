@@ -6,6 +6,7 @@ import ThemeIcon from '../../components/ThemeIcon'
 import { loadColoringPage } from './coloringPages'
 import { playTap, playMatch, playMove } from '../../sound/sfx'
 import './Drawing.css'
+import { useT } from '../../i18n'
 
 // ─── Draw & Paint ─────────────────────────────────────────────────────────────
 // Free drawing on a blank page, or colouring pages made from the world
@@ -89,6 +90,7 @@ function svgToImage(svgText) {
 
 // ── page picker ──────────────────────────────────────────────────────────────
 function PagePicker({ onPick, themeId }) {
+  const tt = useT()
   // Which world's pictures are shown on the right — starts on the current world.
   const [worldId, setWorldId] = useState(themeId)
   const world = THEME_LIST.find(t => t.id === worldId) ?? THEME_LIST[0]
@@ -99,13 +101,13 @@ function PagePicker({ onPick, themeId }) {
       <motion.button className="draw-blank-card" onClick={() => onPick(null)}
         whileHover={{ y: -4 }} whileTap={{ scale: 0.97 }}>
         <span className="draw-blank-icon">✏️</span>
-        <span className="draw-card-title">Blank page</span>
-        <span className="draw-card-sub">Draw anything you like!</span>
+        <span className="draw-card-title">{tt('Blank page')}</span>
+        <span className="draw-card-sub">{tt('Draw anything you like!')}</span>
       </motion.button>
 
       {/* right: pictures to colour, one world at a time */}
       <div className="draw-colour-side">
-        <h3 className="draw-picker-heading">🖍️ Colour a picture</h3>
+        <h3 className="draw-picker-heading">🖍️ {tt('Colour a picture')}</h3>
         <div className="draw-world-tabs" role="tablist">
           {THEME_LIST.map(t => (
             <button
@@ -114,10 +116,10 @@ function PagePicker({ onPick, themeId }) {
               aria-selected={t.id === worldId}
               className={`draw-world-tab${t.id === worldId ? ' active' : ''}`}
               onClick={() => { setWorldId(t.id); playTap() }}
-              title={t.label}
+              title={tt(t.label)}
             >
               <ThemeIcon themeId={t.id} size={26} />
-              <span>{t.label}</span>
+              <span>{tt(t.label)}</span>
             </button>
           ))}
         </div>
@@ -127,7 +129,7 @@ function PagePicker({ onPick, themeId }) {
               initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1, transition: { delay: i * 0.04 } }}
               whileHover={{ y: -4 }} whileTap={{ scale: 0.95 }}>
               <img src={r.image} alt="" draggable="false" />
-              <span>{r.name}</span>
+              <span>{tt(r.name)}</span>
             </motion.button>
           ))}
         </div>
@@ -138,6 +140,7 @@ function PagePicker({ onPick, themeId }) {
 
 // ── main component ───────────────────────────────────────────────────────────
 export default function DrawingGame({ onBack }) {
+  const tt = useT()
   const { theme, themeId } = useTheme()
   const [phase, setPhase] = useState('pick')       // 'pick' | 'draw'
   const [page, setPage] = useState(null)           // null = blank page
@@ -340,11 +343,11 @@ export default function DrawingGame({ onBack }) {
       <div className="game-header">
         <button className="btn btn-secondary back-btn"
           onClick={phase === 'draw' ? () => { setPhase('pick'); playTap() } : onBack}>
-          {phase === 'draw' ? '← Pages' : '← Back'}
+          {phase === 'draw' ? '← ' + tt('Pages') : '← ' + tt('Back')}
         </button>
-        <h2><span style={{ display: 'inline-flex', verticalAlign: '-0.2em' }}><ThemeIcon themeId={themeId} size={28} /></span> Draw &amp; Paint</h2>
+        <h2><span style={{ display: 'inline-flex', verticalAlign: '-0.2em' }}><ThemeIcon themeId={themeId} size={28} /></span> {tt('Draw & Paint')}</h2>
         {phase === 'draw' && (
-          <button className="btn btn-primary draw-save-btn" onClick={save}>{saved ? '✅ Saved!' : '💾 Save picture'}</button>
+          <button className="btn btn-primary draw-save-btn" onClick={save}>{saved ? '✅ ' + tt('Saved!') : '💾 ' + tt('Save picture')}</button>
         )}
       </div>
 
@@ -355,16 +358,16 @@ export default function DrawingGame({ onBack }) {
           {/* tools */}
           <div className="draw-tools">
             {TOOLS.map(t => (
-              <button key={t.id} className={`draw-tool${tool === t.id ? ' active' : ''}`} onClick={() => pickTool(t.id)} title={t.label}>
-                <span className="draw-tool-icon">{t.icon}</span><span className="draw-tool-label">{t.label}</span>
+              <button key={t.id} className={`draw-tool${tool === t.id ? ' active' : ''}`} onClick={() => pickTool(t.id)} title={tt(t.label)}>
+                <span className="draw-tool-icon">{t.icon}</span><span className="draw-tool-label">{tt(t.label)}</span>
               </button>
             ))}
             <div className="draw-tools-sep" />
-            <button className="draw-tool" onClick={undo} disabled={!canUndo} title="Undo">
-              <span className="draw-tool-icon">↩️</span><span className="draw-tool-label">Undo</span>
+            <button className="draw-tool" onClick={undo} disabled={!canUndo} title={tt('Undo')}>
+              <span className="draw-tool-icon">↩️</span><span className="draw-tool-label">{tt('Undo')}</span>
             </button>
-            <button className="draw-tool" onClick={clearAll} title="Start again">
-              <span className="draw-tool-icon">🗑️</span><span className="draw-tool-label">Clear</span>
+            <button className="draw-tool" onClick={clearAll} title={tt('Start again')}>
+              <span className="draw-tool-icon">🗑️</span><span className="draw-tool-label">{tt('Clear')}</span>
             </button>
           </div>
 

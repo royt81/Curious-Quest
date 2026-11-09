@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext'
 import { themePieces } from '../../data/pieces'
 import './Checkers.css'
 import { playMove, playCapture, playWin } from '../../sound/sfx'
+import { useT } from '../../i18n'
 
 // ─── constants ───────────────────────────────────────────────────────────────
 const SIZE = 8
@@ -96,6 +97,7 @@ const gameoverVariants = {
 }
 
 export default function CheckersGame({ onBack }) {
+  const t = useT()
   const { theme } = useTheme()
   const pieces = themePieces(theme)
   const E1 = pieces.human.emoji, E2 = pieces.comp.emoji
@@ -124,8 +126,8 @@ export default function CheckersGame({ onBack }) {
     setTurn(HUMAN); setSelected(null); setChainCell(null)
     setGameOver(false); setWinner(null); setAiThinking(false)
     setLog(mode === 'cpu'
-      ? ['Your move! Tap a piece.']
-      : [`${E1} Player 1's move! Tap a piece.`])
+      ? [t('Your move! Tap a piece.')]
+      : [`${E1} ` + t("Player 1's move! Tap a piece.")])
     setPhase('playing')
   }
 
@@ -176,22 +178,24 @@ export default function CheckersGame({ onBack }) {
     }
   }
 
-  const p1Label = mode === 'cpu' ? 'You' : 'Player 1'
-  const p2Label = mode === 'cpu' ? 'Computer' : 'Player 2'
+  const p1Label = mode === 'cpu' ? t('You') : t('Player 1')
+  const p2Label = mode === 'cpu' ? t('Computer') : t('Player 2')
 
   const doMove = (move) => {
     const mover = turn
     const res = applyMove(board, move)
     if (res.captured) playCapture(); else playMove()
     setBoard(res.board)
+    const youMoved = mover === HUMAN && mode === 'cpu'
     const moverLabel = mover === HUMAN ? `${E1} ${p1Label}` : `${E2} ${p2Label}`
-    if (res.captured) addLog(res.promoted ? `${moverLabel} captured & crowned a King! 👑` : `${moverLabel} captured a piece! 💥`)
-    else if (res.promoted) addLog(`${moverLabel} got a King! 👑`)
+    const say = (en, enYou) => youMoved ? `${E1} ` + t(enYou) : t(en, { name: moverLabel })
+    if (res.captured) addLog(res.promoted ? say('{name} captured & crowned a King!', 'You captured & crowned a King!') + ' 👑' : say('{name} captured a piece!', 'You captured a piece!') + ' 💥')
+    else if (res.promoted) addLog(say('{name} got a King!', 'You got a King!') + ' 👑')
 
     if (res.again) {
       setSelected(res.againFrom)
       setChainCell(res.againFrom)
-      addLog('Jump again! Keep capturing. 🔥')
+      addLog(t('Jump again! Keep capturing.') + ' 🔥')
       return
     }
     setSelected(null)
@@ -235,9 +239,9 @@ export default function CheckersGame({ onBack }) {
 
     if (didCapture) playCapture(); else playMove()
     setBoard(working)
-    if (didCapture) addLog(promoted ? '🤖 captured & crowned a King!' : '🤖 Computer captured a piece!')
-    else if (promoted) addLog('🤖 Computer got a King! 👑')
-    else addLog('🤖 Computer moved.')
+    if (didCapture) addLog('🤖 ' + (promoted ? t('{name} captured & crowned a King!', { name: t('Computer') }) : t('{name} captured a piece!', { name: t('Computer') })))
+    else if (promoted) addLog('🤖 ' + t('{name} got a King!', { name: t('Computer') }) + ' 👑')
+    else addLog('🤖 ' + t('Computer moved.'))
 
     setAiThinking(false)
     if (checkEnd(working, HUMAN)) return
@@ -258,16 +262,16 @@ export default function CheckersGame({ onBack }) {
   const compCount  = countPieces(board, COMP)
 
   const turnLabel = turn === HUMAN
-    ? `${E1} ${p1Label}'s turn`
-    : mode === 'cpu' ? '🤖 Computer is thinking...' : `${E2} ${p2Label}'s turn`
+    ? (mode === 'cpu' ? `${E1} ` + t('Your turn') : `${E1} ` + t("{name}'s turn", { name: p1Label }))
+    : mode === 'cpu' ? '🤖 ' + t('Computer is thinking…') : `${E2} ` + t("{name}'s turn", { name: p2Label })
 
   const status = gameOver
     ? ''
-    : aiThinking ? '🤖 Computer is thinking...'
-    : chainCell ? 'Jump again! Keep capturing.'
+    : aiThinking ? '🤖 ' + t('Computer is thinking…')
+    : chainCell ? t('Jump again! Keep capturing.')
     : mode === 'cpu'
-      ? (turn === HUMAN ? 'Your turn — tap a piece, then a glowing square.' : '')
-      : `${turn === HUMAN ? `${E1} Player 1` : `${E2} Player 2`} — tap a piece, then a glowing square.`
+      ? (turn === HUMAN ? t('Your turn — tap a piece, then a glowing square.') : '')
+      : `${turn === HUMAN ? `${E1} ` + t('Player 1') : `${E2} ` + t('Player 2')} — ` + t('tap a piece, then a glowing square.')
 
   // ── Setup screen ──────────────────────────────────────────────────────────
   if (phase === 'setup') {
@@ -279,30 +283,30 @@ export default function CheckersGame({ onBack }) {
             initial={{ opacity: 0, y: 24, scale: 0.93 }}
             animate={{ opacity: 1, y: 0, scale: 1, transition: { type: 'spring', stiffness: 280, damping: 24 } }}
           >
-            <div className="ck-setup-title">{theme.emoji} Checkers</div>
-            <div className="ck-setup-label">Choose mode</div>
+            <div className="ck-setup-title">{theme.emoji} {t('Checkers')}</div>
+            <div className="ck-setup-label">{t('Choose mode')}</div>
             <div className="ck-mode-btns">
               <button
                 className={`ck-mode-btn${mode === 'cpu' ? ' selected' : ''}`}
                 onClick={() => setMode('cpu')}
               >
                 <span className="ck-mode-icon">🤖</span>
-                <span className="ck-mode-name">1 vs PC</span>
-                <span className="ck-mode-desc">Play against the computer</span>
+                <span className="ck-mode-name">{t('1 vs PC')}</span>
+                <span className="ck-mode-desc">{t('Play against the computer')}</span>
               </button>
               <button
                 className={`ck-mode-btn${mode === 'friends' ? ' selected' : ''}`}
                 onClick={() => setMode('friends')}
               >
                 <span className="ck-mode-icon">🆚</span>
-                <span className="ck-mode-name">1 vs 1</span>
-                <span className="ck-mode-desc">Two players, same screen</span>
+                <span className="ck-mode-name">{t('1 vs 1')}</span>
+                <span className="ck-mode-desc">{t('Two players, same screen')}</span>
               </button>
             </div>
             <button className="btn btn-primary ck-start-btn" onClick={startGame}>
-              Start Game
+              {t('Start Game')}
             </button>
-            <button className="btn btn-secondary ck-back-setup-btn" onClick={onBack}>← Back</button>
+            <button className="btn btn-secondary ck-back-setup-btn" onClick={onBack}>← {t('Back')}</button>
           </motion.div>
         </div>
       </div>
@@ -315,8 +319,8 @@ export default function CheckersGame({ onBack }) {
 
       {/* ── Side panel ── */}
       <div className="ck-side">
-        <button className="btn btn-secondary back-btn" onClick={restart}>← Menu</button>
-        <div className="ck-side-title">{theme.emoji} Checkers</div>
+        <button className="btn btn-secondary back-btn" onClick={restart}>← {t('Menu')}</button>
+        <div className="ck-side-title">{theme.emoji} {t('Checkers')}</div>
         <div className="scores">
           <span className="score p1"><img className="ck-score-face" src={pieces.human.image} alt="" /> {humanCount}</span>
           <span className="score p2"><img className="ck-score-face" src={pieces.comp.image} alt="" /> {compCount}</span>
@@ -326,8 +330,8 @@ export default function CheckersGame({ onBack }) {
         )}
         {gameOver && (
           <div className="ck-gameover-btns">
-            <button className="btn btn-primary" onClick={startGame}>Play Again</button>
-            <button className="btn btn-secondary" onClick={restart}>Menu</button>
+            <button className="btn btn-primary" onClick={startGame}>{t('Play Again')}</button>
+            <button className="btn btn-secondary" onClick={restart}>{t('Menu')}</button>
           </div>
         )}
         <div className="log-box">
@@ -347,10 +351,10 @@ export default function CheckersGame({ onBack }) {
               animate="animate"
             >
               <div className="gameover-emoji">{winner === HUMAN ? '🏆' : (mode === 'cpu' ? '🤖' : '🏆')}</div>
-              <h2>{winner === HUMAN ? `${p1Label} wins!` : `${p2Label} wins!`}</h2>
+              <h2>{winner === HUMAN && mode === 'cpu' ? t('You win!') : t('{name} wins!', { name: winner === HUMAN ? p1Label : p2Label })}</h2>
               <p>{winner === HUMAN
-                ? (mode === 'cpu' ? 'Great moves! 🎉' : `${E1} Player 1 takes it! 🎉`)
-                : (mode === 'cpu' ? 'Nice try — play again!' : `${E2} Player 2 takes it! 🎉`)}</p>
+                ? (mode === 'cpu' ? t('Great moves!') + ' 🎉' : `${E1} ` + t('{name} takes it!', { name: t('Player 1') }) + ' 🎉')
+                : (mode === 'cpu' ? t('Nice try — play again!') : `${E2} ` + t('{name} takes it!', { name: t('Player 2') }) + ' 🎉')}</p>
             </motion.div>
           ) : (
             <motion.div
