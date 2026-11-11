@@ -40,7 +40,7 @@ Safe for children:
 • No links out to social media
 
 **Category:** Education (or Games › Educational) · **Tags:** kids, learning, family
-**Contact e-mail:** roytate.berlin@gmail.com
+**Contact e-mail:** info@curiousqueststudio.art
 **Privacy policy URL:** https://curious-quest-mda.pages.dev/privacy.html
 
 ## Store listing – German (Deutsch)

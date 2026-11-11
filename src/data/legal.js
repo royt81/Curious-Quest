@@ -4,6 +4,6 @@ export const LEGAL = {
   street: 'Fürstenwalder Str. 16',
   city: '10243 Berlin',
   country: 'Germany',
-  email: 'roytate.berlin@gmail.com',
+  email: 'info@curiousqueststudio.art',
   hosting: 'Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, USA',
 }
