@@ -306,6 +306,19 @@
   opacity: 0.72;
 }
 
+/* Upright phones: the cloud strip (and the wind lines) are drawn for a wide screen. Squeezed into a
+   narrow one, the clouds turned into tall ovals — so keep the same shape as on
+   a landscape screen (the strip just gets wider than the screen and scrolls). */
+@media (orientation: portrait) {
+  .layer-clouds { width: auto; height: 14%; }
+  .layer-clouds svg { width: auto !important; aspect-ratio: 1440 / 198; }
+  /* same for the wavy wind lines (they turned into steep, almost vertical waves) */
+  .layer-wind-far,
+  .layer-wind-near { width: auto; }
+  .layer-wind-far svg  { width: auto !important; aspect-ratio: 1440 / 648; }
+  .layer-wind-near svg { width: auto !important; aspect-ratio: 1440 / 612; }
+}
+
 .layer-wind-far {
   top: 4%;
   height: 72%;
