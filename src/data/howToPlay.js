@@ -64,6 +64,18 @@ export const HOW_TO_PLAY = {
     ],
     tip: 'Start with tiles on top of the pile and at the ends of long rows. On Hard, think before you take a pair — the wrong pair can leave you stuck!',
   },
+  blocks: {
+    title: 'Calm Blocks',
+    goal: 'Fill whole rows with blocks — full rows float away!',
+    steps: [
+      ['⬇️', 'Blocks fall down slowly, one at a time.'],
+      ['⬅️', 'Move them left and right, and 🔄 turn them so they fit.'],
+      ['👻', 'The soft shadow shows where the block will land. ⤓ Drop puts it there right away.'],
+      ['✨', 'When a row is full from side to side, it disappears.'],
+      ['🏰', 'When the blocks reach the top, the tower is full — then start a new one!'],
+    ],
+    tip: 'On a phone: tap the board to turn, slide your finger to move, and swipe down to drop.',
+  },
   uno: {
     title: 'Colour Clash',
     goal: 'Be the first to play all of your cards!',

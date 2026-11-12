@@ -9,17 +9,18 @@ automatically — no new app upload is needed for game changes.
 **App name** (max 30): `Curious Quest – Kids Games`
 
 **Short description** (max 80):
-`14 free learning games for kids. No ads, no purchases, no data collected.`
+`15 free learning games for kids. No ads, no purchases, no data collected.`
 
 **Full description:**
 
-Curious Quest is a free collection of 14 games for curious kids aged about 4 to 10 — made by a dad for his child.
+Curious Quest is a free collection of 15 games for curious kids aged about 4 to 10 — made by a dad for his child.
 
 Explore five colourful worlds with Fox, the explorer: Animal Kingdom, Dinosaurs, Space, Robots and Under the Sea. Every game changes its look, characters and music to match the world you pick.
 
 🗺️ Adventure – roll the dice, answer simple questions and race to the trophy
 🧠 Memory – 12 painted pictures in every world
 🀄 Mahjong – match the painted pictures and clear the pile, in three levels
+🧱 Calm Blocks – turn and stack falling blocks, nice and slow
 🏁 Quiz Race – numbers and letters, with a reading voice for children who can't read yet
 🎨 Draw & Paint – free drawing and 20 colouring pages
 🐍 Snakes & Ladders and Race
@@ -50,17 +51,18 @@ Add it in Play Console under *Store presence → Main store listing → Manage t
 **App name** (max 30): `Curious Quest – Kinderspiele`
 
 **Short description** (max 80):
-`14 kostenlose Lernspiele für Kinder. Ohne Werbung, ohne Käufe, ohne Daten.`
+`15 kostenlose Lernspiele für Kinder. Ohne Werbung, ohne Käufe, ohne Daten.`
 
 **Full description:**
 
-Curious Quest ist eine kostenlose Sammlung von 14 Spielen für neugierige Kinder von etwa 4 bis 10 Jahren – gemacht von einem Papa für sein Kind.
+Curious Quest ist eine kostenlose Sammlung von 15 Spielen für neugierige Kinder von etwa 4 bis 10 Jahren – gemacht von einem Papa für sein Kind.
 
 Entdecke mit dem Fuchs fünf bunte Welten: Tierreich, Dinosaurier, Weltraum, Roboter und Unterwasserreich. Jedes Spiel passt Aussehen, Figuren und Musik an die gewählte Welt an.
 
 🗺️ Abenteuer – würfeln, einfache Fragen beantworten und zum Pokal rennen
 🧠 Memory – 12 gemalte Bilder in jeder Welt
 🀄 Mahjong – gleiche Bilder finden und den Stapel abräumen, in drei Stufen
+🧱 Bauklötze – fallende Klötze drehen und stapeln, ganz gemütlich
 🏁 Quiz-Rennen – Zahlen und Buchstaben, mit Vorlesestimme für Kinder, die noch nicht lesen können
 🎨 Malen & Zeichnen – freies Malen und 20 Ausmalbilder
 🐍 Schlangen & Leitern und Wettrennen

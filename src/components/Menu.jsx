@@ -54,6 +54,13 @@ const GAMES = [
     color: 'var(--game-color-4, #10b981)',
   },
   {
+    id: 'blocks',
+    name: 'Calm Blocks',
+    emoji: '🧱',
+    desc: 'Turn and stack the falling blocks to fill whole rows — nice and slow.',
+    color: 'var(--game-color-2, #6366f1)',
+  },
+  {
     id: 'uno',
     name: 'Colour Clash',
     emoji: '🎴',

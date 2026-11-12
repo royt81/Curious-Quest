@@ -193,6 +193,27 @@ export default {
   'Now find the same picture!': 'Jetzt finde dasselbe Bild!',
   'Tap two free tiles with the same picture': 'Tippe zwei freie Steine mit demselben Bild an',
 
+  // ── Calm Blocks ─────────────────────────────────────────────────────────────
+  'Calm Blocks': 'Bauklötze',
+  'Turn and stack the falling blocks to fill whole rows — nice and slow.': 'Dreh und stapel die fallenden Klötze und fülle ganze Reihen – schön gemütlich.',
+  'Taking a little break': 'Kleine Pause',
+  'Your tower is full!': 'Dein Turm ist voll!',
+  'You built 1 row.': 'Du hast 1 Reihe gebaut.',
+  'You built {n} rows.': 'Du hast {n} Reihen gebaut.',
+  'Your best ever!': 'Dein bestes Ergebnis!',
+  'Next': 'Als Nächstes',
+  '{n} rows': '{n} Reihen',
+  'Best: {n}': 'Bestes: {n}',
+  'Down': 'Runter',
+  'Drop': 'Fallen lassen',
+  'Fill whole rows with blocks — full rows float away!': 'Fülle ganze Reihen mit Klötzen – volle Reihen schweben davon!',
+  'Blocks fall down slowly, one at a time.': 'Die Klötze fallen langsam herunter, einer nach dem anderen.',
+  'Move them left and right, and 🔄 turn them so they fit.': 'Schieb sie nach links und rechts und 🔄 dreh sie, damit sie passen.',
+  'The soft shadow shows where the block will land. ⤓ Drop puts it there right away.': 'Der zarte Schatten zeigt, wo der Klotz landet. ⤓ Fallen lassen bringt ihn sofort dorthin.',
+  'When a row is full from side to side, it disappears.': 'Ist eine Reihe von links bis rechts voll, verschwindet sie.',
+  'When the blocks reach the top, the tower is full — then start a new one!': 'Kommen die Klötze oben an, ist der Turm voll – dann bau einen neuen!',
+  'On a phone: tap the board to turn, slide your finger to move, and swipe down to drop.': 'Auf dem Handy: Tippe aufs Feld zum Drehen, wisch zur Seite zum Schieben und nach unten zum Fallenlassen.',
+
   // ── Dots & Boxes ────────────────────────────────────────────────────────────
   'Quick': 'Kurz',
   '3 × 3 boxes': '3 × 3 Kästchen',

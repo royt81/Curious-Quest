@@ -16,6 +16,7 @@ import DominoGame from './games/Domino/DominoGame'
 import BackgammonGame from './games/Backgammon/BackgammonGame'
 import MemoryGame from './games/Memory/MemoryGame'
 import MahjongGame from './games/Mahjong/MahjongGame'
+import BlocksGame from './games/Blocks/BlocksGame'
 import DotsBoxesGame from './games/DotsBoxes/DotsBoxesGame'
 import SnakesLaddersGame from './games/SnakesLadders/SnakesLaddersGame'
 import GameOfLifeGame from './games/GameOfLife/GameOfLifeGame'
@@ -34,7 +35,7 @@ const IDLE_MS = 15000 // 15s of no activity → screensaver
 
 // Every game can be opened directly with a link, e.g. …pages.dev/#memory
 const GAME_IDS = ['adventure', 'quiz', 'race', 'uno', 'foursomes', 'checkers', 'chess', 'domino',
-  'backgammon', 'memory', 'mahjong', 'dotsboxes', 'snakes', 'life', 'draw']
+  'backgammon', 'memory', 'mahjong', 'blocks', 'dotsboxes', 'snakes', 'life', 'draw']
 const screenFromHash = () => {
   const id = typeof window !== 'undefined' ? window.location.hash.slice(1) : ''
   return GAME_IDS.includes(id) ? id : 'menu'
@@ -176,6 +177,7 @@ function App() {
             {screen === 'backgammon' && <BackgammonGame onBack={back} />}
             {screen === 'memory'     && <MemoryGame     onBack={back} />}
             {screen === 'mahjong'    && <MahjongGame    onBack={back} />}
+            {screen === 'blocks'     && <BlocksGame     onBack={back} />}
             {screen === 'dotsboxes'  && <DotsBoxesGame  onBack={back} />}
             {screen === 'snakes'     && <SnakesLaddersGame onBack={back} />}
             {screen === 'life'       && <GameOfLifeGame  onBack={back} />}
