@@ -107,13 +107,25 @@ export function deal(positions, pairPictures, random = false) {
   return randomDeal(positions, pairPictures)
 }
 
+// Takes pictures evenly from every world ("suit"), like the suits of real Mahjong:
+// shuffles each world's pictures and deals them round-robin.
+function evenlyFromSuits(pictures) {
+  const bySuit = {}
+  for (const p of pictures) (bySuit[p.world ?? 'any'] ??= []).push(p)
+  const suits = shuffle(Object.values(bySuit).map(shuffle))
+  const out = []
+  for (let i = 0; suits.some(s => i < s.length); i++)
+    for (const s of suits) if (i < s.length) out.push(s[i])
+  return out
+}
+
 // Builds a new board: [{ id, x, y, z, pic, removed }]
 export function newBoard(layoutId, pictures) {
   const positions = LAYOUTS[layoutId].positions
   const pairs = positions.length / 2
   // one picture per pair when there are enough, otherwise pictures repeat
-  let picks = shuffle(pictures)
-  while (picks.length < pairs) picks = [...picks, ...shuffle(pictures)]
+  let picks = evenlyFromSuits(pictures)
+  while (picks.length < pairs) picks = [...picks, ...evenlyFromSuits(pictures)]
   const pairPictures = shuffle(picks.slice(0, pairs).map((_, i) => i))
   const assigned = deal(positions, pairPictures, !!LAYOUTS[layoutId].random)
   return {

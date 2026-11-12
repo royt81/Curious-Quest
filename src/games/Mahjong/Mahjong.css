@@ -26,10 +26,14 @@
   border: none;
   cursor: pointer;
   border-radius: calc(var(--tw) * 0.14);
-  background: linear-gradient(150deg, #fffdf6 0%, #f4ead2 100%);
-  /* thin world-coloured frame + 3-D side of the tile */
+  --face: #fffdf6;
+  --face2: #f4ead2;
+  --suit: #c9a96b;
+  background: linear-gradient(150deg, var(--face) 0%, var(--face2) 100%);
+  /* suit-coloured frame + 3-D side of the tile */
   box-shadow:
-    inset 0 0 0 calc(var(--tw) * 0.035) color-mix(in srgb, var(--world) 70%, white),
+    inset 0 0 0 calc(var(--tw) * 0.05) var(--suit),
+    inset 0 0 0 calc(var(--tw) * 0.075) rgba(255, 255, 255, 0.7),
     calc(var(--tw) * 0.05) calc(var(--tw) * 0.07) 0 #c9b48a,
     calc(var(--tw) * 0.07) calc(var(--tw) * 0.10) calc(var(--tw) * 0.08) rgba(0, 0, 0, 0.45);
   display: flex;
@@ -38,6 +42,32 @@
   transition: transform 0.15s ease, filter 0.2s ease, opacity 0.35s ease;
   -webkit-tap-highlight-color: transparent;
 }
+/* ── Suits: one tile style per world ── */
+.mj-tile[data-suit='animals']   { --face: #f6fbe9; --face2: #dcefc0; --suit: #6aa84f; }
+.mj-tile[data-suit='dinosaurs'] { --face: #fdf3e1; --face2: #f1d7a8; --suit: #c9772b; }
+.mj-tile[data-suit='space']     { --face: #eef0ff; --face2: #cfd6fb; --suit: #5b6ee1; }
+.mj-tile[data-suit='robots']    { --face: #eef4f6; --face2: #cfdde3; --suit: #4f7f92; }
+.mj-tile[data-suit='sea']       { --face: #e9fafa; --face2: #bfe9ea; --suit: #179da3; }
+
+/* small suit mark in the top-left corner */
+.mj-suit {
+  position: absolute;
+  top: calc(var(--tw) * 0.07);
+  left: calc(var(--tw) * 0.08);
+  width: calc(var(--tw) * 0.26);
+  height: calc(var(--tw) * 0.26);
+  border-radius: 50%;
+  background: var(--suit);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(var(--tw) * 0.15);
+  line-height: 1;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.25);
+  pointer-events: none;
+  z-index: 1;
+}
+
 .mj-tile img {
   width: 86%;
   height: 86%;

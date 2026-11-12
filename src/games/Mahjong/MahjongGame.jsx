@@ -5,6 +5,10 @@ import { LAYOUTS, newBoard, isFree, findPair, reshuffle } from './mahjongLogic'
 import './Mahjong.css'
 import { useT } from '../../i18n'
 
+// Each world is a "suit" (like bamboo / circles / characters in real Mahjong):
+// its own tile colour (see Mahjong.css) and this little mark in the corner.
+const SUIT_MARK = { animals: '🐾', dinosaurs: '🦴', space: '⭐', robots: '⚙️', sea: '🐚' }
+
 const TILE_RATIO = 1.22    // tile height / width
 const LAYER_SHIFT = 0.09   // each layer is drawn this much (× tile width) up and left
 
@@ -179,8 +183,9 @@ export default function MahjongGame({ onBack }) {
                       top: ((tile.y - bounds.minY) / 2) * tileH + (bounds.layers - tile.z) * shift,
                       width: tileW, height: tileH,
                       zIndex: 1 + tile.z * 1000 + (tile.x - bounds.minX) * 20 + (tile.y - bounds.minY),
-                      '--world': pic.color,
-                    }}>
+                    }}
+                    data-suit={pic.world}>
+                    <span className="mj-suit" aria-hidden="true">{SUIT_MARK[pic.world]}</span>
                     <img src={pic.image} alt="" draggable="false" />
                   </button>
                 )
