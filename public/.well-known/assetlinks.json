@@ -4,7 +4,7 @@
     "target": {
       "namespace": "android_app",
       "package_name": "com.roytate.curiousquest",
-      "sha256_cert_fingerprints": ["REPLACE_WITH_PLAY_APP_SIGNING_SHA256"]
+      "sha256_cert_fingerprints": ["E1:6D:95:B0:90:56:DC:11:18:53:76:0E:E3:B2:34:58:AF:75:EA:F3:A1:61:CC:25:99:AB:A4:86:1E:06:F0:A9"]
     }
   }
 ]
