@@ -231,3 +231,26 @@
 }
 .gol-cell.alive.preview { opacity: 1; box-shadow: inset 0 0 0 2px #fff; }
 .gol-turn { border-style: dashed; }
+
+/* ── Board size: as big as the space allows, cells always square (Nov 15) ── */
+.gol-board-wrap { container-type: size; }
+.gol-board,
+.gol-board[style] { height: auto; max-width: none; max-height: none; }
+.gol-cell { cursor: crosshair; }
+
+/* Phone held upright: the board stands upright and gets most of the screen,
+   the buttons below are compact */
+@media (orientation: portrait) and (max-width: 720px) {
+  .gol-screen { padding: 4px 8px 8px; gap: 6px; }
+  .gol-body { gap: 8px; }
+  .gol-board-wrap { padding: 6px; border-radius: var(--r-lg); }
+  .gol-panel { padding: 8px 10px; gap: 6px; border-radius: var(--r-lg); }
+  .gol-controls { gap: 6px; }
+  .gol-controls .btn { padding: 7px 12px; font-size: 0.85rem; }
+  .gol-row { flex-direction: row; align-items: center; gap: 6px; flex-basis: 100%; }
+  .gol-row-label { display: none; }
+  .gol-chip-row { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; gap: 5px; }
+  .gol-chip-row::-webkit-scrollbar { display: none; }
+  .gol-chip { padding: 5px 9px; font-size: 0.78rem; white-space: nowrap; flex-shrink: 0; }
+  .gol-chip:hover { transform: none; }
+}

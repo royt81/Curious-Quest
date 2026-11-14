@@ -198,3 +198,40 @@ button {
     height: 100vw;
   }
 }
+
+/* ── Start menus of Adventure and Quiz Race on short screens (phones held sideways):
+   compact, and they scroll instead of being cut off at the top and bottom ── */
+@media (max-height: 500px), (orientation: portrait) and (max-width: 820px) {
+  .quizrace-screen:has(> .qr-setup),
+  .adventure-screen:has(> .adventure-setup) {
+    overflow-y: auto;
+    justify-content: flex-start;
+    padding: 6px 10px;
+  }
+  :is(.quizrace-screen, .adventure-screen) .qr-setup, :is(.quizrace-screen, .adventure-screen) .adventure-setup {
+    margin: auto 0;               /* centred when it fits, scrolls when it doesn't */
+    flex-shrink: 0;
+    gap: 6px;
+    padding: 8px 16px 10px;
+    max-width: 640px;
+  }
+  :is(.quizrace-screen, .adventure-screen) .qr-setup-tagline { display: none; }
+  :is(.quizrace-screen, .adventure-screen) .qr-setup-title, :is(.quizrace-screen, .adventure-screen) .adv-setup-title { font-size: 1.05rem; }
+  :is(.quizrace-screen, .adventure-screen) .qr-diff-btn, :is(.quizrace-screen, .adventure-screen) .qr-mode-btn { padding-top: 6px; padding-bottom: 6px; }
+  :is(.quizrace-screen, .adventure-screen) .qr-diff-desc { font-size: 0.75rem; }
+  :is(.quizrace-screen, .adventure-screen) .adv-mode-btn { padding: 6px 10px; }
+  :is(.quizrace-screen, .adventure-screen) .adv-mode-icon { font-size: 1.6rem; }
+  :is(.quizrace-screen, .adventure-screen) .player-count-btn { padding: 6px 14px; gap: 3px; }
+  :is(.quizrace-screen, .adventure-screen) .qr-start-btn, :is(.quizrace-screen, .adventure-screen) .adventure-setup .start-btn { padding-top: 8px; padding-bottom: 8px; }
+}
+@media (max-height: 430px), (orientation: portrait) and (max-width: 500px) {
+  :is(.quizrace-screen, .adventure-screen) .qr-diff-desc, :is(.quizrace-screen, .adventure-screen) .adv-mode-sub { display: none; }
+  :is(.quizrace-screen, .adventure-screen) .qr-diff-emoji, :is(.quizrace-screen, .adventure-screen) .adv-mode-icon { font-size: 1.3rem; }
+  :is(.quizrace-screen, .adventure-screen) .adv-mode-btn { flex-direction: row; gap: 8px; justify-content: center; }
+  :is(.quizrace-screen, .adventure-screen) .player-count-btn { flex-direction: row; gap: 6px; padding: 6px 12px; }
+}
+@media (max-height: 500px), (orientation: portrait) and (max-width: 820px) {
+  :is(.quizrace-screen, .adventure-screen) .setup-start-btn, :is(.quizrace-screen, .adventure-screen) .qr-start-btn { padding: 8px 32px; font-size: 1rem; }
+  :is(.quizrace-screen, .adventure-screen) .qr-read-toggle { padding: 5px 12px; }
+  :is(.quizrace-screen, .adventure-screen) .qr-diff-btn, :is(.quizrace-screen, .adventure-screen) .adv-mode-btn { flex-direction: row; justify-content: center; gap: 8px; }
+}

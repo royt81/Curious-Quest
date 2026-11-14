@@ -244,7 +244,7 @@ export default function Sidebar({ activeGame, onSelect, onHome, collapsed, onTog
             exit={{ opacity: 0, transition: { duration: 0.1 } }}
           >
             {/* while playing, only the expand button, ❓ and ⚙️ stay — the game gets the space */}
-            {!inGame && SECTIONS.flatMap((section, si) => [
+            {!inGame && <div className="sidebar-icon-games">{SECTIONS.flatMap((section, si) => [
               si > 0 && <span key={`div-${section.id}`} className="sidebar-icon-divider" aria-hidden="true" />,
               ...section.games.map(g => (
               <motion.button
@@ -260,7 +260,7 @@ export default function Sidebar({ activeGame, onSelect, onHome, collapsed, onTog
                   : g.emoji}
               </motion.button>
               )),
-            ])}
+            ])}</div>}
             <div className="sidebar-icon-settings">
               {onHelp && <HowToPlayButton onClick={onHelp} />}
               <SettingsButton />

@@ -10,6 +10,7 @@ import { makePictureQuestion } from './pictureQuestions'
 import { speak, announce, speakSteps, stopSpeaking, canSpeak } from '../../sound/speech'
 import { useT, useLang, tr, getLang } from '../../i18n'
 import useSaved, { readSaved } from '../../hooks/useSaved'
+import EndGameButton from '../../components/EndGameButton'
 
 // ─── Board constants ───────────────────────────────────────────────────────────
 const STEP_MS      = 170  // ms per tile during piece movement
@@ -1131,7 +1132,13 @@ export default function AdventureGame({ onBack }) {
         {/* ── Sidebar ── */}
         <div className="adv-sidebar">
           <div className="adv-sidebar-header">
-            <div className="adv-game-title">🗺️ {t('Adventure!')}</div>
+            <div className="adv-title-row">
+              <div className="adv-game-title">🗺️ {t('Adventure!')}</div>
+              <EndGameButton
+                disabled={animating || rolling}
+                onEnd={() => { stopSpeaking(); setChallenge(null); setPhase('setup') }}
+              />
+            </div>
             {pictureMode && canSpeak && (
               <button
                 className={`adv-voice-btn${voiceOn ? ' on' : ''}`}

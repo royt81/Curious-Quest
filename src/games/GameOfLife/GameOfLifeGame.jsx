@@ -16,6 +16,7 @@ import useSaved from '../../hooks/useSaved'
    Single-player sandbox — no opponent, just patterns to discover.
    ════════════════════════════════════════════════════════════════════════════ */
 
+const UPRIGHT_Q = '(orientation: portrait) and (max-width: 720px)'
 const ROWS = 30   // 40 × 30 (same 4:3 shape as before) so the Glider Gun (36 wide) fits
 const COLS = 40
 
@@ -233,6 +234,18 @@ export default function GameOfLifeGame({ onBack }) {
   const [stampId, setStampId] = useState(null)
   const [turns, setTurns] = useState(0)
   const [hover, setHover] = useState(null)        // [r, c] under the mouse, for the preview
+  const boardRef = useRef(null)
+  const lastCell = useRef(null)
+  // Phone held upright: show the board turned (30 wide × 40 tall) so the cells get bigger
+  const [upright, setUpright] = useState(() => typeof window !== 'undefined' && window.matchMedia(UPRIGHT_Q).matches)
+  useEffect(() => {
+    const m = window.matchMedia(UPRIGHT_Q)
+    const f = () => setUpright(m.matches)
+    m.addEventListener('change', f)
+    return () => m.removeEventListener('change', f)
+  }, [])
+  const dRows = upright ? COLS : ROWS          // rows/columns as shown on screen
+  const dCols = upright ? ROWS : COLS
   const stampShape = useMemo(() => {
     const p = PATTERNS.find(x => x.id === stampId)
     if (!p) return null
@@ -314,21 +327,35 @@ export default function GameOfLifeGame({ onBack }) {
     paintValue.current = !grid[r][c]
     toggleCell(r, c, paintValue.current)
   }
-  const handleEnter = (r, c) => {
-    if (stampShape) { setHover([r, c]); return }
-    if (running || !painting.current) return
-    toggleCell(r, c, paintValue.current)
-  }
-  const stopPaint = () => { painting.current = false }
 
-  useEffect(() => {
-    window.addEventListener('mouseup', stopPaint)
-    window.addEventListener('touchend', stopPaint)
-    return () => {
-      window.removeEventListener('mouseup', stopPaint)
-      window.removeEventListener('touchend', stopPaint)
-    }
-  }, [])
+  // One handler for mouse, finger and pen: works out which cell is under it.
+  // (Separate touch + mouse handlers made a tap switch a cell on and straight off again.)
+  const cellAt = (e) => {
+    const b = boardRef.current?.getBoundingClientRect()
+    if (!b) return null
+    const dc = Math.floor(((e.clientX - b.left) / b.width) * dCols)
+    const dr = Math.floor(((e.clientY - b.top) / b.height) * dRows)
+    if (dr < 0 || dc < 0 || dr >= dRows || dc >= dCols) return null
+    return upright ? [dc, dr] : [dr, dc]
+  }
+  const onPointerDown = (e) => {
+    const cell = cellAt(e)
+    if (!cell) return
+    e.preventDefault()
+    try { boardRef.current.setPointerCapture(e.pointerId) } catch { /* ignore */ }
+    lastCell.current = cell[0] * COLS + cell[1]
+    handleDown(cell[0], cell[1])
+  }
+  const onPointerMove = (e) => {
+    const cell = cellAt(e)
+    if (stampShape) { if (e.pointerType === 'mouse') setHover(cell); return }
+    if (!cell || running || !painting.current) return
+    const key = cell[0] * COLS + cell[1]
+    if (key === lastCell.current) return
+    lastCell.current = key
+    toggleCell(cell[0], cell[1], paintValue.current)
+  }
+  const stopPaint = () => { painting.current = false; lastCell.current = null }
 
   const reset = (newGrid) => {
     clearHistory()
@@ -372,25 +399,31 @@ export default function GameOfLifeGame({ onBack }) {
           animate={{ opacity: 1, y: 0, transition: { duration: 0.35 } }}
         >
           <div
+            ref={boardRef}
             className="gol-board"
             style={{
-              gridTemplateColumns: `repeat(${COLS}, 1fr)`,
-              gridTemplateRows: `repeat(${ROWS}, 1fr)`,
+              gridTemplateColumns: `repeat(${dCols}, 1fr)`,
+              gridTemplateRows: `repeat(${dRows}, 1fr)`,
+              aspectRatio: `${dCols} / ${dRows}`,
+              width: `min(100cqw, calc(100cqh * ${dCols / dRows}))`,
             }}
             onDragStart={(e) => e.preventDefault()}
-            onMouseLeave={() => setHover(null)}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={stopPaint}
+            onPointerCancel={stopPaint}
+            onPointerLeave={() => setHover(null)}
           >
-            {grid.map((row, r) =>
-              row.map((aliveCell, c) => (
+            {Array.from({ length: dRows * dCols }, (_, i) => {
+              const dr = Math.floor(i / dCols), dc = i % dCols
+              const r = upright ? dc : dr, c = upright ? dr : dc
+              return (
                 <div
-                  key={`${r}-${c}`}
-                  className={`gol-cell ${aliveCell ? 'alive' : ''}${preview?.has(r * COLS + c) ? ' preview' : ''}`}
-                  onMouseDown={() => handleDown(r, c)}
-                  onMouseEnter={() => handleEnter(r, c)}
-                  onTouchStart={() => handleDown(r, c)}
+                  key={i}
+                  className={`gol-cell ${grid[r][c] ? 'alive' : ''}${preview?.has(r * COLS + c) ? ' preview' : ''}`}
                 />
-              ))
-            )}
+              )
+            })}
           </div>
         </motion.div>
 

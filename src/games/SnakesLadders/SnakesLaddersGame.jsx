@@ -6,6 +6,7 @@ import { playTap, playDiceRoll, playDiceClack, playDiceSettle, playClimb, playSl
 import './SnakesLadders.css'
 import { useT, tr } from '../../i18n'
 import useSaved, { readSaved } from '../../hooks/useSaved'
+import EndGameButton from '../../components/EndGameButton'
 
 /* ════════════════════════════════════════════════════════════════════════════
    SNAKES & LADDERS — a 64-square dice climb. Pure luck, great for travel.
@@ -437,6 +438,7 @@ export default function SnakesLaddersGame({ onBack }) {
         {/* Sidebar */}
         <div className="sl-sidebar">
           <div className="sl-sidebar-title"><img src="/other-icons/snake.svg" alt="" style={{ width: '1em', height: '1em', objectFit: 'contain', display: 'inline-block', verticalAlign: '-0.15em' }} /> {t('Snakes & Ladders')}</div>
+          <EndGameButton className="sl-end" onEnd={() => setPhase('setup')} />
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={current?.pid}

@@ -886,3 +886,31 @@
   color: var(--accent);
   transition: color 0.2s;
 }
+
+/* title + "End game" on one line */
+.adv-title-row { display: flex; align-items: center; justify-content: center; gap: 8px; flex-wrap: wrap; }
+.adv-title-row .end-game-btn { padding: 3px 9px; font-size: 0.72rem; }
+
+/* ── Phones held sideways (short screens): everything in the side panel must fit,
+   so the latest message under "Roll Dice!" is never cut off ── */
+@media (max-height: 500px), (orientation: portrait) and (max-width: 820px) {
+  .adv-sidebar { gap: 5px; }
+  .adv-sidebar-header { padding: 2px 4px 5px; gap: 3px; }
+  .adv-game-title { font-size: 0.85rem; }
+  .adv-turn-info { padding: 3px 10px; font-size: 0.85rem; }
+  .adv-turn-emoji { font-size: 1rem; }
+  .adv-players { padding: 4px 8px; gap: 2px; }
+  .adv-player-row { padding: 1px 5px; }
+  /* the dice shrinks to whatever room is left */
+  .dice-area { flex: 1 1 0; min-height: 0; padding: 0; overflow: hidden; }
+  .dice-area .dice-face, .dice-area .dice-empty { width: 58px; height: 58px; }
+  .dice-area .dice-empty { font-size: 1.4rem; }
+  .draw-btn { padding: 8px 10px; font-size: 0.9rem; flex-shrink: 0; }
+  /* show the newest message (two lines at most), never cut */
+  .adventure-screen .log-box { flex: 0 0 auto; max-height: none; overflow: hidden; }
+  .adventure-screen .log-line:not(:first-child) { display: none; }
+  .adventure-screen .log-line {
+    display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+    font-size: 0.72rem; padding-bottom: 2px;
+  }
+}

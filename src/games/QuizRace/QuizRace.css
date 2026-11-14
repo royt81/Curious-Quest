@@ -588,3 +588,7 @@
   .qr-card .option-btn.opt-text { font-size: 0.85rem; padding: 6px 6px; }
   .qr-q-tag { font-size: 0.7rem; }
 }
+
+/* "End game" sits in the top corner of the question area */
+.qr-main { position: relative; }
+.qr-end { position: absolute; top: 4px; left: 8px; z-index: 3; padding: 3px 9px; font-size: 0.72rem; }

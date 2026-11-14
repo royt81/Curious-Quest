@@ -8,6 +8,7 @@ import { speakSteps, stopSpeaking, canSpeak } from '../../sound/speech'
 import { WORD_BANKS } from './quizWords'
 import { useT, tr, getLang } from '../../i18n'
 import useSaved from '../../hooks/useSaved'
+import EndGameButton from '../../components/EndGameButton'
 
 const TRACK_LENGTH = 10 // spaces from start (0) to finish (10)
 
@@ -699,6 +700,7 @@ export default function QuizRaceGame({ onBack }) {
 
       {/* ── Question area (centre) ── */}
       <div className="qr-main">
+        <EndGameButton className="qr-end" onEnd={() => setPhase('setup')} />
         <div className={`quest-feedback ${feedback.tone}`}>{feedback.text}</div>
         <div className="quest-card qr-card">
           <div className="qr-q-tag">{task.family === 'letter' ? '🔤 ' + t('Letter') : task.family === 'meaning' ? '📖 ' + t('Word') : '🔢 ' + t('Number')}</div>

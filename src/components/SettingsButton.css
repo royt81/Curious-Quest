@@ -215,3 +215,16 @@
 }
 .settings-colour-preset span { font-size: 1.3rem; }
 .settings-colour-preset.active { border-color: var(--accent); background: var(--accent-soft); }
+
+/* Screen direction (phones and tablets) */
+.settings-rotate { display: flex; flex-direction: column; gap: 6px; margin: 4px 0 8px; }
+.settings-rotate-label { font-size: 0.9rem; color: var(--text-dim); }
+.settings-rotate-hint { color: var(--text-dim); font-size: 0.8rem; }
+.settings-phone {
+  display: inline-block;
+  border: 2.5px solid currentColor;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+.settings-phone.up   { width: 13px; height: 21px; }
+.settings-phone.side { width: 21px; height: 13px; margin: 4px 0; }

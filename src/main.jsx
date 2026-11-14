@@ -16,6 +16,7 @@ import './index.css'
 import App from './App.jsx'
 import './responsive.css'
 import { ThemeProvider } from './context/ThemeContext.jsx'
+import { initOrientation } from './orientation'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -24,6 +25,9 @@ createRoot(document.getElementById('root')).render(
     </ThemeProvider>
   </StrictMode>,
 )
+
+// Screen direction chosen in Settings (phones and tablets)
+initOrientation()
 
 // Installable app + offline play (production builds only)
 if ('serviceWorker' in navigator && import.meta.env.PROD) {

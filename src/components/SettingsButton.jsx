@@ -10,6 +10,7 @@ import { useTheme } from '../context/ThemeContext'
 import { THEME_LIST } from '../data/themes'
 import ThemeIcon from './ThemeIcon'
 import { LANGUAGES, useT, useLang, setLang } from '../i18n'
+import { canRotate, applyOrientation } from '../orientation'
 import './SettingsButton.css'
 
 // Full screen works on desktop, Android and iPad — not on iPhone Safari,
@@ -34,6 +35,7 @@ export default function SettingsButton() {
   const [soundOn, setSoundOn] = useState(!isMuted())
   const [vol, setVol] = useState(getVolume())
   const [isFull, setIsFull] = useState(false)
+  const [rotateFailed, setRotateFailed] = useState(false)
   const [musicOn, setMusicOnState] = useState(isMusicOn())
   const [musicVol, setMusicVol] = useState(getMusicVolume())
   const [voicePrefs, setVoicePrefsState] = useState(getVoicePrefs)
@@ -250,6 +252,30 @@ export default function SettingsButton() {
               <h4>🖥️ {t('Screen')}</h4>
               {canFullscreen && (
                 <Switch on={isFull} onClick={toggleFullscreen} label={t('Full screen')} hint={t('Great on a tablet')} />
+              )}
+              {canRotate && (
+                <div className="settings-rotate">
+                  <span className="settings-rotate-label">{t('Screen direction')}</span>
+                  <div className="settings-colour-presets">
+                    {[
+                      { v: 'auto',      icon: '🔄', label: 'Turns with phone' },
+                      { v: 'portrait',  label: 'Always upright', phone: 'up' },
+                      { v: 'landscape', label: 'Always sideways', phone: 'side' },
+                    ].map(o => (
+                      <button
+                        key={o.v}
+                        className={`settings-colour-preset${(settings.orientation || 'auto') === o.v ? ' active' : ''}`}
+                        onClick={() => {
+                          setSetting('orientation', o.v)
+                          applyOrientation(o.v).then(ok => setRotateFailed(!ok))
+                        }}
+                      >
+                        <span>{o.phone ? <i className={`settings-phone ${o.phone}`} aria-hidden="true" /> : o.icon}</span>{t(o.label)}
+                      </button>
+                    ))}
+                  </div>
+                  {rotateFailed && <small className="settings-rotate-hint">{t("This device doesn't allow it here — try it in the installed app.")}</small>}
+                </div>
               )}
               <Switch
                 on={settings.screensaver}
