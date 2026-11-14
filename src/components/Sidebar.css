@@ -354,3 +354,34 @@
   cursor: pointer;
 }
 .sb-colour-cycle:hover { background: var(--surface-1); }
+
+/* ── Game groups ── */
+/* 15 games + group names: slightly tighter rows so it all fits on a laptop */
+.sidebar-nav .sidebar-item { padding: 7px 12px; }
+.sidebar-nav .sidebar-section { margin-bottom: 2px; }
+.sidebar-nav .sidebar-section-label { padding: 8px 6px 2px; }
+.sidebar-nav .sidebar-section:first-child .sidebar-section-label { padding-top: 0; }
+/* collapsed sidebar: a thin line between the groups */
+.sidebar-icon-divider {
+  display: block;
+  width: 24px;
+  height: 1px;
+  margin: 3px auto;
+  background: var(--border-soft, rgba(255, 255, 255, 0.15));
+  flex-shrink: 0;
+}
+/* soft fade at the bottom so it's visible that the list continues */
+.sidebar:not(.collapsed) .sidebar-nav {
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
+          mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
+  padding-bottom: 20px;
+}
+
+/* ── While playing: a slim, see-through strip (expand button + ❓ + ⚙️ only) ── */
+.sidebar.collapsed.in-game {
+  background: transparent;
+  border-right: none;
+  backdrop-filter: none;
+}
+.sidebar.collapsed.in-game .sidebar-icons { justify-content: flex-end; }
+.sidebar.collapsed.in-game .sidebar-toggle { right: 8px; }

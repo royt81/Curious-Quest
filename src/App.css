@@ -22,6 +22,7 @@
 :has(.sidebar.collapsed) .app-main {
   margin-left: 56px;
 }
+:has(.sidebar.collapsed.in-game) .app-main { margin-left: 44px; }
 
 /* Screensaver: fade out sidebar + main, leaving only the animated background.
    Any mouse/keyboard/touch activity wakes it (handled in App.jsx). */
@@ -40,5 +41,6 @@
 @media (max-width: 899px) {
   .app-main,
   :has(.sidebar.collapsed) .app-main { margin-left: 56px; }
+  :has(.sidebar.collapsed.in-game) .app-main { margin-left: 44px; }
   .sidebar:not(.collapsed) { box-shadow: 8px 0 30px rgba(0,0,0,0.5); }
 }

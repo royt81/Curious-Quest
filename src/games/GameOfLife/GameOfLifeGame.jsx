@@ -4,6 +4,7 @@ import { useTheme } from '../../context/ThemeContext'
 import { playTap } from '../../sound/sfx'
 import './GameOfLife.css'
 import { useT, tr } from '../../i18n'
+import useSaved from '../../hooks/useSaved'
 
 /* ════════════════════════════════════════════════════════════════════════════
    CONWAY'S GAME OF LIFE — the famous "no-player" cellular automaton.
@@ -210,10 +211,10 @@ function stampPattern(cells) {
 export default function GameOfLifeGame({ onBack }) {
   const t = useT()
   const { theme } = useTheme()
-  const [grid, setGrid] = useState(() => stampPattern(PATTERNS[0].cells))
+  const [grid, setGrid] = useSaved('life', 'grid', () => stampPattern(PATTERNS[0].cells))
   const [running, setRunning] = useState(false)
-  const [gen, setGen] = useState(0)
-  const [speedId, setSpeedId] = useState('normal')
+  const [gen, setGen] = useSaved('life', 'gen', 0)
+  const [speedId, setSpeedId] = useSaved('life', 'speedId', 'normal')
   const [showRules, setShowRules] = useState(false)
   const [endMsg, setEndMsg] = useState(null)
 

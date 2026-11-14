@@ -7,6 +7,7 @@ import { playCorrect, playWrong, playWin } from '../../sound/sfx'
 import { speakSteps, stopSpeaking, canSpeak } from '../../sound/speech'
 import { WORD_BANKS } from './quizWords'
 import { useT, tr, getLang } from '../../i18n'
+import useSaved from '../../hooks/useSaved'
 
 const TRACK_LENGTH = 10 // spaces from start (0) to finish (10)
 
@@ -350,19 +351,19 @@ export default function QuizRaceGame({ onBack }) {
   const { theme } = useTheme()
 
   // ── setup choices ──
-  const [phase, setPhase] = useState('setup') // 'setup' | 'playing' | 'gameover'
-  const [diffId, setDiffId] = useState('easy')
-  const [mode, setMode] = useState('cpu') // 'cpu' | 'hotseat'
+  const [phase, setPhase] = useSaved('quiz', 'phase', 'setup') // 'setup' | 'playing' | 'gameover'
+  const [diffId, setDiffId] = useSaved('quiz', 'diffId', 'easy')
+  const [mode, setMode] = useSaved('quiz', 'mode', 'cpu') // 'cpu' | 'hotseat'
   const playerCount = 2 // hot-seat is always 2 players
 
   // ── live game state ──
-  const [players, setPlayers] = useState([])
-  const [positions, setPositions] = useState([])
-  const [currentIdx, setCurrentIdx] = useState(0)
-  const [task, setTask] = useState(null)
+  const [players, setPlayers] = useSaved('quiz', 'players', [])
+  const [positions, setPositions] = useSaved('quiz', 'positions', [])
+  const [currentIdx, setCurrentIdx] = useSaved('quiz', 'currentIdx', 0)
+  const [task, setTask] = useSaved('quiz', 'task', null)
   const [picked, setPicked] = useState(null)
   const [locked, setLocked] = useState(false)
-  const [finishOrder, setFinishOrder] = useState([])
+  const [finishOrder, setFinishOrder] = useSaved('quiz', 'finishOrder', [])
   const [feedback, setFeedback] = useState({ text: '', tone: 'try' })
   const [cpuThinking, setCpuThinking] = useState(false)
   // read-aloud: remembered setting + which part is being read (-1 = question)

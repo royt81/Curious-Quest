@@ -5,6 +5,7 @@ import RacerAvatar from '../../components/RacerAvatar'
 import { playTap, playDiceRoll, playDiceClack, playDiceSettle, playClimb, playSlide, playWin } from '../../sound/sfx'
 import './SnakesLadders.css'
 import { useT, tr } from '../../i18n'
+import useSaved, { readSaved } from '../../hooks/useSaved'
 
 /* ════════════════════════════════════════════════════════════════════════════
    SNAKES & LADDERS — a 64-square dice climb. Pure luck, great for travel.
@@ -74,19 +75,19 @@ export default function SnakesLaddersGame({ onBack }) {
   const t = useT()
   const { theme } = useTheme()
 
-  const [phase, setPhase] = useState('setup')   // 'setup' | 'playing' | 'gameover'
-  const [mode, setMode] = useState('friends')   // 'friends' | 'cpu'
-  const [playerCount, setPlayerCount] = useState(2)
+  const [phase, setPhase] = useSaved('snakes', 'phase', 'setup')   // 'setup' | 'playing' | 'gameover'
+  const [mode, setMode] = useSaved('snakes', 'mode', 'friends')   // 'friends' | 'cpu'
+  const [playerCount, setPlayerCount] = useSaved('snakes', 'playerCount', 2)
 
-  const [players, setPlayers] = useState([])
-  const [positions, setPositions] = useState([])
-  const [displayPos, setDisplayPos] = useState([])
-  const [currentPlayer, setCurrentPlayer] = useState(0)
-  const [diceValue, setDiceValue] = useState(null)
+  const [players, setPlayers] = useSaved('snakes', 'players', [])
+  const [positions, setPositions] = useSaved('snakes', 'positions', [])
+  const [displayPos, setDisplayPos] = useState(() => readSaved('snakes', 'positions') ?? [])
+  const [currentPlayer, setCurrentPlayer] = useSaved('snakes', 'currentPlayer', 0)
+  const [diceValue, setDiceValue] = useSaved('snakes', 'diceValue', null)
   const [rolling, setRolling] = useState(false)
   const [animating, setAnimating] = useState(false)
-  const [winner, setWinner] = useState(null)
-  const [log, setLog] = useState([])
+  const [winner, setWinner] = useSaved('snakes', 'winner', null)
+  const [log, setLog] = useSaved('snakes', 'log', [])
 
   const rollTimer = useRef(null)
   const moveTimer = useRef(null)

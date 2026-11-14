@@ -54,11 +54,13 @@
 /* ── workspace: tools | stage, options underneath ── */
 .draw-work {
   flex: 1; min-height: 0;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-rows: 1fr auto;
-  grid-template-areas: "tools stage" "tools options";
-  gap: 10px;
+  width: 100%;
+  /* sideways screens: tools | upright page | colours, as one centred row —
+     the page takes the full height and is as wide as that allows */
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
+  gap: 12px;
 }
 .draw-tools {
   grid-area: tools;
@@ -89,13 +91,16 @@
 .draw-stage-wrap {
   grid-area: stage;
   min-width: 0; min-height: 0;
+  height: 100%;
+  aspect-ratio: 3 / 4;
+  flex: 0 1 auto;
   container-type: size;
   display: flex; align-items: center; justify-content: center;
 }
 .draw-stage {
   position: relative;
-  width: min(100cqw, calc(100cqh * 4 / 3));
-  aspect-ratio: 4 / 3;
+  width: min(100cqw, calc(100cqh * 3 / 4));
+  aspect-ratio: 3 / 4;
   border-radius: var(--r-lg);
   overflow: hidden;
   box-shadow: 0 10px 30px rgba(0,0,0,0.45), 0 0 0 6px rgba(255,255,255,0.85);
@@ -117,14 +122,17 @@
 
 .draw-options {
   grid-area: options;
-  display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
-  gap: 10px 16px;
-  padding: 8px 12px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 14px;
+  padding: 10px;
+  overflow-y: auto;
   background: var(--surface-0);
   border: 1px solid var(--border-soft);
   border-radius: var(--r-lg);
 }
-.draw-palette, .draw-stickers { display: flex; flex-wrap: wrap; justify-content: center; gap: 7px; }
+.draw-palette, .draw-stickers { display: grid; grid-template-columns: repeat(4, auto); justify-content: center; gap: 8px; }
+.draw-stickers { grid-template-columns: repeat(3, auto); }
+.draw-sizes { flex-wrap: wrap; justify-content: center; }
 .draw-swatch {
   width: 38px; height: 38px;
   border-radius: 50%;
@@ -161,11 +169,16 @@
 /* ── phones / portrait tablets: tools across the top ── */
 @media (orientation: portrait) and (max-width: 1024px), (max-width: 700px) {
   .draw-work {
+    display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto minmax(0, 1fr) auto;
     grid-template-areas: "tools" "stage" "options";
     gap: 8px;
   }
+  .draw-stage-wrap { height: auto; aspect-ratio: auto; }
+  /* upright: colours in a strip under the page again */
+  .draw-options { flex-direction: row; flex-wrap: wrap; gap: 8px 14px; padding: 6px 10px; overflow: visible; }
+  .draw-palette, .draw-stickers { display: flex; flex-wrap: wrap; gap: 6px; }
   .draw-tools { flex-direction: row; overflow-x: auto; overflow-y: hidden; padding: 6px; justify-content: center; }
   .draw-tool { width: 58px; padding: 5px 2px; flex-shrink: 0; }
   .draw-tool-icon { font-size: 1.4rem; }
@@ -275,4 +288,23 @@
 @media (orientation: portrait) and (max-width: 1024px), (max-width: 700px) {
   .draw-picker-grid { grid-template-rows: none; grid-auto-rows: auto; align-content: center; }
   .draw-page-card { aspect-ratio: 1 / 1; max-height: 100%; }
+}
+
+/* ── phones held sideways: slim tools and colours so the page gets the height ── */
+@media (max-height: 500px) and (orientation: landscape) {
+  .draw-screen { gap: 4px; }
+  .draw-screen .game-header h2 { display: none; }
+  .draw-work { gap: 6px; }
+  .draw-tools { padding: 4px; gap: 3px; }
+  .draw-tool { width: 44px; padding: 4px 0; }
+  .draw-tool-label { display: none; }
+  .draw-tool-icon { font-size: 1.25rem; }
+  .draw-tools-sep { margin: 2px 0; }
+  .draw-options { padding: 6px; gap: 8px; }
+  .draw-palette { grid-template-columns: repeat(4, auto); gap: 5px; }
+  .draw-swatch { width: 26px; height: 26px; border-width: 2px; }
+  .draw-size, .draw-sticker { width: 36px; height: 36px; }
+  .draw-sticker { font-size: 1.2rem; }
+  .draw-sticker img { width: 26px; height: 26px; }
+  .draw-save-btn { padding: 6px 10px; font-size: 0.8rem; }
 }

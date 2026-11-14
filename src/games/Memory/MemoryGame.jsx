@@ -5,6 +5,8 @@ import { WORLD_PICTURES, worldPictures } from '../../data/pictures'
 import './Memory.css'
 import { playCard, playMatch, playWin } from '../../sound/sfx'
 import { useT } from '../../i18n'
+import useFitGrid from '../../hooks/useFitGrid'
+import useSaved from '../../hooks/useSaved'
 
 // ── Board sizes ───────────────────────────────────────────────────────────────
 const BOARD_SIZES = {
@@ -174,12 +176,12 @@ function starsFor(moves, pairs) {
 export default function MemoryGame({ onBack }) {
   const t = useT()
   const { themeId } = useTheme()
-  const [size, setSize]       = useState(DEFAULT_SIZE)
-  const [boardThemeId, setBoardThemeId] = useState(themeId) // frozen at game start
-  const [cards, setCards]     = useState([])
+  const [size, setSize]       = useSaved('memory', 'size', DEFAULT_SIZE)
+  const [boardThemeId, setBoardThemeId] = useSaved('memory', 'boardThemeId', themeId) // frozen at game start
+  const [cards, setCards]     = useSaved('memory', 'cards', [])
   const [flipped, setFlipped] = useState([])
-  const [matched, setMatched] = useState([])
-  const [moves, setMoves]     = useState(0)
+  const [matched, setMatched] = useSaved('memory', 'matched', [])
+  const [moves, setMoves]     = useSaved('memory', 'moves', 0)
   const [locked, setLocked]   = useState(false)
 
   const cfg = BOARD_SIZES[size] || BOARD_SIZES[DEFAULT_SIZE]
@@ -208,7 +210,13 @@ export default function MemoryGame({ onBack }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [size])
 
-  useEffect(() => { initGame() }, [initGame])
+  // A saved game for this board size is continued; otherwise deal a new one
+  // (also after switching between 16 and 24 cards)
+  const deckFitsSize = cards.length === (BOARD_SIZES[size] || BOARD_SIZES[DEFAULT_SIZE]).pairs * 2
+  useEffect(() => {
+    if (deckFitsSize) return
+    initGame()
+  }, [initGame]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const totalPairs = cfg.pairs
   const pairsFound = matched.length / 2
@@ -244,6 +252,9 @@ export default function MemoryGame({ onBack }) {
   }
 
   const stars = starsFor(moves, totalPairs)
+
+  // cards as big as the screen allows (6×4, 4×6, 8×3 … whichever fits best)
+  const [areaRef, fit] = useFitGrid(cards.length || 16, { gap: 8 })
 
   return (
     <div className="memory-screen screen">
@@ -288,9 +299,10 @@ export default function MemoryGame({ onBack }) {
         </div>
       ) : (
         <div className="memory-play">
+          <div className="memory-area" ref={areaRef}>
           <div
             className={`memory-grid memory-grid-${size}`}
-            style={{ gridTemplateColumns: `repeat(${cfg.cols}, 1fr)` }}
+            style={{ gridTemplateColumns: `repeat(${fit.cols}, ${fit.cell}px)`, '--cell': `${fit.cell}px` }}
           >
             {cards.map((card, idx) => {
               const isUp      = flipped.includes(idx) || matched.includes(idx)
@@ -314,6 +326,7 @@ export default function MemoryGame({ onBack }) {
                 </button>
               )
             })}
+          </div>
           </div>
 
           <div className="turn-banner">

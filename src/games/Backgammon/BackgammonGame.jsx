@@ -5,6 +5,7 @@ import { themePieces } from '../../data/pieces'
 import './Backgammon.css'
 import { playMove, playCapture, playWin, playDiceRoll, playDiceSettle } from '../../sound/sfx'
 import { useT, tr } from '../../i18n'
+import useSaved from '../../hooks/useSaved'
 
 /* ════════════════════════════════════════════════════════════════════════════
    BACKGAMMON — human (HUMAN, positive checkers) vs computer (COMP, negative).
@@ -311,17 +312,17 @@ export default function BackgammonGame({ onBack }) {
   const t = useT()
   const { theme } = useTheme()
 
-  const [state, setState] = useState(() => ({
+  const [state, setState] = useSaved('backgammon', 'state', () => ({
     points: startingPoints(), barH: 0, barC: 0, offH: 0, offC: 0,
   }))
-  const [dice, setDice] = useState([])        // remaining usable die values
-  const [allDice, setAllDice] = useState([])  // full roll (for display)
-  const [turn, setTurn] = useState(HUMAN)
-  const [rolled, setRolled] = useState(false)
+  const [dice, setDice] = useSaved('backgammon', 'dice', [])        // remaining usable die values
+  const [allDice, setAllDice] = useSaved('backgammon', 'allDice', [])  // full roll (for display)
+  const [turn, setTurn] = useSaved('backgammon', 'turn', HUMAN)
+  const [rolled, setRolled] = useSaved('backgammon', 'rolled', false)
   const [selected, setSelected] = useState(null) // source index or 'bar'
-  const [gameOver, setGameOver] = useState(false)
-  const [winner, setWinner] = useState(null)
-  const [log, setLog] = useState(() => [tr('Roll the dice to begin!')])
+  const [gameOver, setGameOver] = useSaved('backgammon', 'gameOver', false)
+  const [winner, setWinner] = useSaved('backgammon', 'winner', null)
+  const [log, setLog] = useSaved('backgammon', 'log', () => [tr('Roll the dice to begin!')])
   const [aiThinking, setAiThinking] = useState(false)
 
   const stateRef = useRef({})

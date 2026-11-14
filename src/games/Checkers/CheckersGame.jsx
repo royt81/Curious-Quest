@@ -5,6 +5,7 @@ import { themePieces } from '../../data/pieces'
 import './Checkers.css'
 import { playMove, playCapture, playWin } from '../../sound/sfx'
 import { useT } from '../../i18n'
+import useSaved from '../../hooks/useSaved'
 
 // ─── constants ───────────────────────────────────────────────────────────────
 const SIZE = 8
@@ -102,17 +103,17 @@ export default function CheckersGame({ onBack }) {
   const pieces = themePieces(theme)
   const E1 = pieces.human.emoji, E2 = pieces.comp.emoji
 
-  const [phase,    setPhase]    = useState('setup')   // 'setup' | 'playing'
-  const [mode,     setMode]     = useState('cpu')      // 'cpu' | 'friends'
+  const [phase,    setPhase]    = useSaved('checkers', 'phase', 'setup')   // 'setup' | 'playing'
+  const [mode,     setMode]     = useSaved('checkers', 'mode', 'cpu')      // 'cpu' | 'friends'
 
-  const [board,    setBoard]    = useState(makeInitialBoard)
-  const [turn,     setTurn]     = useState(HUMAN)
+  const [board,    setBoard]    = useSaved('checkers', 'board', makeInitialBoard)
+  const [turn,     setTurn]     = useSaved('checkers', 'turn', HUMAN)
   const [selected, setSelected] = useState(null)
-  const [chainCell, setChainCell] = useState(null)
-  const [gameOver, setGameOver] = useState(false)
-  const [winner,   setWinner]   = useState(null)
+  const [chainCell, setChainCell] = useSaved('checkers', 'chainCell', null)
+  const [gameOver, setGameOver] = useSaved('checkers', 'gameOver', false)
+  const [winner,   setWinner]   = useSaved('checkers', 'winner', null)
   const [aiThinking, setAiThinking] = useState(false)
-  const [log,      setLog]      = useState([])
+  const [log,      setLog]      = useSaved('checkers', 'log', [])
 
   const aiTimer = useRef(null)
   const stateRef = useRef({})

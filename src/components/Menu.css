@@ -182,3 +182,34 @@
 @media (max-width: 520px) {
   .menu-world { white-space: normal; -webkit-text-stroke-width: 5px; }
 }
+
+/* ── Game groups (Learn, Puzzles, …) ──
+   Groups flow next to each other, so small groups (Learn, Create) share a row
+   with others instead of each taking a whole row. */
+.menu-groups {
+  width: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 8px 36px;
+}
+.menu-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  max-width: 100%;
+}
+.menu-group-title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--text-dim);
+  padding: 4px 16px;
+  border-radius: 999px;
+  background: rgba(10, 16, 28, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}

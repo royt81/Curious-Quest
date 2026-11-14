@@ -9,39 +9,55 @@ function rect(x0, y0, cols, rows, z) {
   return out
 }
 
-// Small, kid-friendly layouts. Every layout has an even number of tiles.
+// Rows of different widths, centred (for diamond shapes). widths in tiles.
+// Rows of different widths (in tiles), centred on the widest row maxW.
+// A tile is 2 half-units wide, so centring offsets a row by (maxW - w) half-units.
+function rows(widths, z, y0 = 0, maxW = Math.max(...widths)) {
+  return widths.flatMap((w, r) => rect(maxW - w, y0 + r * 2, w, 1, z))
+}
+
+// Small, kid-friendly layouts — several pile shapes per level, so a new round
+// can look different. Every shape has an even number of tiles.
 export const LAYOUTS = {
   easy: {
     label: 'Easy', icon: '🐣',
-    // pyramid 6×4 → 4×2 → 2, plus one "wing" tile on each side = 36 tiles
-    positions: [
-      ...rect(0, 0, 6, 4, 0),
-      ...rect(2, 2, 4, 2, 1),
-      ...rect(4, 3, 2, 1, 2),
-      { x: -2, y: 3, z: 0 }, { x: 12, y: 3, z: 0 },
+    shapes: [
+      // pyramid 6×4 → 4×2 → 2, plus one "wing" tile on each side = 36
+      [...rect(0, 0, 6, 4, 0), ...rect(2, 2, 4, 2, 1), ...rect(4, 3, 2, 1, 2),
+        { x: -2, y: 3, z: 0 }, { x: 12, y: 3, z: 0 }],
+      // flower: a cross with a little hill in the middle = 30
+      [...rect(4, 0, 3, 1, 0), ...rect(0, 2, 6, 2, 0), ...rect(4, 6, 3, 1, 0),
+        ...rect(2, 2, 4, 2, 1), ...rect(4, 3, 2, 1, 2), { x: -2, y: 3, z: 0 }, { x: 12, y: 3, z: 0 }],
+      // two towers with a bridge = 30
+      [...rect(0, 0, 3, 3, 0), ...rect(8, 0, 3, 3, 0), ...rect(1, 1, 2, 2, 1), ...rect(9, 1, 2, 2, 1),
+        { x: 2, y: 2, z: 2 }, { x: 10, y: 2, z: 2 }, { x: 6, y: 1, z: 0 }, { x: 6, y: 3, z: 0 }],
     ],
   },
   medium: {
     label: 'Medium', icon: '🦊',
-    // 8×4 → 6×2 → 4, plus wings = 50 tiles
-    positions: [
-      ...rect(0, 0, 8, 4, 0),
-      ...rect(2, 2, 6, 2, 1),
-      ...rect(4, 3, 4, 1, 2),
-      { x: -2, y: 3, z: 0 }, { x: 16, y: 3, z: 0 },
+    shapes: [
+      // 8×4 → 6×2 → 4, plus wings = 50
+      [...rect(0, 0, 8, 4, 0), ...rect(2, 2, 6, 2, 1), ...rect(4, 3, 4, 1, 2),
+        { x: -2, y: 3, z: 0 }, { x: 16, y: 3, z: 0 }],
+      // diamond = 50
+      [...rows([2, 4, 6, 8, 6, 4, 2], 0), ...rows([2, 4, 6, 4, 2], 1, 2, 8)],
+      // wide steps = 50
+      [...rect(0, 0, 10, 3, 0), ...rect(2, 1, 8, 1, 1), ...rect(2, 3, 8, 1, 1), ...rect(6, 2, 4, 1, 2)],
     ],
   },
   hard: {
     label: 'Hard', icon: '🐉',
     // dealt at random: like real Mahjong, a game can end with no way out
     random: true,
-    // 8×6 → 6×4 → 4×2 → 2, plus wings = 84 tiles
-    positions: [
-      ...rect(0, 0, 8, 6, 0),
-      ...rect(2, 2, 6, 4, 1),
-      ...rect(4, 4, 4, 2, 2),
-      ...rect(6, 5, 2, 1, 3),
-      { x: -2, y: 5, z: 0 }, { x: 16, y: 5, z: 0 },
+    shapes: [
+      // 8×6 → 6×4 → 4×2 → 2, plus wings = 84
+      [...rect(0, 0, 8, 6, 0), ...rect(2, 2, 6, 4, 1), ...rect(4, 4, 4, 2, 2), ...rect(6, 5, 2, 1, 3),
+        { x: -2, y: 5, z: 0 }, { x: 16, y: 5, z: 0 }],
+      // big diamond, three layers = 76
+      [...rows([2, 4, 6, 8, 10, 8, 6, 4, 2], 0), ...rows([2, 4, 6, 4, 2], 1, 4, 10),
+        ...rows([2, 4, 2], 2, 6, 10)],
+      // fortress = 90
+      [...rect(0, 0, 9, 6, 0), ...rect(1, 1, 7, 4, 1), ...rect(5, 3, 3, 2, 2), ...rect(6, 4, 2, 1, 3)],
     ],
   },
 }
@@ -119,9 +135,16 @@ function evenlyFromSuits(pictures) {
   return out
 }
 
-// Builds a new board: [{ id, x, y, z, pic, removed }]
-export function newBoard(layoutId, pictures) {
-  const positions = LAYOUTS[layoutId].positions
+// Builds a new board: { shape, pictures, tiles: [{ id, x, y, z, pic, removed }] }
+// Picks one of the level's pile shapes — a different one than `lastShape`.
+// `upright`: the screen is taller than wide, so the pile is turned on its side
+// (x and y swapped) to give the tiles more room. The deal is made after turning,
+// so Easy/Medium stay fully solvable.
+export function newBoard(layoutId, pictures, lastShape = -1, upright = false) {
+  const { shapes } = LAYOUTS[layoutId]
+  let shape = Math.floor(Math.random() * shapes.length)
+  if (shapes.length > 1 && shape === lastShape) shape = (shape + 1 + Math.floor(Math.random() * (shapes.length - 1))) % shapes.length
+  const positions = upright ? shapes[shape].map(p => ({ x: p.y, y: p.x, z: p.z })) : shapes[shape]
   const pairs = positions.length / 2
   // one picture per pair when there are enough, otherwise pictures repeat
   let picks = evenlyFromSuits(pictures)
@@ -129,6 +152,8 @@ export function newBoard(layoutId, pictures) {
   const pairPictures = shuffle(picks.slice(0, pairs).map((_, i) => i))
   const assigned = deal(positions, pairPictures, !!LAYOUTS[layoutId].random)
   return {
+    shape,
+    upright,
     pictures: picks.slice(0, pairs),
     tiles: positions.map((p, i) => ({ id: i, ...p, pic: assigned[i], removed: false })),
   }

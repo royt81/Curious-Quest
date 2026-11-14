@@ -19,6 +19,11 @@ export default {
   'Expand': 'Aufklappen',
   'Collapse': 'Zuklappen',
   'Game Box': 'Spielekiste',
+  'Learn': 'Lernen',
+  'Puzzles': 'Knobeln',
+  'Board games': 'Brettspiele',
+  'Board & card games': 'Brett- & Kartenspiele',
+  'Create': 'Kreativ',
   'About · Privacy · Impressum': 'Über · Datenschutz · Impressum',
   'How to play': 'Spielregeln',
   'How to play {game}': 'So spielt man {game}',
@@ -54,7 +59,7 @@ export default {
   'Game of Life': 'Spiel des Lebens',
   'Tap cells to make patterns, press play, and watch them grow and change!': 'Tippe Zellen an, drück auf Start und sieh zu, wie sie wachsen und sich verändern!',
   'Snakes & Ladders': 'Schlangen & Leitern',
-  'Climb the ladders, dodge the snakes, and race to square 100!': 'Kletter die Leitern hoch, weich den Schlangen aus und renne ins Ziel!',
+  'Climb the ladders, dodge the snakes, and race to the top square!': 'Kletter die Leitern hoch, weich den Schlangen aus und renne ins Ziel!',
 
   // ── Settings ────────────────────────────────────────────────────────────────
   'Settings': 'Einstellungen',

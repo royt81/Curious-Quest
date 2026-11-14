@@ -9,11 +9,11 @@ automatically — no new app upload is needed for game changes.
 **App name** (max 30): `Curious Quest – Kids Games`
 
 **Short description** (max 80):
-`15 free learning games for kids. No ads, no purchases, no data collected.`
+`12 free learning games for kids. No ads, no purchases, no data collected.`
 
 **Full description:**
 
-Curious Quest is a free collection of 15 games for curious kids aged about 4 to 10 — made by a dad for his child.
+Curious Quest is a free collection of 12 games for curious kids aged about 4 to 10 — made by a dad for his child.
 
 Explore five colourful worlds with Fox, the explorer: Animal Kingdom, Dinosaurs, Space, Robots and Under the Sea. Every game changes its look, characters and music to match the world you pick.
 
@@ -23,8 +23,8 @@ Explore five colourful worlds with Fox, the explorer: Animal Kingdom, Dinosaurs,
 🧱 Calm Blocks – turn and stack falling blocks, nice and slow
 🏁 Quiz Race – numbers and letters, with a reading voice for children who can't read yet
 🎨 Draw & Paint – free drawing and 20 colouring pages
-🐍 Snakes & Ladders and Race
-♟️ Chess, Checkers, Backgammon, Domino, Colour Clash, Dots & Boxes
+🐍 Snakes & Ladders
+♟️ Chess, Checkers, Backgammon, Colour Clash
 🔬 Game of Life
 
 In English and German (Deutsch).
@@ -51,11 +51,11 @@ Add it in Play Console under *Store presence → Main store listing → Manage t
 **App name** (max 30): `Curious Quest – Kinderspiele`
 
 **Short description** (max 80):
-`15 kostenlose Lernspiele für Kinder. Ohne Werbung, ohne Käufe, ohne Daten.`
+`12 kostenlose Lernspiele für Kinder. Ohne Werbung, ohne Käufe, ohne Daten.`
 
 **Full description:**
 
-Curious Quest ist eine kostenlose Sammlung von 15 Spielen für neugierige Kinder von etwa 4 bis 10 Jahren – gemacht von einem Papa für sein Kind.
+Curious Quest ist eine kostenlose Sammlung von 12 Spielen für neugierige Kinder von etwa 4 bis 10 Jahren – gemacht von einem Papa für sein Kind.
 
 Entdecke mit dem Fuchs fünf bunte Welten: Tierreich, Dinosaurier, Weltraum, Roboter und Unterwasserreich. Jedes Spiel passt Aussehen, Figuren und Musik an die gewählte Welt an.
 
@@ -65,8 +65,8 @@ Entdecke mit dem Fuchs fünf bunte Welten: Tierreich, Dinosaurier, Weltraum, Rob
 🧱 Bauklötze – fallende Klötze drehen und stapeln, ganz gemütlich
 🏁 Quiz-Rennen – Zahlen und Buchstaben, mit Vorlesestimme für Kinder, die noch nicht lesen können
 🎨 Malen & Zeichnen – freies Malen und 20 Ausmalbilder
-🐍 Schlangen & Leitern und Wettrennen
-♟️ Schach, Dame, Backgammon, Domino, Farben-Duell, Käsekästchen
+🐍 Schlangen & Leitern
+♟️ Schach, Dame, Backgammon, Farben-Duell
 🔬 Spiel des Lebens
 
 Auf Deutsch und Englisch.

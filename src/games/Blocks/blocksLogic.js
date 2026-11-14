@@ -1,41 +1,42 @@
 // Calm Blocks — falling-block puzzle logic (no React here, easy to test).
 // The board is a grid of rows; each cell is null or a colour index.
 
+// The 7 classic four-block shapes
+const FOUR_BLOCK_SHAPES = [
+  [[1, 1, 1, 1]],
+  [[1, 1], [1, 1]],
+  [[1, 1, 1], [0, 1, 0]],
+  [[0, 1, 1], [1, 1, 0]],
+  [[1, 1, 0], [0, 1, 1]],
+  [[1, 0, 0], [1, 1, 1]],
+  [[0, 0, 1], [1, 1, 1]],
+]
+
 export const LEVELS = {
   easy: {
     label: 'Easy', icon: '🐣',
-    cols: 8, rows: 14,
-    fallMs: 1200,          // slow and steady
-    // small, friendly shapes
-    shapes: [
-      [[1]],
-      [[1, 1]],
-      [[1, 1, 1]],
-      [[1, 0], [1, 1]],
-      [[1, 1], [1, 1]],
-    ],
+    cols: 9, rows: 15,
+    fallMs: 1100,           // slow and steady, never speeds up
+    speedUp: null,
+    // the classic shapes plus two friendly small ones (a 3-in-a-row and a corner)
+    shapes: [...FOUR_BLOCK_SHAPES, [[1, 1, 1]], [[1, 0], [1, 1]]],
   },
   classic: {
     label: 'Classic', icon: '🦊',
-    cols: 10, rows: 16,
-    fallMs: 950,
-    // the 7 classic four-block shapes
-    shapes: [
-      [[1, 1, 1, 1]],
-      [[1, 1], [1, 1]],
-      [[1, 1, 1], [0, 1, 0]],
-      [[0, 1, 1], [1, 1, 0]],
-      [[1, 1, 0], [0, 1, 1]],
-      [[1, 0, 0], [1, 1, 1]],
-      [[0, 0, 1], [1, 1, 1]],
-    ],
+    cols: 10, rows: 18,
+    fallMs: 850,
+    // a little faster every 5 rows (8% each time), never faster than 300 ms
+    speedUp: { everyRows: 5, step: 0.08, minMs: 300 },
+    shapes: FOUR_BLOCK_SHAPES,
   },
 }
 
-// Speeds up only a tiny bit: 4% per 10 rows, never faster than 60% of the start speed
+// How long a piece waits before it moves down one row
 export function fallDelay(level, rowsCleared) {
-  const base = LEVELS[level].fallMs
-  return Math.max(base * 0.6, base * (1 - 0.04 * Math.floor(rowsCleared / 10)))
+  const { fallMs, speedUp } = LEVELS[level]
+  if (!speedUp) return fallMs
+  const steps = Math.floor(rowsCleared / speedUp.everyRows)
+  return Math.max(speedUp.minMs, Math.round(fallMs * Math.pow(1 - speedUp.step, steps)))
 }
 
 export const emptyBoard = (cols, rows) => Array.from({ length: rows }, () => Array(cols).fill(null))

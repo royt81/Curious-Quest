@@ -5,6 +5,7 @@ import ThemeIcon from './ThemeIcon'
 import ThemePicker from './ThemePicker'
 import AboutPage from './AboutPage'
 import { useT } from '../i18n'
+import { GAME_GROUPS } from '../data/gameGroups'
 import './Menu.css'
 
 // Game list for the main menu. Each game shows ONE clear icon (matching the
@@ -23,14 +24,6 @@ const GAMES = [
     emoji: '🧮',
     desc: 'Answer number and letter questions to race to the finish!',
     color: 'var(--game-color-1, #f59e0b)',
-  },
-  {
-    id: 'race',
-    name: 'Race',
-    emoji: '🏁',
-    image: '/other-icons/race.svg',
-    desc: 'Draw cards and race to the finish line!',
-    color: 'var(--game-color-3, #ec4899)',
   },
   {
     id: 'draw',
@@ -57,6 +50,7 @@ const GAMES = [
     id: 'blocks',
     name: 'Calm Blocks',
     emoji: '🧱',
+    image: '/other-icons/blocks.svg',
     desc: 'Turn and stack the falling blocks to fill whole rows — nice and slow.',
     color: 'var(--game-color-2, #6366f1)',
   },
@@ -82,26 +76,11 @@ const GAMES = [
     color: 'var(--game-color-2, #6366f1)',
   },
   {
-    id: 'domino',
-    name: 'Domino',
-    emoji: '🁫',
-    image: '/domino/2-3.svg',
-    desc: 'Match the ends and empty your hand to win!',
-    color: 'var(--game-color-2, #6366f1)',
-  },
-  {
     id: 'backgammon',
     name: 'Backgammon',
     emoji: '🎲',
     desc: 'Roll the dice, race your checkers home, and bear off to win!',
     color: 'var(--game-color-4, #10b981)',
-  },
-  {
-    id: 'dotsboxes',
-    name: 'Dots & Boxes',
-    emoji: '⬛',
-    desc: 'Draw lines, close boxes, and claim the most — perfect for travelling!',
-    color: 'var(--game-color-2, #6366f1)',
   },
   {
     id: 'life',
@@ -115,7 +94,7 @@ const GAMES = [
     name: 'Snakes & Ladders',
     emoji: '🐍',
     image: '/other-icons/snake.svg',
-    desc: 'Climb the ladders, dodge the snakes, and race to square 100!',
+    desc: 'Climb the ladders, dodge the snakes, and race to the top square!',
     color: 'var(--game-color-3, #ec4899)',
   },
 ]
@@ -128,6 +107,8 @@ const cardVariants = {
   initial: { opacity: 0, y: 40, scale: 0.93 },
   animate: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.42, ease: [0.25, 0.1, 0.25, 1] } },
 }
+
+const GAMES_BY_ID = Object.fromEntries(GAMES.map(g => [g.id, g]))
 
 export default function Menu({ onSelect }) {
   const { theme, themeId } = useTheme()
@@ -162,34 +143,41 @@ export default function Menu({ onSelect }) {
         <p className="menu-subtitle">{t('Choose a game to play')}</p>
       </motion.div>
 
-      <motion.div
-        className="game-grid"
-        variants={containerVariants}
-        initial="initial"
-        animate="animate"
-      >
-        {GAMES.map(g => (
-          <motion.button
-            key={g.id}
-            className="game-card glass-panel"
-            variants={cardVariants}
-            whileHover={{ y: -8, scale: 1.03, transition: { duration: 0.2, ease: 'easeOut' } }}
-            whileTap={{ scale: 0.97, transition: { duration: 0.1 } }}
-            onClick={() => onSelect?.(g.id)}
+      <div className="menu-groups">
+      {GAME_GROUPS.map(group => (
+        <section key={group.id} className="menu-group">
+          <h3 className="menu-group-title"><span aria-hidden="true">{group.icon}</span> {t(group.label)}</h3>
+          <motion.div
+            className="game-grid"
+            variants={containerVariants}
+            initial="initial"
+            animate="animate"
           >
-            <div className="game-card-icon" style={{ '--card-color': g.color }}>
-              <span className="game-card-icon-glow" />
-              {g.image
-                ? <img className="game-card-icon-img" src={g.image} alt="" />
-                : <span className="game-card-icon-emoji">{g.emoji}</span>}
-            </div>
-            <div className="game-card-body">
-              <span className="game-card-title">{t(g.name)}</span>
-              <span className="game-card-desc">{t(g.desc)}</span>
-            </div>
-          </motion.button>
-        ))}
-      </motion.div>
+            {group.games.map(id => GAMES_BY_ID[id]).filter(Boolean).map(g => (
+              <motion.button
+                key={g.id}
+                className="game-card glass-panel"
+                variants={cardVariants}
+                whileHover={{ y: -8, scale: 1.03, transition: { duration: 0.2, ease: 'easeOut' } }}
+                whileTap={{ scale: 0.97, transition: { duration: 0.1 } }}
+                onClick={() => onSelect?.(g.id)}
+              >
+                <div className="game-card-icon" style={{ '--card-color': g.color }}>
+                  <span className="game-card-icon-glow" />
+                  {g.image
+                    ? <img className="game-card-icon-img" src={g.image} alt="" />
+                    : <span className="game-card-icon-emoji">{g.emoji}</span>}
+                </div>
+                <div className="game-card-body">
+                  <span className="game-card-title">{t(g.name)}</span>
+                  <span className="game-card-desc">{t(g.desc)}</span>
+                </div>
+              </motion.button>
+            ))}
+          </motion.div>
+        </section>
+      ))}
+      </div>
 
       <footer className="menu-footer">
         <button className="about-link" onClick={() => setShowAbout(true)}>

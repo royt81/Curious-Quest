@@ -9,6 +9,7 @@ import { CHALLENGES_BY_THEME_DE, GENERAL_CHALLENGES_DE } from './challengeQuesti
 import { makePictureQuestion } from './pictureQuestions'
 import { speak, announce, speakSteps, stopSpeaking, canSpeak } from '../../sound/speech'
 import { useT, useLang, tr, getLang } from '../../i18n'
+import useSaved, { readSaved } from '../../hooks/useSaved'
 
 // ─── Board constants ───────────────────────────────────────────────────────────
 const STEP_MS      = 170  // ms per tile during piece movement
@@ -576,22 +577,22 @@ export default function AdventureGame({ onBack }) {
   const { theme } = useTheme()
   const { path: PATH, road: ROAD_D, road2: ROAD_D2, ang: ANG } = useMemo(() => getPathForTheme(theme.id), [theme.id])
 
-  const [phase,         setPhase]         = useState('setup')
-  const [playerCount,   setPlayerCount]   = useState(2)
-  const [positions,     setPositions]     = useState([])
-  const [currentPlayer, setCurrentPlayer] = useState(0)
-  const [log,           setLog]           = useState([])
-  const [winner,        setWinner]        = useState(null)
+  const [phase,         setPhase]         = useSaved('adventure', 'phase', 'setup')
+  const [playerCount,   setPlayerCount]   = useSaved('adventure', 'playerCount', 2)
+  const [positions,     setPositions]     = useSaved('adventure', 'positions', [])
+  const [currentPlayer, setCurrentPlayer] = useSaved('adventure', 'currentPlayer', 0)
+  const [log,           setLog]           = useSaved('adventure', 'log', [])
+  const [winner,        setWinner]        = useSaved('adventure', 'winner', null)
   const [animating,     setAnimating]     = useState(false)
-  const [challenge,     setChallenge]     = useState(null)
+  const [challenge,     setChallenge]     = useSaved('adventure', 'challenge', null)
   const [diceValue,     setDiceValue]     = useState(null)
   const [rolling,       setRolling]       = useState(false)
   // displayPos tracks the visual (animated) position; positions tracks the game-logic position
-  const [displayPos,    setDisplayPos]    = useState([])
+  const [displayPos,    setDisplayPos]    = useState(() => readSaved('adventure', 'positions') ?? [])
   // sleepers[i] === true → player i must skip their next turn (display mirror of skipRef)
-  const [sleepers,      setSleepers]      = useState([])
+  const [sleepers,      setSleepers]      = useSaved('adventure', 'sleepers', [])
   // 'read' = text trivia · 'picture' = tap-the-picture questions + voice (no reading needed)
-  const [mode,          setMode]          = useState(() => {
+  const [mode,          setMode]          = useSaved('adventure', 'mode', () => {
     try { return localStorage.getItem('adv-mode') || 'read' } catch { return 'read' }
   })
   const [voiceOn,       setVoiceOn]       = useState(true)
@@ -615,7 +616,7 @@ export default function AdventureGame({ onBack }) {
   const rollTimer  = useRef(null)
   const moveTimer  = useRef(null)
   // Source of truth for skip-a-turn flags (ref so logic is synchronous & StrictMode-safe)
-  const skipRef    = useRef([])
+  const skipRef    = useRef(readSaved('adventure', 'sleepers') ?? [])
   // No-repeat shuffle bags for questions/surprise/bonus cards, (re)built on startGame
   const questionBagRef = useRef(null)
   const surpriseBagRef = useRef(null)

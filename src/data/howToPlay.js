@@ -30,17 +30,6 @@ export const HOW_TO_PLAY = {
     ],
     tip: 'Turn on "Read the questions to me" or tap 🔊 to hear a question.',
   },
-  race: {
-    title: 'Race',
-    goal: 'Cheer on the animals racing to the finish line!',
-    steps: [
-      ['🃏', 'Tap the deck to draw a card.'],
-      ['🐾', 'A card with an animal moves that animal forward 1 to 5 steps.'],
-      ['⛈️', 'Storm: everyone still racing goes back 1.'],
-      ['🚀', 'Boost: the leader jumps 2 ahead. 🔀 Swap: first and last swap places!'],
-      ['🥇', 'The race ends when three animals have finished — gold, silver and bronze!'],
-    ],
-  },
   memory: {
     title: 'Memory',
     goal: 'Find all the matching pairs!',
@@ -108,16 +97,6 @@ export const HOW_TO_PLAY = {
       ['👆', 'Tap a piece to see where it can go, then tap a dot.'],
     ],
   },
-  domino: {
-    title: 'Domino',
-    goal: 'Be the first to play all of your tiles!',
-    steps: [
-      ['🁣', 'Each tile has two numbers of dots.'],
-      ['🔗', 'Play a tile whose number matches one end of the line.'],
-      ['📦', 'Can\'t play? Draw a tile from the pile.'],
-      ['🏆', 'First with no tiles left wins. If nobody can play, the fewest dots wins.'],
-    ],
-  },
   backgammon: {
     title: 'Backgammon',
     goal: 'Bring all 15 of your pieces home and take them off the board first!',
@@ -128,17 +107,6 @@ export const HOW_TO_PLAY = {
       ['💥', 'Land on a single enemy piece to send it to the middle bar — it has to start again.'],
       ['🏠', 'When all your pieces are in your home (points 1–6), move them off the board to win.'],
     ],
-  },
-  dotsboxes: {
-    title: 'Dots & Boxes',
-    goal: 'Close more boxes than the other player!',
-    steps: [
-      ['✏️', 'Take turns drawing one line between two dots next to each other.'],
-      ['⬛', 'Draw the fourth side of a box and it\'s yours!'],
-      ['🔁', 'Closed a box? You get another turn.'],
-      ['🏆', 'When all the boxes are taken, the one with the most boxes wins.'],
-    ],
-    tip: 'Careful: don\'t draw the third side of a box — the other player can close it!',
   },
   snakes: {
     title: 'Snakes & Ladders',

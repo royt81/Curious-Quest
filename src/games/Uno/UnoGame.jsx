@@ -6,6 +6,7 @@ import ThemeIcon from '../../components/ThemeIcon'
 import './Uno.css'
 import { playCard, playDraw, playWin } from '../../sound/sfx'
 import { tr, useT, getLang } from '../../i18n'
+import useSaved from '../../hooks/useSaved'
 
 // ─── Card back showing the active theme icon ──────────────────────────────────
 function CardBack({ themeId, small, onClick, clickable }) {
@@ -126,21 +127,21 @@ export default function UnoGame({ mode, onBack }) {
   }
   const { themeId } = useTheme()
   const is2P = mode === '2player'
-  const [colorCount, setColorCount] = useState(4)
+  const [colorCount, setColorCount] = useSaved('uno', 'colorCount', 4)
 
   // game state
-  const [deck,          setDeck]          = useState([])
-  const [hands,         setHands]         = useState([[], []])
-  const [pile,          setPile]          = useState([])
-  const [activeColor,   setActiveColor]   = useState(null)
-  const [turn,          setTurn]          = useState(0)
-  const [gameOver,      setGameOver]      = useState(false)
-  const [winner,        setWinner]        = useState(null)
-  const [log,           setLog]           = useState([])
+  const [deck,          setDeck]          = useSaved('uno', 'deck', [])
+  const [hands,         setHands]         = useSaved('uno', 'hands', [[], []])
+  const [pile,          setPile]          = useSaved('uno', 'pile', [])
+  const [activeColor,   setActiveColor]   = useSaved('uno', 'activeColor', null)
+  const [turn,          setTurn]          = useSaved('uno', 'turn', 0)
+  const [gameOver,      setGameOver]      = useSaved('uno', 'gameOver', false)
+  const [winner,        setWinner]        = useSaved('uno', 'winner', null)
+  const [log,           setLog]           = useSaved('uno', 'log', [])
   const [aiThinking,    setAiThinking]    = useState(false)
-  const [choosingColor, setChoosingColor] = useState(false)
-  const [pendingWild,   setPendingWild]   = useState(null)
-  const [gameScore,     setGameScore]     = useState(null)
+  const [choosingColor, setChoosingColor] = useSaved('uno', 'choosingColor', false)
+  const [pendingWild,   setPendingWild]   = useSaved('uno', 'pendingWild', null)
+  const [gameScore,     setGameScore]     = useSaved('uno', 'gameScore', null)
   const [newScoreId,    setNewScoreId]    = useState(null)
   const [allScores,     setAllScores]     = useState(loadScores)
 
@@ -174,7 +175,11 @@ export default function UnoGame({ mode, onBack }) {
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => { startGame(UNO_COLORS.slice(0, colorCount)) }, [])
+  // continue a saved game; otherwise deal a new one
+  useEffect(() => {
+    if (hands[0]?.length && !gameOver) return
+    startGame(UNO_COLORS.slice(0, colorCount))
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── core play-card logic (reads fresh state via ref) ──────────────────────
   const applyCard = (cardId, chosenColor) => {

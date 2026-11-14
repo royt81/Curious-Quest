@@ -7,14 +7,15 @@ import { loadColoringPage } from './coloringPages'
 import { playTap, playMatch, playMove } from '../../sound/sfx'
 import './Drawing.css'
 import { useT } from '../../i18n'
+import useSaved, { readSaved, writeSaved } from '../../hooks/useSaved'
 
 // ─── Draw & Paint ─────────────────────────────────────────────────────────────
 // Free drawing on a blank page, or colouring pages made from the world
 // characters. Layers inside the "stage" (bottom → top):
 //   background colour · colouring-page areas (SVG) · brush canvas · outline (SVG)
 
-const W = 1200, H = 900                     // internal canvas resolution (4:3)
-const PAGE_BOX = { x: 175, y: 45, size: 850 } // where a colouring page sits
+const W = 900, H = 1200                     // internal canvas resolution: an upright page (3:4)
+const PAGE_BOX = { x: 25, y: 175, size: 850 } // where a colouring page sits (centred)
 const MAX_UNDO = 15
 
 const COLORS = [
@@ -142,15 +143,15 @@ function PagePicker({ onPick, themeId }) {
 export default function DrawingGame({ onBack }) {
   const tt = useT()
   const { theme, themeId } = useTheme()
-  const [phase, setPhase] = useState('pick')       // 'pick' | 'draw'
-  const [page, setPage] = useState(null)           // null = blank page
+  const [phase, setPhase] = useSaved('draw', 'phase', 'pick')       // 'pick' | 'draw'
+  const [page, setPage] = useSaved('draw', 'page', null)           // null = blank page
   const [pageSvg, setPageSvg] = useState(null)     // { areas, outline, regions }
   const [tool, setTool] = useState('brush')
   const [color, setColor] = useState('#ff3b30')
   const [size, setSize] = useState('m')
   const [sticker, setSticker] = useState('⭐')
-  const [bg, setBg] = useState('#ffffff')
-  const [fills, setFills] = useState([])           // colour per colouring-page area
+  const [bg, setBg] = useSaved('draw', 'bg', '#ffffff')
+  const [fills, setFills] = useSaved('draw', 'fills', [])           // colour per colouring-page area
   const [canUndo, setCanUndo] = useState(false)
   const [saved, setSaved] = useState(false)
 
@@ -169,9 +170,37 @@ export default function DrawingGame({ onBack }) {
     })
   }, [themeStickers])
 
+  // ── keep the picture (the canvas pixels) on the device ──
+  const saveTimer = useRef(null)
+  const saveCanvas = () => {
+    clearTimeout(saveTimer.current)
+    saveTimer.current = setTimeout(() => {
+      const c = canvasRef.current
+      if (!c) return
+      // WebP keeps the see-through parts and is much smaller than PNG
+      let url = c.toDataURL('image/webp', 0.9)
+      if (!url.startsWith('data:image/webp')) url = c.toDataURL('image/png')
+      writeSaved('draw', 'canvas', url)
+    }, 400)
+  }
+  useEffect(() => () => clearTimeout(saveTimer.current), [])
+
+  // Coming back to a saved drawing: load its colouring page and paint the picture back
+  useEffect(() => {
+    if (phase !== 'draw') return
+    if (page && !pageSvg) loadColoringPage(page.url).then(setPageSvg)
+    const url = readSaved('draw', 'canvas')
+    if (url && canvasRef.current) {
+      const img = new Image()
+      img.onload = () => canvasRef.current?.getContext('2d').drawImage(img, 0, 0)
+      img.src = url
+    }
+  }, [phase]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // ── open a page ──
   const openPage = async (p) => {
     playTap()
+    writeSaved('draw', 'canvas', null)      // a new page starts empty
     setPage(p)
     setBg('#ffffff')
     history.current = []
@@ -216,6 +245,7 @@ export default function DrawingGame({ onBack }) {
     setFills(last.fills)
     setBg(last.bg)
     setCanUndo(history.current.length > 0)
+    saveCanvas()
   }
   const clearAll = () => {
     snapshot()
@@ -223,6 +253,7 @@ export default function DrawingGame({ onBack }) {
     canvasRef.current.getContext('2d').clearRect(0, 0, W, H)
     setFills(f => f.map(() => '#ffffff'))
     setBg('#ffffff')
+    saveCanvas()
   }
 
   // ── pointer handling ──
@@ -304,7 +335,7 @@ export default function DrawingGame({ onBack }) {
       drawing.current = p
     }
   }
-  const endStroke = () => { drawing.current = null }
+  const endStroke = () => { saveCanvas(); drawing.current = null }   // every brush, fill or sticker ends here
 
   // ── save as PNG ──
   const save = async () => {

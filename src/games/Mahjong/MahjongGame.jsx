@@ -1,13 +1,18 @@
-import { useState, useEffect, useLayoutEffect, useRef, useMemo, useCallback } from 'react'
+import { useState, useEffect, useMemo, useCallback } from 'react'
+import useElementSize from '../../hooks/useElementSize'
 import { ALL_PICTURES } from '../../data/pictures'
 import { playTap, playMatch, playWrong, playWin } from '../../sound/sfx'
 import { LAYOUTS, newBoard, isFree, findPair, reshuffle } from './mahjongLogic'
 import './Mahjong.css'
 import { useT } from '../../i18n'
+import useSaved from '../../hooks/useSaved'
 
 // Each world is a "suit" (like bamboo / circles / characters in real Mahjong):
 // its own tile colour (see Mahjong.css) and this little mark in the corner.
 const SUIT_MARK = { animals: '🐾', dinosaurs: '🦴', space: '⭐', robots: '⚙️', sea: '🐚' }
+
+// Is the screen taller than wide? (used for the very first board, before measuring)
+const uprightNow = () => typeof window !== 'undefined' && window.innerHeight > window.innerWidth * 1.15
 
 const TILE_RATIO = 1.22    // tile height / width
 const LAYER_SHIFT = 0.09   // each layer is drawn this much (× tile width) up and left
@@ -20,51 +25,53 @@ function starsFor(helps) {
 
 export default function MahjongGame({ onBack }) {
   const t = useT()
-  const [level, setLevel] = useState('easy')
-  const [board, setBoard] = useState(() => newBoard('easy', ALL_PICTURES))
+  const [level, setLevel] = useSaved('mahjong', 'level', 'easy')
+  const [board, setBoard] = useSaved('mahjong', 'board', () => newBoard('easy', ALL_PICTURES, -1, uprightNow()))
   const [selected, setSelected] = useState(null)
   const [hint, setHint] = useState(null)
   const [wrong, setWrong] = useState(null)
-  const [history, setHistory] = useState([])
-  const [helps, setHelps] = useState(0)
-  const [tileW, setTileW] = useState(48)
-  const areaRef = useRef(null)
+  const [history, setHistory] = useSaved('mahjong', 'history', [])
+  const [helps, setHelps] = useSaved('mahjong', 'helps', 0)
 
+  // Make the tiles as big as the free space allows (measured again whenever the
+  // board element is replaced — e.g. after the "Board cleared!" screen)
+  const [areaRef, area] = useElementSize()
   const { tiles, pictures } = board
-  const positions = LAYOUTS[level].positions
+
+  // Turned the phone before the first move? Deal the board again the other way round.
+  const areaUpright = area.width > 0 && area.height > area.width * 1.15
+  useEffect(() => {
+    if (!area.width || areaUpright === board.upright) return
+    if (tiles.some(t => t.removed)) return            // never reshuffle a game in progress
+    // reacting to the measured screen shape (an outside value), so setState here is intended
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setBoard(b => newBoard(level, ALL_PICTURES, b.shape - 1, areaUpright))
+  }, [areaUpright]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const start = useCallback((lv) => {
     setLevel(lv)
-    setBoard(newBoard(lv, ALL_PICTURES))
+    setBoard(b => newBoard(lv, ALL_PICTURES, b.shape, uprightNow()))   // a different pile shape each round
     setSelected(null); setHint(null); setWrong(null); setHistory([]); setHelps(0)
   }, [])
 
   // Board size in half-tile units
   const bounds = useMemo(() => {
-    const xs = positions.map(p => p.x), ys = positions.map(p => p.y), zs = positions.map(p => p.z)
+    const xs = tiles.map(p => p.x), ys = tiles.map(p => p.y), zs = tiles.map(p => p.z)
     return {
       minX: Math.min(...xs), minY: Math.min(...ys),
       cols: (Math.max(...xs) - Math.min(...xs) + 2) / 2,
       rows: (Math.max(...ys) - Math.min(...ys) + 2) / 2,
       layers: Math.max(...zs),
     }
-  }, [positions])
+  }, [tiles.length, board.shape])   // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Make the tiles as big as the free space allows
-  useLayoutEffect(() => {
-    const el = areaRef.current
-    if (!el) return undefined
-    const fit = () => {
-      const w = el.clientWidth - 16, h = el.clientHeight - 16
-      const byW = w / (bounds.cols + bounds.layers * LAYER_SHIFT + 0.1)
-      const byH = h / (bounds.rows * TILE_RATIO + bounds.layers * LAYER_SHIFT + 0.1)
-      setTileW(Math.max(24, Math.min(byW, byH, 120)))
-    }
-    fit()
-    const ro = new ResizeObserver(fit)
-    ro.observe(el)
-    return () => ro.disconnect()
-  }, [bounds])
+  const tileW = useMemo(() => {
+    if (!area.width) return 48
+    const w = area.width - 12, h = area.height - 12
+    const byW = w / (bounds.cols + bounds.layers * LAYER_SHIFT + 0.1)
+    const byH = h / (bounds.rows * TILE_RATIO + bounds.layers * LAYER_SHIFT + 0.1)
+    return Math.max(24, Math.min(byW, byH, 170))
+  }, [area, bounds])
 
   const freeIds = useMemo(
     () => new Set(tiles.filter(t => !t.removed && isFree(t, tiles)).map(t => t.id)),
@@ -101,7 +108,13 @@ export default function MahjongGame({ onBack }) {
   }
 
   const doShuffle = () => {
-    setBoard(b => ({ ...b, tiles: reshuffle(b.tiles) }))
+    setBoard(b => {
+      const next = reshuffle(b.tiles)
+      // Very rarely the last tiles lie exactly on top of each other — no shuffle
+      // can free them. Then the stuck tiles are simply cleared, so nobody is stuck forever.
+      if (!findPair(next)) return { ...b, tiles: next.map(t => ({ ...t, removed: true })) }
+      return { ...b, tiles: next }
+    })
     setSelected(null); setHint(null)
     // shuffling when stuck is free — except on Hard, where getting stuck is part of the game
     if (!stuck || LAYOUTS[level].random) setHelps(n => n + 1)
@@ -195,7 +208,7 @@ export default function MahjongGame({ onBack }) {
 
           <div className="mj-bar">
             <button className="btn btn-secondary" onClick={undo} disabled={!history.length}>↩️ {t('Undo')}</button>
-            <div className={`turn-banner${stuck ? ' mj-stuck' : ''}`}>
+            <div className={`turn-banner mj-banner${stuck ? ' mj-stuck' : ''}`}>
               {stuck ? t('No more pairs — tap Shuffle!')
                 : selected !== null ? t('Now find the same picture!')
                 : t('Tap two free tiles with the same picture')}

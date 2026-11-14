@@ -7,17 +7,14 @@ import BackgroundAnimation from './components/BackgroundAnimation'
 import Menu from './components/Menu'
 import FoursomesGame from './games/Foursomes/FoursomesGame'
 import UnoGame from './games/Uno/UnoGame'
-import RaceGame from './games/Race/RaceGame'
 import AdventureGame from './games/Adventure/AdventureGame'
 import QuizRaceGame from './games/QuizRace/QuizRaceGame'
 import CheckersGame from './games/Checkers/CheckersGame'
 import ChessGame from './games/Chess/ChessGame'
-import DominoGame from './games/Domino/DominoGame'
 import BackgammonGame from './games/Backgammon/BackgammonGame'
 import MemoryGame from './games/Memory/MemoryGame'
 import MahjongGame from './games/Mahjong/MahjongGame'
 import BlocksGame from './games/Blocks/BlocksGame'
-import DotsBoxesGame from './games/DotsBoxes/DotsBoxesGame'
 import SnakesLaddersGame from './games/SnakesLadders/SnakesLaddersGame'
 import GameOfLifeGame from './games/GameOfLife/GameOfLifeGame'
 import DrawingGame from './games/Drawing/DrawingGame'
@@ -34,8 +31,8 @@ const screenVariants = {
 const IDLE_MS = 15000 // 15s of no activity → screensaver
 
 // Every game can be opened directly with a link, e.g. …pages.dev/#memory
-const GAME_IDS = ['adventure', 'quiz', 'race', 'uno', 'foursomes', 'checkers', 'chess', 'domino',
-  'backgammon', 'memory', 'mahjong', 'blocks', 'dotsboxes', 'snakes', 'life', 'draw']
+const GAME_IDS = ['adventure', 'quiz', 'uno', 'foursomes', 'checkers', 'chess',
+  'backgammon', 'memory', 'mahjong', 'blocks', 'snakes', 'life', 'draw']
 const screenFromHash = () => {
   const id = typeof window !== 'undefined' ? window.location.hash.slice(1) : ''
   return GAME_IDS.includes(id) ? id : 'menu'
@@ -71,7 +68,8 @@ function App() {
   }, [])
   // Small screens (phones / portrait tablets): start with the menu folded away.
   const isNarrow = () => typeof window !== 'undefined' && window.innerWidth < 900
-  const [collapsed, setCollapsed] = useState(isNarrow)
+  // folded away on small screens, and whenever the app opens straight into a game
+  const [collapsed, setCollapsed] = useState(() => isNarrow() || screenFromHash() !== 'menu')
   const [screensaver, setScreensaver] = useState(false)
   const { themeId } = useTheme()
   const timerRef = useRef(null)
@@ -80,7 +78,7 @@ function App() {
   const [helpOpen, setHelpOpen] = useState(false)
   const goGame = (game) => {
     setScreen(game)
-    if (isNarrow()) setCollapsed(true)
+    setCollapsed(true)               // a game gets the whole screen; the sidebar folds away
     let seen = []
     try { seen = JSON.parse(localStorage.getItem('cq-rules-seen') || '[]') } catch { /* ignore */ }
     if (HOW_TO_PLAY[game] && game !== 'life' && !seen.includes(game)) {
@@ -88,7 +86,10 @@ function App() {
       try { localStorage.setItem('cq-rules-seen', JSON.stringify([...seen, game])) } catch { /* ignore */ }
     }
   }
-  const back = () => { setScreen('menu'); setHelpOpen(false) }
+  const back = () => {
+    setScreen('menu'); setHelpOpen(false)
+    if (!isNarrow()) setCollapsed(false)   // on bigger screens the game list comes back
+  }
 
   // Screensaver only when: sidebar collapsed, on the menu, and idle.
   const { screensaver: screensaverOn, colour } = useSettings()
@@ -168,17 +169,14 @@ function App() {
           >
             {screen === 'adventure'  && <AdventureGame  onBack={back} />}
             {screen === 'quiz'       && <QuizRaceGame   onBack={back} />}
-            {screen === 'race'       && <RaceGame       mode="ai" onBack={back} />}
             {screen === 'uno'        && <UnoGame        mode="ai" onBack={back} />}
             {screen === 'foursomes'  && <FoursomesGame  mode="ai" onBack={back} />}
             {screen === 'checkers'   && <CheckersGame   onBack={back} />}
             {screen === 'chess'      && <ChessGame      onBack={back} />}
-            {screen === 'domino'     && <DominoGame     onBack={back} />}
             {screen === 'backgammon' && <BackgammonGame onBack={back} />}
             {screen === 'memory'     && <MemoryGame     onBack={back} />}
             {screen === 'mahjong'    && <MahjongGame    onBack={back} />}
             {screen === 'blocks'     && <BlocksGame     onBack={back} />}
-            {screen === 'dotsboxes'  && <DotsBoxesGame  onBack={back} />}
             {screen === 'snakes'     && <SnakesLaddersGame onBack={back} />}
             {screen === 'life'       && <GameOfLifeGame  onBack={back} />}
             {screen === 'draw'       && <DrawingGame     onBack={back} />}

@@ -7,40 +7,31 @@ import SettingsButton from './SettingsButton'
 import { HowToPlayButton } from './HowToPlay'
 import { useSettings, setSetting } from '../settings'
 import { useT } from '../i18n'
+import { GAME_GROUPS } from '../data/gameGroups'
 import './Sidebar.css'
 
-const SECTIONS = [
-  {
-    id: null,
-    games: [
-      { id: 'adventure',  name: 'Adventure!',       emoji: '🗺️' },
-      { id: 'quiz',       name: 'Quiz Race',         emoji: '🧮' },
-      { id: 'memory',     name: 'Memory',            emoji: '🧠' },
-      { id: 'mahjong',    name: 'Mahjong',           emoji: '🀄' },
-      { id: 'blocks',     name: 'Calm Blocks',       emoji: '🧱' },
-      { id: 'dotsboxes',  name: 'Dots & Boxes',      emoji: '⬛' },
-      { id: 'draw',       name: 'Draw & Paint',      emoji: '🎨' },
-    ],
-  },
-  {
-    id: 'classic',
-    label: 'Game Box',
-    icon: '/other-icons/game-chest.svg',
-    collapsible: true,
-    games: [
-      { id: 'checkers',   name: 'Checkers',         emoji: '🔴' },
-      { id: 'chess',      name: 'Chess',            emoji: '♟️' },
-      { id: 'domino',     name: 'Domino',           emoji: '🁫', image: '/domino/2-3.svg' },
-      { id: 'backgammon', name: 'Backgammon',       emoji: '🎲' },
-      { id: 'snakes',     name: 'Snakes & Ladders', emoji: '🐍', image: '/other-icons/snake.svg' },
-      { id: 'uno',        name: 'Colour Clash',      emoji: '🎴' },
-      { id: 'race',       name: 'Race',             emoji: '🏁', image: '/other-icons/race.svg' },
-      { id: 'life',       name: 'Game of Life',     emoji: '🔬' },
-    ],
-  },
-]
+// Sidebar look of each game; the grouping comes from data/gameGroups.js
+const GAME_ENTRIES = {
+  adventure:  { name: 'Adventure!',       emoji: '🗺️' },
+  quiz:       { name: 'Quiz Race',        emoji: '🧮' },
+  memory:     { name: 'Memory',           emoji: '🧠' },
+  mahjong:    { name: 'Mahjong',          emoji: '🀄' },
+  blocks:     { name: 'Calm Blocks',      emoji: '🧱', image: '/other-icons/blocks.svg' },
+  life:       { name: 'Game of Life',     emoji: '🔬' },
+  chess:      { name: 'Chess',            emoji: '♟️' },
+  checkers:   { name: 'Checkers',         emoji: '🔴' },
+  backgammon: { name: 'Backgammon',       emoji: '🎲' },
+  snakes:     { name: 'Snakes & Ladders', emoji: '🐍', image: '/other-icons/snake.svg' },
+  uno:        { name: 'Colour Clash',     emoji: '🎴' },
+  draw:       { name: 'Draw & Paint',     emoji: '🎨' },
+}
 
-const ALL_GAMES = SECTIONS.flatMap(s => s.games)
+const SECTIONS = GAME_GROUPS.map(gr => ({
+  id: gr.id,
+  label: gr.label,
+  games: gr.games.map(id => ({ id, ...GAME_ENTRIES[id] })),
+}))
+
 
 // Quick colour switch (same setting as Settings → Colours)
 const COLOUR_PRESETS = [
@@ -84,14 +75,15 @@ export default function Sidebar({ activeGame, onSelect, onHome, collapsed, onTog
   const [showPicker, setShowPicker] = useState(false)
   const { themeId, setThemeId } = useTheme()
   const t = useT()
+  const inGame = !!activeGame
 
   const toggleSection = (id) =>
     setOpenSections(prev => ({ ...prev, [id]: !prev[id] }))
 
   return (
     <motion.aside
-      className={`sidebar ${collapsed ? 'collapsed' : ''}`}
-      animate={{ width: collapsed ? 56 : 200 }}
+      className={`sidebar ${collapsed ? 'collapsed' : ''}${inGame ? ' in-game' : ''}`}
+      animate={{ width: collapsed ? (inGame ? 44 : 56) : 200 }}
       transition={{ type: 'spring', stiffness: 340, damping: 30 }}
     >
       <button
@@ -251,7 +243,10 @@ export default function Sidebar({ activeGame, onSelect, onHome, collapsed, onTog
             animate={{ opacity: 1, transition: { delay: 0.1, duration: 0.2 } }}
             exit={{ opacity: 0, transition: { duration: 0.1 } }}
           >
-            {ALL_GAMES.map(g => (
+            {/* while playing, only the expand button, ❓ and ⚙️ stay — the game gets the space */}
+            {!inGame && SECTIONS.flatMap((section, si) => [
+              si > 0 && <span key={`div-${section.id}`} className="sidebar-icon-divider" aria-hidden="true" />,
+              ...section.games.map(g => (
               <motion.button
                 key={g.id}
                 className={`sidebar-icon-btn ${activeGame === g.id ? 'active' : ''}`}
@@ -264,7 +259,8 @@ export default function Sidebar({ activeGame, onSelect, onHome, collapsed, onTog
                   ? <img src={g.image} alt="" style={{ width: '1.3rem', height: '1.3rem', objectFit: 'contain', display: 'block' }} />
                   : g.emoji}
               </motion.button>
-            ))}
+              )),
+            ])}
             <div className="sidebar-icon-settings">
               {onHelp && <HowToPlayButton onClick={onHelp} />}
               <SettingsButton />

@@ -172,3 +172,10 @@
   .blk-mini { grid-auto-rows: 14px; grid-template-rows: repeat(auto-fill, 14px); }
   .blk-mini .blk-cell { width: 14px; height: 14px; }
 }
+
+/* header: icon + a clear pause button */
+.blk-title-icon { width: 1.3em; height: 1.3em; vertical-align: -0.25em; }
+.blk-pause-top { padding: 8px 16px; font-size: 0.95rem; white-space: nowrap; }
+@media (max-width: 600px), (max-height: 500px) {
+  .blk-pause-top { padding: 6px 12px; font-size: 0.85rem; }
+}

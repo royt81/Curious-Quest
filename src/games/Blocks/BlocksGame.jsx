@@ -2,6 +2,7 @@ import { useReducer, useEffect, useLayoutEffect, useRef, useState, useCallback }
 import { useTheme } from '../../context/ThemeContext'
 import { playTap, playMatch, playWin, playMove } from '../../sound/sfx'
 import { useT } from '../../i18n'
+import { readSaved, writeSaved } from '../../hooks/useSaved'
 import {
   LEVELS, fallDelay, emptyBoard, makeBag, spawn, collides,
   tryMove, tryRotate, dropPosition, lockPiece, fullRows, removeRows,
@@ -60,6 +61,15 @@ function lock(s, piece) {
   const full = fullRows(board)
   if (full.length) return withSound({ ...s, board, piece: null, phase: 'clearing', clearing: full }, 'clear')
   return withSound(spawnNext(s, board), 'lock')
+}
+
+// Continue a saved game (paused, so nothing falls before the child is ready)
+function resumeOrNew(level) {
+  const saved = readSaved('blocks', 'state')
+  const ok = saved && LEVELS[saved.level] && saved.board?.length === LEVELS[saved.level].rows
+    && saved.board[0]?.length === LEVELS[saved.level].cols
+  if (!ok) return newGame(level)
+  return { ...saved, best: loadBest(), phase: saved.phase === 'play' ? 'paused' : saved.phase, sound: null, soundId: 0 }
 }
 
 function reducer(s, a) {
@@ -131,10 +141,17 @@ export default function BlocksGame({ onBack }) {
   const t = useT()
   const { themeId } = useTheme()
   const palette = PALETTES[themeId] ?? PALETTES.animals
-  const [s, dispatch] = useReducer(reducer, 'easy', (lv) => newGame(lv))
+  const [s, dispatch] = useReducer(reducer, 'easy', resumeOrNew)
   const [cell, setCell] = useState(28)
   const areaRef = useRef(null)
   const touch = useRef(null)
+
+  // keep the game on the device (written at most every 300 ms)
+  useEffect(() => {
+    // eslint-disable-next-line no-unused-vars
+    const { sound, soundId, best, ...game } = s
+    writeSaved('blocks', 'state', game)
+  }, [s])
 
   // gravity — slow, and only while playing
   useEffect(() => {
@@ -246,7 +263,7 @@ export default function BlocksGame({ onBack }) {
     <div className="blocks-screen screen">
       <div className="game-header">
         <button className="btn btn-secondary back-btn" onClick={onBack}>← {t('Back')}</button>
-        <h2>🧱 {t('Calm Blocks')}</h2>
+        <h2><img className="blk-title-icon" src="/other-icons/blocks.svg" alt="" /> {t('Calm Blocks')}</h2>
         <div className="memory-size-toggle" role="group" aria-label={t('Level')}>
           {Object.entries(LEVELS).map(([id, l]) => (
             <button key={id} type="button"
@@ -256,6 +273,11 @@ export default function BlocksGame({ onBack }) {
             </button>
           ))}
         </div>
+        <button type="button" className="btn btn-secondary blk-pause-top"
+          onClick={() => dispatch({ type: 'pause' })}
+          disabled={s.phase !== 'play' && s.phase !== 'paused'}>
+          {s.phase === 'paused' ? '▶ ' + t('Play') : '⏸ ' + t('Pause')}
+        </button>
       </div>
 
       <div className="blk-main">

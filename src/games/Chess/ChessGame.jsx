@@ -10,30 +10,26 @@ import {
 import './Chess.css'
 import { playMove, playCapture, playWin } from '../../sound/sfx'
 import { useT } from '../../i18n'
+import useSaved from '../../hooks/useSaved'
 
 const AI_DELAY = 650
-
-const gameoverVariants = {
-  initial: { opacity: 0, scale: 0.85, y: 20 },
-  animate: { opacity: 1, scale: 1, y: 0, transition: { type: 'spring', stiffness: 280, damping: 24 } },
-}
 
 export default function ChessGame({ onBack }) {
   const t = useT()
   const { theme } = useTheme()
 
-  const [phase, setPhase] = useState('setup')     // 'setup' | 'playing'
-  const [mode,  setMode]  = useState('cpu')        // 'cpu' | 'friends'
+  const [phase, setPhase] = useSaved('chess', 'phase', 'setup')     // 'setup' | 'playing'
+  const [mode,  setMode]  = useSaved('chess', 'mode', 'cpu')        // 'cpu' | 'friends'
 
-  const [board, setBoard] = useState(makeInitialBoard)
-  const [turn,  setTurn]  = useState(WHITE)
-  const [enPassant, setEnPassant] = useState(null)
+  const [board, setBoard] = useSaved('chess', 'board', makeInitialBoard)
+  const [turn,  setTurn]  = useSaved('chess', 'turn', WHITE)
+  const [enPassant, setEnPassant] = useSaved('chess', 'enPassant', null)
   const [selected, setSelected]   = useState(null)
-  const [gameOver, setGameOver]   = useState(false)
-  const [winner, setWinner]       = useState(null) // WHITE | BLACK | 'draw'
-  const [endKind, setEndKind]     = useState(null) // 'checkmate' | 'stalemate'
+  const [gameOver, setGameOver]   = useSaved('chess', 'gameOver', false)
+  const [winner, setWinner]       = useSaved('chess', 'winner', null) // WHITE | BLACK | 'draw'
+  const [endKind, setEndKind]     = useSaved('chess', 'endKind', null) // 'checkmate' | 'stalemate'
   const [aiThinking, setAiThinking] = useState(false)
-  const [log, setLog] = useState([])
+  const [log, setLog] = useSaved('chess', 'log', [])
 
   const aiTimer = useRef(null)
   const stateRef = useRef({})
@@ -198,6 +194,19 @@ export default function ChessGame({ onBack }) {
     )
   }
 
+  // Result shown in the side panel at the end — the board stays visible
+  const resultEmoji = gameOver ? (winner === 'draw' ? '🤝' : (winner === WHITE ? '🏆' : (mode === 'cpu' ? '🤖' : '🏆'))) : null
+  const resultTitle = gameOver ? (winner === 'draw'
+                  ? t('Draw!')
+                  : winner === WHITE && mode === 'cpu' ? t('You win!') : t('{name} wins!', { name: winner === WHITE ? p1Label : p2Label })) : null
+  const resultText = gameOver ? (endKind === 'stalemate'
+                  ? t('Stalemate — nobody can move.') + ' 🤝'
+                  : endKind === 'insufficient'
+                  ? t('Not enough pieces left to checkmate.') + ' 🤝'
+                  : winner === WHITE
+                    ? (mode === 'cpu' ? t('Checkmate! Great game!') + ' 🎉' : '♙ ' + t('{name} checkmates!', { name: t('Player 1') }) + ' 🎉')
+                    : (mode === 'cpu' ? t('Checkmate — nice try, play again!') : '♟ ' + t('{name} checkmates!', { name: t('Player 2') }) + ' 🎉')) : null
+
   // ── Playing screen ──
   return (
     <div className="chess-screen screen">
@@ -216,6 +225,13 @@ export default function ChessGame({ onBack }) {
           </div>
         )}
         {gameOver && (
+          <div className="cs-result" role="status">
+            <span className="cs-result-emoji">{resultEmoji}</span>
+            <b>{resultTitle}</b>
+            <span>{resultText}</span>
+          </div>
+        )}
+        {gameOver && (
           <div className="cs-gameover-btns">
             <button className="btn btn-primary" onClick={startGame}>{t('Play Again')}</button>
             <button className="btn btn-secondary" onClick={restart}>{t('Menu')}</button>
@@ -229,34 +245,10 @@ export default function ChessGame({ onBack }) {
       {/* ── Board area ── */}
       <div className="cs-main">
         <AnimatePresence mode="wait">
-          {gameOver ? (
-            <motion.div
-              key="gameover"
-              className="gameover"
-              variants={gameoverVariants}
-              initial="initial"
-              animate="animate"
-            >
-              <div className="gameover-emoji">{winner === 'draw' ? '🤝' : (winner === WHITE ? '🏆' : (mode === 'cpu' ? '🤖' : '🏆'))}</div>
-              <h2>
-                {winner === 'draw'
-                  ? t('Draw!')
-                  : winner === WHITE && mode === 'cpu' ? t('You win!') : t('{name} wins!', { name: winner === WHITE ? p1Label : p2Label })}
-              </h2>
-              <p>
-                {endKind === 'stalemate'
-                  ? t('Stalemate — nobody can move.') + ' 🤝'
-                  : endKind === 'insufficient'
-                  ? t('Not enough pieces left to checkmate.') + ' 🤝'
-                  : winner === WHITE
-                    ? (mode === 'cpu' ? t('Checkmate! Great game!') + ' 🎉' : '♙ ' + t('{name} checkmates!', { name: t('Player 1') }) + ' 🎉')
-                    : (mode === 'cpu' ? t('Checkmate — nice try, play again!') : '♟ ' + t('{name} checkmates!', { name: t('Player 2') }) + ' 🎉')}
-              </p>
-            </motion.div>
-          ) : (
+          {(
             <motion.div
               key="playing"
-              className="chess-play"
+              className={`chess-play${gameOver ? ' is-over' : ''}`}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1, transition: { duration: 0.3 } }}
             >

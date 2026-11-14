@@ -123,3 +123,8 @@
   .mj-bar .btn { padding: 6px 10px; font-size: 0.85rem; }
   .mj-bar .turn-banner { padding: 6px 12px; font-size: 0.85rem; }
 }
+
+/* phones: the hint text only shows when there are no pairs left, so the bar stays one line */
+@media (max-width: 600px), (max-height: 500px) {
+  .mj-banner:not(.mj-stuck) { display: none; }
+}
